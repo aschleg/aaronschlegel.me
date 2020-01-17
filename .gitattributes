@@ -1,0 +1,6 @@
+$ cat .gitattributes
+
+*.ipynb
+*.ipynb-meta
+plugins/* linguist-vendored
+themes/* linguist-vendored

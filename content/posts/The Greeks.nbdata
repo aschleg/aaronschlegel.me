@@ -1,0 +1,7 @@
+Title: Measuring Sensitivity to Derivatives Pricing Changes with the "Greeks" and Python
+Slug: measure-sensitivity-derivatives-greeks-python
+Date: 2018-01-24
+Category: Python
+Tags: Python, finance, mathematics
+Author: Aaron Schlegel
+Summary: The Greeks are used as risk measures that represent how sensitive the price of derivatives are to change.

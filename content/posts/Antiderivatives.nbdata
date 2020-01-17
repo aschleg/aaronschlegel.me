@@ -1,0 +1,7 @@
+Title: Antiderivatives 
+Slug: antiderivatives
+Date: 2019-02-19
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: Antiderivatives, which are also referred to as indefinite integrals or primitive functions, is essentially the opposite of a derivative (hence the name). More formally, an antiderivative $F$ is a function whose derivative is equivalent to the original function $f$, or stated more concisely: $F^\prime(x) = f(x)$. The Fundamental Theorem of Calculus defines the relationship between differential and integral calculus. We will see later that an antiderivative can be thought of as a restatement of an indefinite integral. Therefore, the discussion of antiderivatives provides a nice segue from the differential to integral calculus. The process of finding an antiderivative of a function is known as antidifferentiation and is the reverse of differentiating a function.

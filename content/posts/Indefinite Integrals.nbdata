@@ -1,0 +1,7 @@
+Title: Indefinite Integrals
+Slug: indefinite-integrals
+Date: 2019-02-20
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: As we noted in the previous sections on the Fundamental Theorem of Calculus and Antiderivatives, indefinite integrals are also called antiderivatives and are the same process. Indefinite integrals are expressed without upper and lower limits on the integrand, the notation $\int f(x)$ is used to denote the function as an antiderivative of $F$. Therefore, $\int f(x) \space dx = F^\prime(x)$.

@@ -1,0 +1,7 @@
+Title: Exploratory Data Analysis of Shelter Cat Outcomes with Pandas and Seaborn
+Slug: exploratory-data-analysis-shelter-cat-outcomes-pandas-seaborn
+Date: 2018-02-12
+Category: Python
+Tags: Python, animal welfare, pandas, seaborn 
+Author: Aaron Schlegel
+Summary: The following post walked through how to extract and transform the shelter outcome data to make it tidy and suitable for data analysis. In this post, we perform exploratory data analysis using pandas and seaborn to investigate and visualize the shelter outcomes of cats. The findings that are garnered from the exploratory data analysis step can help tremendously in the model building phase when we need to select the important features of the data.

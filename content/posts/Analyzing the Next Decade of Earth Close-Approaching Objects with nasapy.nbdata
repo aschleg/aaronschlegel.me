@@ -1,0 +1,7 @@
+Title: Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy
+Slug: analyzing-next-decade-earth-close-approaching-objects-nasapy
+Date: 2020-01-20
+Category: nasapy
+Tags: Python, data analysis, astronomy
+Author: Aaron Schlegel
+Summary: In this example, we will walk through a possible use case of the nasapy library by extracting the next 10 years of close-approaching objects to Earth identified by NASA's Jet Propulsion Laboratory's Small-Body Database. The close_approach method of the nasapy library allows one to access the JPL SBDB to extract data related to known meteoroids and asteroids within proximity to Earth. Setting the parameter return_df=True automatically coerces the returned JSON data into a pandas DataFrame.

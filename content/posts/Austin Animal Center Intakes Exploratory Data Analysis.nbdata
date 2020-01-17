@@ -1,0 +1,7 @@
+Title: Austin Animal Center Intakes Exploratory Data Analysis with Python, Pandas and Seaborn
+Slug: austin-animal-center-intakes-exploratory-data-analysis-python-pandas-seaborn
+Date: 2018-04-12
+Category: Analysis
+Tags: Python, data analysis, animal welfare
+Author: Aaron Schlegel
+Summary: The Austin Animal Center, the largest no-kill municipal shelter in the United States, makes available its collected data on Austin's Open Data Portal. This data includes both animals incoming into the shelter and the animals' outcome. In this post, we perform some exploratory data analysis on the intakes dataset to see if we can find any noticeable trends or interesting pieces of information of the data. First, we will extract the data from Austin's Data Portal, which is supported by Socrata. We will then perform some data transformation and cleaning steps to get the data ready for analysis.

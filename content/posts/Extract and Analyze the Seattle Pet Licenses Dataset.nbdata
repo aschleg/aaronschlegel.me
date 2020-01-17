@@ -1,0 +1,7 @@
+Title: Extract and Analyze the Seattle Pet Licenses Dataset
+Slug: extract-analyze-seattle-pet-licenses-dataset
+Date: 2018-03-19
+Category: Analysis
+Tags: Python, data analysis, animal welfare
+Author: Aaron Schlegel
+Summary: The city of Seattle makes available its database of pet licenses issued from 2005 to the beginning of 2017 as part of the city's ongoing Open Data Initiative. This post will explore extracting the data from Seattle's Open Data portal using requests, then transform the extracted JSON data into a workable dataset with pandas to analyze and investigate the pet license database.

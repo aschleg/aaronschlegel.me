@@ -1,0 +1,7 @@
+Title: Substitution Rule
+Slug: substitution-rule
+Date: 2019-02-20
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: The Substitution Rule is another technique for integrating complex functions and is the corresponding process of integration as the chain rule is to differentiation. The Substitution Rule is applicable to a wide variety of integrals, but is most performant when the integral in question is similar to forms where the Chain Rule would be applicable. In this post, the Substitution Rule is explored with several examples. Python and SymPy are also used to verify our results.

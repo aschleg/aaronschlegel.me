@@ -1,0 +1,7 @@
+Title: Plot Earth Fireball Impacts with nasapy, pandas and folium
+Slug: plot-earth-fireball-impacts-nasapy-pandas-folium
+Date: 2020-01-04
+Category: nasapy
+Tags: Python, data analysis, astronomy
+Author: Aaron Schlegel
+Summary: In this example, we will go through one possible use of the nasapy library by extracting a decade of fireball data from the NASA API and visualizing it on a map. Using the nasapy library, we can extract the last 10 years of fireball data as a pandas DataFrame by calling the fireballs function. The fireballs method does not require authentication to the NASA API, so we can go straight to getting the data.

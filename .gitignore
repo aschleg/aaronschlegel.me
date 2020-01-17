@@ -1,0 +1,12 @@
+$ cat .gitignore
+
+output/
+content/data
+content/figure
+content/draft
+drafts/
+__pycache__/
+.idea/
+_/
+.ipynb_checkpoints/
+.DS_Store

@@ -1,0 +1,7 @@
+Title: Integration by Parts
+Slug: integration-by-parts
+Date: 2019-03-01
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: Integration by parts is another technique for simplifying integrands. As we saw in previous posts, each differentiation rule has a corresponding integration rule. In the case of integration by parts, the corresponding differentiation rule is the Product Rule. This post will introduce the integration by parts formula as well as several worked-through examples.

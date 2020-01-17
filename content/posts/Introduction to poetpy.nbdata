@@ -1,0 +1,7 @@
+Title: Introduction to poetpy 
+Slug: introduction-to-poetpy
+Date: 2018-07-03
+Category: poetpy
+Tags: Python, APIs, poetpy
+Author: Aaron Schlegel
+Summary: The poetpy library is a Python wrapper for the PoetryDB API. The library provides a Pythonic interface for interacting with and extracting information from the PoetryDB database. In this introductory example, we will explore some of the basic functionality of the poetpy library for interacting with the PoetryDB database.

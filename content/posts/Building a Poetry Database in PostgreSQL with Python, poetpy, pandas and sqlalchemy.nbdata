@@ -1,0 +1,7 @@
+Title: Building a Poetry Database in PostgreSQL with Python, poetpy, pandas and Sqlalchemy
+Slug: building-poetry-database-postgresql-python-poetpy-pandas-sqlalchemy
+Date: 2018-07-28
+Category: poetpy
+Tags: Python, APIs, poetpy, databases, SQL
+Author: Aaron Schlegel
+Summary: In this example, we walk through a sample use case of extracting data from a database using an API and then structuring that data in a cohesive manner that allows us to create a relational database that we can then query with SQL statements. The database we will create with the extracted data will use Postgresql. The Python libraries that will be used in this example are poetpy, a Python wrapper for the PoetryDB API written by yours truly, pandas for transforming and cleansing the data as needed, and sqlalchemy for handling the SQL side of things.

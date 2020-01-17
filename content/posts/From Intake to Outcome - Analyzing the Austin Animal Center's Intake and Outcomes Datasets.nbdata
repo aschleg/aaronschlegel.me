@@ -1,0 +1,7 @@
+Title: From Intake to Outcome: Analyzing the Austin Animal Center's Intake and Outcomes Datasets
+Slug: intake-outcome-austin-animal-center-analysis
+Date: 2018-04-20
+Category: Analysis
+Tags: Python, data analysis, animal welfare
+Author: Aaron Schlegel
+Summary: The Austin Animal Center provides its animal intake and outcome datasets on Socrata. When an animal is taken into the shelter, it is given a unique identifier that is also used in the outcomes dataset. We have already investigated and performed exploratory data analysis on the Austin Animal Center's intakes and animal outcomes individually and found several interesting facets of information. In this analysis, we merge the intakes and outcomes dataset using pandas to enable us to perform exploratory data analysis on the merged data. With the data merged, we will be able to explore in more depth the transition from intake to outcome.

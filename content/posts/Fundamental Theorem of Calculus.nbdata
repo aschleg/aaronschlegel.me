@@ -1,0 +1,7 @@
+Title: The Fundamental Theorem of Calculus
+Slug: fundamental-theorem-calculus
+Date: 2019-02-20
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: The Fundamental Theorem of Calculus is a theorem that connects the two branches of calculus, differential and integral, into a single framework. We saw the computation of antiderivatives previously is the same process as integration; thus we know that differentiation and integration are inverse processes. The Fundamental Theorem of Calculus formalizes this connection. The theorem is given in two parts, which we will explore in turn along with Python examples to verify our results.

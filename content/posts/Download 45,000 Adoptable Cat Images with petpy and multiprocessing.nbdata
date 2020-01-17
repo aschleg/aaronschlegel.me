@@ -1,0 +1,7 @@
+Title: Download 45,000 Adoptable Cat Images in 6.5 Minutes with petpy and multiprocessing
+Slug: download-45k-cat-images-petpy-multiprocessing
+Date: 2018-01-10
+Category: Python
+Tags: Python, petpy, multiprocessing
+Author: Aaron Schlegel
+Summary: Using petpy and multiprocessing to download 45,000 cat images in 6.5 minutes

@@ -1,0 +1,7 @@
+Title: L'Hospital's Rule for Calculating Limits and Indeterminate Forms
+Slug: lhospital-rule-calculating-limits-indeterminate-forms
+Date: 2019-02-21
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: L'Hospital's Rule allows us to simplify the evaluation of limits that involve indeterminate forms. An indeterminate form is defined as a limit that does not give enough information to determine the original limit. In this post, we explore several examples of indeterminate forms and how to calculate their limits using L'Hospital's Rule. We also leverage Python and SymPy to verify our answers.

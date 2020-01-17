@@ -1,0 +1,7 @@
+Title: Newton's Method for Finding Equation Roots
+Slug: newtons-method-equation-roots
+Date: 2019-02-19
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: Newton's method, also known as Newton-Raphson, is an approach for finding the roots of nonlinear equations and is one of the most common root-finding algorithms due to its relative simplicity and speed. The root of a function is the point at which $f(x) = 0$. This post explores the how Newton's Method works for finding roots of equations and walks through several examples with SymPy to verify our answers.

@@ -1,0 +1,7 @@
+Title: Put-Call Parity of Vanilla European Options and Python Implementation
+Slug: put-call-parity-euro-options-python
+Date: 2018-01-11
+Category: Python
+Tags: Python, finance, mathematics
+Author: Aaron Schlegel
+Summary: Introduces the put-call parity as identified by Hans Stoll in 1969 as well as Python code for computing the put-call parity both numerically and symbolically.

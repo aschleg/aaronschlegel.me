@@ -1,0 +1,7 @@
+Title: Predicting Shelter Cat Adoptions and Transfers with Scikit-learn and Machine Learning
+Slug: predict-shelter-cat-outcomes-scikit-learn-machine-learning
+Date: 2018-03-06
+Category: Machine Learning
+Tags: Python, animal welfare, scikit-learn, machine learning
+Author: Aaron Schlegel
+Summary: Following from the previous analyses of the Austin Animal Center's shelter outcomes dataset, we now take what we learned from the exploratory data analysis component of the investigation and build and train a machine learning model for predicting if a cat entering the shelter will be adopted or transferred to a partner facility. Adoptions and transfers make up about 90% of all the outcomes.

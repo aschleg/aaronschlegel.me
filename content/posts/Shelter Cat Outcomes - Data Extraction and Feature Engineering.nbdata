@@ -1,0 +1,7 @@
+Title: Extraction and Feature Engineering of Animal Austin Center's Shelter Outcomes Dataset using Requests and Pandas
+Slug: extraction-feature-engineering-aac-data-requests-pandas
+Date: 2018-02-05
+Category: Python
+Tags: Python, animal welfare, pandas, seaborn 
+Author: Aaron Schlegel
+Summary: The Austin Animal Center, the largest no-kill municipal animal shelter in the United States, makes available its shelter animal outcomes dataset as patrt of the City of Austin's Open Data program. This post demonstrates how to extract the data from the City of Austin's Open Data portal using the requests library and convert the resulting JSON to a tabular pandas DataFrame. We will then enrich the data by applying feature engineering to the data to add more information, which should help improve the outcome prediction model.

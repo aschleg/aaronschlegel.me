@@ -1,0 +1,7 @@
+Title: Implied Volatility Calculations with Python
+Slug: implied-volatility-functions-python
+Date: 2018-01-16
+Category: Python
+Tags: Python, finance, mathematics
+Author: Aaron Schlegel
+Summary: Discusses calculations of the implied volatility measure in pricing security options with the Black-Scholes model.

@@ -1,0 +1,7 @@
+Title: Derivatives of Logarithmic Functions
+Slug: logarithmic-functions-derivatives
+Date: 2019-02-17
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: Implicit differentiation can also be employed to find the derivatives of logarithmic functions, which are of the form $y = \log_a{x}$. In this post, we explore several derivatives of logarithmic functions and also prove some commonly used derivatives. The symbolic computation library SymPy is also employed to verify our answers.

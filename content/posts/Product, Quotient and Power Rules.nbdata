@@ -1,0 +1,7 @@
+Title: Product, Quotient and Power Rules of Differentiation
+Slug: product-quotient-power-rules-differentiation
+Date: 2019-02-17
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: Several rules exist for finding the derivatives of functions with several components such as $x \space sin \space x$. With these rules and the chain rule, which will be explored later, any derivative of a function can be found (assuming they exist). There are five rules that help simplify the computation of derivatives, of which each will be explored in turn. We will also take advantage of SymPy to perform symbolic computations to confirm our results.

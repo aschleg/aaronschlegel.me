@@ -1,0 +1,7 @@
+Title: Analyzing the Consumer Complaints Database with Python, SQL and Plotly
+Slug: analyze-consumer-complaints-database-python-sql-plotly
+Date: 2018-02-08
+Category: SQL
+Tags: Python, SQL, Plotly
+Author: Aaron Schlegel
+Summary: The consumer complaints database is a collection of complaints received by the Bureau of Consumer Financial Protection related to financial products and services. This post explores creating a database file using SQLite and analyzing the data with Pandas and Plotly.

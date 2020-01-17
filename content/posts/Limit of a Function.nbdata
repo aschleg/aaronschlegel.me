@@ -1,0 +1,7 @@
+Title: Limit of a Function
+Slug: limit-function
+Date: 2019-02-17
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: A function limit, roughly speaking, describes the behavior of a function around a specific value. Limits play a role in the definition of the derivative and function continuity and are also used in the convergent sequences. In this post, we will explore the definition of a function limit and some other limit laws using examples with Python.

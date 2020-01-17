@@ -1,0 +1,7 @@
+Title: The Chain Rule of Differentiation
+Slug: chain-rule-differentiation
+Date: 2019-02-17
+Category: Calculus
+Tags: mathematics, calculus, Python
+Author: Aaron Schlegel
+Summary: The chain rule is a powerful and useful derivation technique that allows the derivation of functions that would not be straightforward or possible with the only the previously discussed rules at our disposal. The rule takes advantage of the "compositeness" of a function. In this post, we will explore several examples of the chain rule and will also confirm our results using the SymPy symbolic computation library.
