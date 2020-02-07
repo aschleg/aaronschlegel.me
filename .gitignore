@@ -5,6 +5,7 @@ content/data
 content/figure
 content/draft
 drafts/
+themes/gum/static/fonts/Univers
 __pycache__/
 .idea/
 _/

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
+
 from __future__ import unicode_literals
 
 AUTHOR = 'Aaron Schlegel'
@@ -52,4 +53,4 @@ SOCIAL = (('Github', 'https://github.com/aschleg'),
 DEFAULT_PAGINATION = 100
 
 # Uncomment following line if you want document-relative URLs when developing
-# RELATIVE_URLS = True
+RELATIVE_URLS = True

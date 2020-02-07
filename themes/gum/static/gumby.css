@@ -1,6 +1,50 @@
 @charset "UTF-8";
-@import url(//fonts.googleapis.com/css?family=Lato|Lora);
+@import url(https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap);
 
+/* Fonts
+--------------------------------------------------------- */
+
+@font-face {
+    font-family: 'Univers LT Roman';
+    src: url('fonts/Univers/UniversLT-55Rm.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Univers LT Bold';
+    src: url('fonts/Univers/UniversLT-65Bd.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Univers LT Oblique';
+    src: url('fonts/Univers/UniversLT-55Obl.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Univers LT Black';
+    src: url('fonts/Univers/UniversLT-75Blk.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Univers LT Extra Black';
+    src: url('fonts/Univers/UniversLT-85XBlk.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Univers LT';
+    src: url('fonts/Univers/UniversLT-45Lt.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -134,11 +178,12 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Lora', serif; /*"Roboto", sans-serif;*/
+  font-family: 'Univers LT Roman', sans-serif;
+  font-variant: all-small-caps;
   color: #052D3E;
   text-rendering: optimizeLegibility;
   padding-top: 0.273em;
-  line-height: 1.15538em;
+  line-height: 0.75em;
   padding-bottom: 0.273em;
 }
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -169,17 +214,17 @@ h1.absurd {
 
 h2 {
   font-size: 42px;
-  font-size: 2.625rem;
+  font-size: 3rem;
 }
 
 h3 {
   font-size: 30px;
-  font-size: 1.875rem;
+  font-size: 2rem;
 }
 
 h4 {
   font-size: 26px;
-  font-size: 1.625rem;
+  font-size: 1.5rem;
 }
 
 h5 {
@@ -210,23 +255,24 @@ h6 {
 }
 
 /*=====================================================
- 
+
   Links & Paragraph styles
-  
+
   ======================================================*/
 p {
   font-family: "Lato", sans-serif;
   font-weight: 400;
-  font-size: 18px;
-  font-size: 1rem;
+  font-size: 17px;
   margin-bottom: 13px;
   line-height: 1.625em;
 }
+
 p.lead {
   font-size: 20px;
   font-size: 1.25rem;
   margin-bottom: 18px;
 }
+
 @media only screen and (max-width: 768px) {
   p {
     font-size: 17.6px;
@@ -241,6 +287,7 @@ a {
   outline: 0;
   line-height: inherit;
 }
+
 a:hover {
   color: #D87D0F;
 }
@@ -248,7 +295,7 @@ a:hover {
 /*=====================================================
 
   Lists
-  
+
  ======================================================*/
 ul, ol {
   margin-bottom: 0.273em;
@@ -471,6 +518,15 @@ abbr {
 .column, .columns {
   margin-left: 1.81818%;
   float: left;
+  min-height: 1px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.column-right, .columns-right {
+  margin-left: 1.81818%;
+  float: right !important;
   min-height: 1px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1040,10 +1096,10 @@ img {
     font-size: 1.875rem;
   }
   .navbar a.toggle:hover {
-    background: #565a5d;
+    color: #565a5d;
   }
   .navbar a.toggle:active, .navbar a.toggle.active {
-    background: #3e4043;
+    color: #3e4043;
   }
 }
 .navbar .logo {

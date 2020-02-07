@@ -1,18 +1,59 @@
-/*
- Author : Nick Rance
-
- - Credits
- - 	Main CSS from Gumby framework
- - 	Some CSS from Twitter Bootstrap - http://twitter.github.io/bootstrap/
-
-*/
-
-
 /* Code Highlighting */
+
+.project-border {
+  border-bottom: 2px solid black;
+}
+
+.project-header {
+  margin-top: 20px;
+}
+
+ul.blank > li {
+  font-family: 'Univers LT Roman';
+  font-variant: all-small-caps;
+  font-size: 1.4em;
+}
+
+.navbar ul li {
+  font-family: 'Univers LT Roman', sans-serif;
+  font-variant: all-small-caps;
+}
+
+.navbar ul li > a {
+  font-size: 1.5rem;
+  text-shadow: none;
+  color: black;
+}
+
+.navbar {
+  background: none;
+  margin-bottom: 2rem;
+}
+
+ul.columns-right li a:hover {
+  color: #0e90f8;
+  background: none !important;
+}
+
+ul.columns-right li a:active {
+  color: #0e90f8;
+  background: none !important;
+}
+
+abbr {
+  font-family: 'Univers LT Roman';
+  font-size: 1em;
+}
+
+address {
+  font-family: 'Univers LT Roman';
+  font-size: 15px;
+}
+
 code,
 pre {
   padding: 0 3px 2px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: "Roboto Mono", monospace;
   font-size: 12px;
   color: #333333;
   -webkit-border-radius: 3px;
@@ -21,6 +62,7 @@ pre {
 }
 
 code {
+  font-size: .8em;
   padding: 2px 4px;
   color: #d14;
   white-space: nowrap;
@@ -63,9 +105,6 @@ pre code {
   max-height: 340px;
   overflow-y: scroll;
 }
-
-
-
 
 
 /* Table
@@ -158,10 +197,9 @@ table th[class*="span"],
 #banner h1 { font-size:3.25rem }
 
 .no-touch .navbar ul li.active > a {
-  
   background: #868d92;
-
 }
+
 /* Posts
 --------------------------------------------------------- */
 
@@ -183,6 +221,16 @@ address { font-size:14px; margin-bottom:10px;}
 
 .btn > a, .btn input, .btn button, .skiplink > a, .skiplink input, .skiplink button {
   color: #052D3E;
+}
+
+/* Footer
+--------------------------------------------------------- */
+.bg { background:#eee; margin-top:35px; padding-top:25px; border-top:5px solid #D87D0F; }
+
+/* Responsive fixes
+--------------------------------------------------------- */
+@media only screen and (max-width: 600px) {
+  #banner h1 a {font-size:22px!important; line-height:24px;}
 }
 
 /* Typography
@@ -224,17 +272,4 @@ p a {
 p a:visited {
   color: #A63305 !important;
   text-decoration: none;
-}
-
-
-/* Footer
---------------------------------------------------------- */
-.bg { background:#eee; margin-top:35px; padding-top:25px; border-top:5px solid #D87D0F; }
-
-
-
-/* Responsive fixes
---------------------------------------------------------- */
-@media only screen and (max-width: 600px) {
-  #banner h1 a {font-size:22px!important; line-height:24px;}
 }
