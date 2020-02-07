@@ -1,45 +1,5 @@
 /* Code Highlighting */
 
-.project-border {
-  border-bottom: 2px solid black;
-}
-
-.project-header {
-  margin-top: 20px;
-}
-
-ul.blank > li {
-  font-family: 'Univers LT Roman';
-  font-variant: all-small-caps;
-  font-size: 1.4em;
-}
-
-.navbar ul li {
-  font-family: 'Univers LT Roman', sans-serif;
-  font-variant: all-small-caps;
-}
-
-.navbar ul li > a {
-  font-size: 1.5rem;
-  text-shadow: none;
-  color: black;
-}
-
-.navbar {
-  background: none;
-  margin-bottom: 2rem;
-}
-
-ul.columns-right li a:hover {
-  color: #0e90f8;
-  background: none !important;
-}
-
-ul.columns-right li a:active {
-  color: #0e90f8;
-  background: none !important;
-}
-
 abbr {
   font-family: 'Univers LT Roman';
   font-size: 1em;
@@ -200,6 +160,38 @@ table th[class*="span"],
   background: #868d92;
 }
 
+ul.blank > li {
+  font-family: 'Univers LT Roman';
+  font-variant: all-small-caps;
+  font-size: 1.4em;
+}
+
+.navbar ul li {
+  font-family: 'Univers LT Roman', sans-serif;
+  font-variant: all-small-caps;
+}
+
+.navbar ul li > a {
+  font-size: 1.5rem;
+  text-shadow: none;
+  color: black;
+}
+
+.navbar {
+  background: none;
+  margin-bottom: 2rem;
+}
+
+ul.columns-right li a:hover {
+  color: #0e90f8;
+  background: none !important;
+}
+
+ul.columns-right li a:active {
+  color: #0e90f8;
+  background: none !important;
+}
+
 /* Posts
 --------------------------------------------------------- */
 
@@ -272,4 +264,21 @@ p a {
 p a:visited {
   color: #A63305 !important;
   text-decoration: none;
+}
+
+/* Other
+--------------------------------------------------------- */
+
+.project-border {
+  border-bottom: 2px solid black;
+}
+
+.project-header {
+  margin-top: 20px;
+}
+
+.blog-header {
+  font-family: 'Univers LT Bold';
+  font-variant: all-small-caps;
+  font-size: 5rem !important;
 }

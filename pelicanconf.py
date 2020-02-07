@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'Aaron Schlegel'
-SITENAME = ''
+SITENAME = "Aaron Schlegel's Notebook of Interesting Things"
 SITESUBTITLE = ''
 SITEURL = 'https://aaronschlegel.me'
 

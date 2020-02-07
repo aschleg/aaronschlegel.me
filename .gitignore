@@ -1,13 +1,9 @@
 $ cat .gitignore
 
 output/
-content/data
-content/figure
 content/draft
-drafts/
 themes/gum/static/fonts/Univers
 __pycache__/
 .idea/
-_/
 .ipynb_checkpoints/
 .DS_Store
