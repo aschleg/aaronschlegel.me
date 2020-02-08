@@ -1,47 +1,34 @@
 @charset "UTF-8";
-@import url(https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap);
 
 /* Fonts
 --------------------------------------------------------- */
 
+@import url(https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap);
+
 @font-face {
     font-family: 'Univers LT Roman';
-    src: url('fonts/Univers/UniversLT-55Rm.woff') format('woff');
+    src: url('../fonts/Univers/UniversLT-55Rm.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Univers LT Bold';
-    src: url('fonts/Univers/UniversLT-65Bd.woff') format('woff');
+    src: url('../fonts/Univers/UniversLT-65Bd.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Univers LT Oblique';
-    src: url('fonts/Univers/UniversLT-55Obl.woff') format('woff');
+    src: url('../fonts/Univers/UniversLT-55Obl.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'Univers LT Black';
-    src: url('fonts/Univers/UniversLT-75Blk.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Univers LT Extra Black';
-    src: url('fonts/Univers/UniversLT-85XBlk.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
-}
-
-@font-face {
     font-family: 'Univers LT';
-    src: url('fonts/Univers/UniversLT-45Lt.woff') format('woff');
+    src: url('../fonts/Univers/UniversLT-45Lt.woff') format('woff');
     font-weight: 300;
     font-style: normal;
 }
@@ -173,8 +160,8 @@ html, body {
   font-family: "entypo";
   font-style: normal;
   font-weight: 400;
-  src: url(fonts/icons/entypo.eot);
-  src: url("fonts/icons/entypo.eot?#iefix") format("ie9-skip-eot"), url("fonts/icons/entypo.woff") format("woff"), url("fonts/icons/entypo.ttf") format("truetype");
+  src: url(../fonts/icons/entypo.eot);
+  src: url("../fonts/icons/entypo.eot?#iefix") format("ie9-skip-eot"), url("../fonts/icons/entypo.woff") format("woff"), url("../fonts/icons/entypo.ttf") format("truetype");
 }
 
 h1, h2, h3, h4, h5, h6 {

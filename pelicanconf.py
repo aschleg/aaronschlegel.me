@@ -7,6 +7,7 @@ AUTHOR = 'Aaron Schlegel'
 SITENAME = "Aaron Schlegel's Notebook of Interesting Things"
 SITESUBTITLE = ''
 SITEURL = 'https://aaronschlegel.me'
+SITE_SUMMARY = 'The Blog and Notebooks of Aaron Schlegel'
 
 MARKUP = ('md', 'ipynb')
 
@@ -28,7 +29,7 @@ IGNORE_FILES = ['content/draft', '.ipynb_checkpoints']
 GITHUB_URL = 'https://github.com/aschleg'
 TWITTER_URL = 'http://www.twitter.com/Aaron_Schlegel'
 GOOGLEPLUS_URL = 'https://plus.google.com/u/0/102881569650657098667'
-
+TWITTER_USERNAME = '@Aaron_Schlegel'
 GOOGLE_ANALYTICS_ID = 'UA-48350829-2'
 GOOGLE_ANALYTICS_SITENAME = 'aaronschlegel.me'
 
@@ -50,7 +51,7 @@ SOCIAL = (('Github', 'https://github.com/aschleg'),
           ('Linkedin', 'https://linkedin.com/in/aaronschlegel'),
           ('Twitter', 'http://www.twitter.com/Aaron_Schlegel'),)
 
-DEFAULT_PAGINATION = 100
+DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
-RELATIVE_URLS = True
+#RELATIVE_URLS = True

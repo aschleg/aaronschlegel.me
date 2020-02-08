@@ -33,13 +33,14 @@
 
         <!-- Mobile viewport optimized: j.mp/bplateviewport -->
         <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta property="og:site_name" content="{{ SITENAME }}" />
+        <meta property="og:type" content="article" />
+        <meta name="twitter:site" content="{{ TWITTER_USERNAME }}" />
+        <meta name="twitter:creator" content="{{ TWITTER_USERNAME }}" />
 
-        <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/gumby.css" />
-        <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/style.css" />
-        <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/pygment.css" />
+        <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/styles.min.css" />
 
         <script src="{{ SITEURL }}/theme/js/libs/modernizr-2.6.2.min.js"></script>
-
 
           {% if GOOGLE_ANALYTICS_ID %}
               <script>
@@ -157,8 +158,8 @@
 
 {% include 'disqus_script.html' %}
 {% include 'piwik.html' %}
-  <script src="{{ SITEURL }}/theme/js/libs/jquery-1.9.1.min.js"></script>
-  <script src="{{ SITEURL }}/theme/js/libs/gumby.min.js"></script>
-  <script src="{{ SITEURL }}/theme/js/plugins.js"></script>
+  <script src="{{ SITEURL }}/theme/js/libs/jquery-1.9.1.min.gz.js"></script>
+  <script src="{{ SITEURL }}/theme/js/libs/gumby.min.gz.js"></script>
+  <script src="{{ SITEURL }}/theme/js/plugins.gz.js"></script>
 </body>
 </html>
