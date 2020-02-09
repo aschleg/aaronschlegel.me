@@ -202,5 +202,4 @@ Algorithm for Cholesky decomposition. Retrieved from
 Cholesky decomposition (2016). In Wikipedia. Retrieved from
 <https://en.wikipedia.org/wiki/Cholesky_decomposition>
 
-Rencher, A. (2002). Methods of Multivariate Analysis (Second Edition
-ed.)
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)

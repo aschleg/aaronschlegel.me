@@ -181,3 +181,10 @@ Conclusion
 ----------
 
 In this post, the Kruskal-Wallis test for comparing more than two groups with non-normal distributions was investigated using two implementations in base R and the `agricolae` package. The test was also manually calculated to verify the results. As demonstrated in this post, the Kruskal-Wallis test performs just as well with approximately normally distributed data.
+
+References
+----------
+
+[Corder, Gregory W.; Foreman, Dale I. (2009). Nonparametric Statistics for Non-Statisticians. Hoboken: John Wiley & Sons.](https://amzn.to/3blPBbR)
+
+[Siegel; Castellan (1988). Nonparametric Statistics for the Behavioral Sciences (Second ed.). New York: McGraw–Hill.](https://amzn.to/2S8D2cc)

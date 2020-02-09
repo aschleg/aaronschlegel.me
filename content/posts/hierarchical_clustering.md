@@ -367,15 +367,14 @@ the average linkage method are the overall best performers (Rencher,
 References
 ----------
 
-Gan, Guojun, Chaoqun Ma, and Jianhong Wu, Data Clustering: Theory,
+[Gan, Guojun, Chaoqun Ma, and Jianhong Wu, Data Clustering: Theory,
 Algorithms, and Applications, ASA-SIAM Series on Statistics and Applied
-Probability, SIAM, Philadelphia, ASA, Alexandria, VA, 2007.
+Probability, SIAM, Philadelphia, ASA, Alexandria, VA, 2007.](https://amzn.to/2UyYnxe)
 
 Murtagh, F. (n.d.). Multivariate Data Analysis with Fortran C and Java.
 Queenâs University Belfast.
 
-Rencher, A. (2002). Methods of Multivariate Analysis (2nd ed.). Brigham
-Young University: John Wiley & Sons, Inc.
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)
 
 <http://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/1999/clustering/node12.html#SECTION00033100000000000000>
 

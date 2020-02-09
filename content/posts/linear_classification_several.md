@@ -254,4 +254,4 @@ table(root$Tree.Number, root.cv$class, dnn = c('Actual Group','Predicted Group')
 References
 ----------
 
-Rencher, A. (n.d.). Methods of Multivariate Analysis (2nd ed.). Brigham Young University: John Wiley & Sons, Inc.
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)

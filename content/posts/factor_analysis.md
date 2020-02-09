@@ -427,8 +427,7 @@ loadings to help improve interpretation of the factors.
 References
 ----------
 
-Rencher, A. (2002). Methods of Multivariate Analysis (2nd ed.). Brigham
-Young University: John Wiley & Sons, Inc.
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)
 
 <http://web.stanford.edu/class/psych253/tutorials/FactorAnalysis.html>
 

@@ -243,8 +243,8 @@ Barile, Margherita. "Singleton Set." From MathWorld--A Wolfram Web
 Resource, created by Eric W. Weisstein.
 <http://mathworld.wolfram.com/SingletonSet.html>
 
-Enderton, H. (1977). Elements of set theory (1st ed.). New York:
-Academic Press.
+[Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.](https://amzn.to/2SsiA5g)
 
 Weisstein, Eric W. "Empty Set." From MathWorld--A Wolfram Web Resource.
 <http://mathworld.wolfram.com/EmptySet.html>

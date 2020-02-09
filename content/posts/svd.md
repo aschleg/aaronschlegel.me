@@ -296,8 +296,8 @@ Baker, K. (2005, March). Singular value decomposition Tutorial.
 Retrieved from
 <https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf>
 
-Rencher, A. (n.d.). Methods of Multivariate Analysis (2nd ed.). Brigham
-Young University: John Wiley & Sons, Inc.
+[Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.](https://amzn.to/2SsiA5g)
 
 Singular value decomposition (SVD). Retrieved from
 <https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf>

@@ -352,6 +352,6 @@ Inverse matrix of 2x2 matrix, 3x3 matrix, 4x4 matrix. Retrieved August
 10, 2016, from
 <http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html>
 
-Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., & Wasserman, W.
+[Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., & Wasserman, W.
 (2004). Applied linear statistical models (5th ed.). Boston, MA:
-McGraw-Hill Higher Education.
+McGraw-Hill Higher Education.](https://amzn.to/2vcB1my)

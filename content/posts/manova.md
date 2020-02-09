@@ -318,6 +318,6 @@ This post explored the extension of ANOVA to multiple dependent variables known 
 References
 ----------
 
-Andrews, D. F., and Herzberg, A. M. (1985), Data, New York: Springer-Verlag.
+[Andrews, D. F., and Herzberg, A. M. (1985), Data, New York: Springer-Verlag.](https://amzn.to/2HizNch)
 
-Rencher, A. (n.d.). Methods of Multivariate Analysis (2nd ed.). Brigham Young University: John Wiley & Sons, Inc.
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)

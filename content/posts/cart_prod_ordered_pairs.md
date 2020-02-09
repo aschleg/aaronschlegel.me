@@ -230,8 +230,8 @@ $(A ∪ B) × C = (A × C) ∪ (B × C)$.
 References
 ----------
 
-Enderton, H. (1977). Elements of set theory (1st ed.). New York:
-Academic Press.
+[Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.](https://amzn.to/2SsiA5g)
 
 MacGillivray, G. Cartesian Products and Relations. Victoria, BC.
 Retrieved from <http://www.math.uvic.ca/faculty/gmacgill/guide/RF.pdf>

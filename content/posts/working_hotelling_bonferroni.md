@@ -163,6 +163,8 @@ References
 
 Feng, Y. Simultaneous inferences and other topics in regression analysis. Retrieved from <http://www.stat.columbia.edu/~yangfeng/W4315/lectures/lecture-4/lecture_4.pdf>
 
-Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., & Wasserman, W. (2004). Applied linear statistical models (5th ed.). Boston, MA: McGraw-Hill Higher Education.
+[Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., & Wasserman, W.
+(2004). Applied linear statistical models (5th ed.). Boston, MA:
+McGraw-Hill Higher Education.](https://amzn.to/2vcB1my)
 
 Why are simultaneous confidence intervals wider than the normal ones? (2016). Retrieved from <http://stats.stackexchange.com/questions/188372/why-are-simultaneous-confidence-intervals-wider-than-the-normal-ones>

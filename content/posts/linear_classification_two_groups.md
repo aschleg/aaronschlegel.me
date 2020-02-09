@@ -194,4 +194,4 @@ This post explored the predictive aspect of linear discriminant analysis as well
 References
 ----------
 
-Rencher, A. (n.d.). Methods of Multivariate Analysis (2nd ed.). Brigham Young University: John Wiley & Sons, Inc.
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)

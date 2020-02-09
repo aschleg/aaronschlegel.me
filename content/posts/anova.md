@@ -192,3 +192,8 @@ Conclusion
 ----------
 
 In this example, a hypothesis was tested with data from more than two treatments using One-way ANOVA. The reported ANOVA table from the `anova()` function was then replicated manually to verify the results. The test concluded there is a difference between the three treatments, however, nothing more than that is known. Which group is the most different from the others? How much do the two treatments defer from the control? Typically after performing a test involving more than two groups, post-hoc analysis is done to answer these questions.
+
+References
+----------
+
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)

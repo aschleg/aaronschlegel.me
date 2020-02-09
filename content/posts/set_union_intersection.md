@@ -169,4 +169,5 @@ Axiom schema of specification. (2017, May 27). In Wikipedia, The Free Encycloped
 
 Axiom of union. (2017, May 27). In Wikipedia, The Free Encyclopedia. From <https://en.wikipedia.org/w/index.php?title=Axiom_of_union&oldid=782595523>
 
-Enderton, H. (1977). Elements of set theory (1st ed.). New York: Academic Press.
+[Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.](https://amzn.to/2SsiA5g)

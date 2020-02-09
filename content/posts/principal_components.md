@@ -630,8 +630,8 @@ technique.
 References
 ----------
 
-Joliffe, I. T. (2002). Principal Component Analysis (2nd ed.). Springer.
+[Joliffe, I. T. (2002). Principal Component Analysis (2nd ed.). Springer.](https://amzn.to/2H8GIoi)
 
-Rencher, A. (n.d.). Methods of Multivariate Analysis (2nd ed.)
+[Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.](https://amzn.to/39gsldt)
 
 <https://onlinecourses.science.psu.edu/stat505/node/54>

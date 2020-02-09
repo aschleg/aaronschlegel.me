@@ -246,5 +246,5 @@ Fourth identity: $A ∩ −A = ⌀$
 References
 ----------
 
-Enderton, H. (1977). Elements of set theory (1st ed.). New York:
-Academic Press.
+[Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.](https://amzn.to/2SsiA5g)
