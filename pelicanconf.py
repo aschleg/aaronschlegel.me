@@ -12,7 +12,7 @@ SITE_SUMMARY = 'The Blog and Notebooks of Aaron Schlegel'
 MARKUP = ('md', 'ipynb')
 
 PLUGIN_PATHS = ['./plugins']
-PLUGINS = ['ipynb.markup', 'rmd_reader', 'render_math']
+PLUGINS = ['related_posts', 'ipynb.markup', 'rmd_reader', 'render_math']
 
 THEME = 'themes/gum'
 
@@ -52,6 +52,9 @@ SOCIAL = (('Github', 'https://github.com/aschleg'),
           ('Twitter', 'http://www.twitter.com/Aaron_Schlegel'),)
 
 DEFAULT_PAGINATION = 10
+
+# Related Posts
+RELATED_POSTS_MAX = 5
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
