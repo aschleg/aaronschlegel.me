@@ -282,3 +282,12 @@ p a:visited {
   font-variant: all-small-caps;
   font-size: 5rem !important;
 }
+
+.project-description {
+  margin-top: 0.75em;
+}
+
+.project-description-header {
+  font-family: 'Univers LT Bold';
+  border-bottom: 1px solid black;
+}

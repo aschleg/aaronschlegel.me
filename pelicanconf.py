@@ -51,7 +51,7 @@ SOCIAL = (('Github', 'https://github.com/aschleg'),
           ('Linkedin', 'https://linkedin.com/in/aaronschlegel'),
           ('Twitter', 'http://www.twitter.com/Aaron_Schlegel'),)
 
-DEFAULT_PAGINATION = 10
+DEFAULT_PAGINATION = 20
 
 # Related Posts
 RELATED_POSTS_MAX = 5
