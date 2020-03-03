@@ -17,7 +17,7 @@ Consider an experiment designed to test plant yields from a control and two diff
 
 There is no reason to assume there is a difference between the control and the two treatments so the hypothesis for this example can, therefore, be stated as:
 
-$$ H_0 : \mu_c = \mu_t_1 = \mu_t_2 $$
+$$ H_0 : \mu_c = \mu_{t_1} = \mu_{t_2} $$
 $H_A$ : At least one mean between the control and the two treatments is not equal.
 
 First, start by loading the packages that will be needed to analyze the data as well as the dataset. The `PlantGrowth` dataset is available with base R.
@@ -43,13 +43,13 @@ ggplot(PlantGrowth, aes(PlantGrowth$weight)) +
 
     ## Warning: Ignoring unknown aesthetics: data
 
-![](figure/anova/plantgrowth_histogram.png)
+![](../figure/anova/plantgrowth_histogram.png)
 
 ``` r
 qqPlot(PlantGrowth$weight, col = PlantGrowth$group)
 ```
 
-![](figure/anova/plantgrowth_qqplot.png)
+![](../figure/anova/plantgrowth_qqplot.png)
 
     ## [1] 14 16
 
