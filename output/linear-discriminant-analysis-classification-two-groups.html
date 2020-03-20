@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Linear Discriminant Analysis for the Classification of Two Groups</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="In this post, we will use the discriminant functions found in the first post to classify the observations. We will also employ cross-validation on the predicted groups to get a realistic sense of how the model would perform in practice on new observations. Linear classification analysis assumes the populations have equal covariance matrices (\(\Sigma_1 = \Sigma_2\)) but does not assume the data are normally distributed. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Linear Discriminant Analysis for the Classification of Two Groups" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-08-24 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="In this post, we will use the discriminant functions found in the first post to classify the observations. We will also employ cross-validation on the predicted groups to get a realistic sense of how the model would perform in practice on new observations. Linear classification analysis assumes the populations have equal covariance matrices (\(\Sigma_1 = \Sigma_2\)) but does not assume the data are normally distributed. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html" rel="bookmark"
+                   title="Permalink to Linear Discriminant Analysis for the Classification of Two Groups">Linear Discriminant Analysis for the Classification of Two Groups</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-08-24T00:00:00-07:00">
+                Fri 24 August 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>The second objective of linear discriminant analysis is the classification of observations. A previous post explored the <a href="http://wp.me/p4aZEo-5Os">descriptive aspect of linear discriminant analysis</a> with data collected on two groups of beetles. In this post, we will use the discriminant functions found in the first post to classify the observations. We will also employ cross-validation on the predicted groups to get a realistic sense of how the model would perform in practice on new observations. Linear classification analysis assumes the populations have equal covariance matrices (<span class="math">\(\Sigma_1 = \Sigma_2\)</span>) but does not assume the data are normally distributed.</p>
+<h2>Classification with Linear Discriminant Analysis</h2>
+<p>The classification portion of LDA can be employed after calculating <span class="math">\(\bar{y}_1, \bar{y}_2\)</span> and <span class="math">\(S_{p1}\)</span>. The procedure for classifying observations is based on the discriminant functions:</p>
+<div class="math">$$ z = a'y = (\bar{y}_1 - \bar{y}_2)'S_{p1}^{-1}y $$</div>
+<p><span class="math">\(y\)</span> is the vector of measurements to be classified. The discriminant functions <span class="math">\(z_1\)</span> and <span class="math">\(z_2\)</span> for the two groups are used to determine to which group the observation vector belongs. The classification procedure assigns the observation vector <span class="math">\(y\)</span> to group 1 if its discriminant function <span class="math">\(z = a′y\)</span> is closer to <span class="math">\(z_1\)</span> or group 2 if its discriminant function is closer to <span class="math">\(z\)</span>.</p>
+<div class="math">$$ z &gt; \frac{1}{2}(\bar{z}_1 + \bar{z}_2) $$</div>
+<p>We can now express the classification function regarding the observation vector <span class="math">\(y\)</span>.</p>
+<div class="math">$$ \frac{1}{2}(\bar{z}_1 + \bar{z}_2) = \frac{1}{2}(\bar{y}_1 - \bar{y}_2)'S_{p1}^{-1}(\bar{y}_1 + \bar{y}_2) $$</div>
+<p>Thus the observation vector <span class="math">\(y\)</span> is assigned to a group determined by the following:</p>
+<p>Assign <span class="math">\(y\)</span> to group 1 if:
+</p>
+<div class="math">$$ a'y = (\bar{y}_1 - \bar{y}_2)'S_{p1}y &gt; \frac{1}{2}(\bar{y}_1 - \bar{y}_2)'S_{p1}^{-1}(\bar{y}_1 + \bar{y}_2) $$</div>
+<p>Or assign <span class="math">\(y\)</span> to group 2 if:
+</p>
+<div class="math">$$ a'y = (\bar{y}_1 - \bar{y}_2)'S_{p1}y &lt; \frac{1}{2}(\bar{y}_1 - \bar{y}_2)'S_{p1}^{-1}(\bar{y}_1 + \bar{y}_2) $$</div>
+<p>This classification rule is where the discriminant function comes into play. Note the discriminant function acts as a linear classification function only in the two-group case.</p>
+<h2>Classification with Linear Discriminant Analysis in R</h2>
+<p>The following steps should be familiar from the discriminant function post. We first calculate the group means <span class="math">\(\bar{y}_1\)</span> and <span class="math">\(\bar{y}_2\)</span> and the pooled sample variance <span class="math">\(S_{p1}\)</span>. The beetle data were obtained from the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book Methods of Multivariate Analysis by Alvin Rencher.</p>
+<div class="highlight"><pre><span></span><span class="n">beetles</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;BEETLES.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Measurement.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Species&#39;</span><span class="p">,</span> <span class="s">&#39;transverse.groove.dist&#39;</span><span class="p">,</span> <span class="s">&#39;elytra.length&#39;</span><span class="p">,</span> <span class="s">&#39;second.antennal.joint.length&#39;</span><span class="p">,</span> <span class="s">&#39;third.antennal.joint.length&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Find the group means and the pooled sample variance.</p>
+<div class="highlight"><pre><span></span><span class="n">beetle1</span> <span class="o">&lt;-</span> <span class="n">beetles[beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+<span class="n">beetle2</span> <span class="o">&lt;-</span> <span class="n">beetles[beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+
+<span class="n">n1</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">beetle1</span><span class="p">)</span>
+<span class="n">n2</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">beetle2</span><span class="p">)</span>
+
+<span class="n">beetle1.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">beetle1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+<span class="n">beetle2.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">beetle2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+
+<span class="n">w1</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">n1</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">var</span><span class="p">(</span><span class="n">beetle1</span><span class="p">)</span>
+<span class="n">w2</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">n2</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">var</span><span class="p">(</span><span class="n">beetle2</span><span class="p">)</span>
+
+<span class="n">sp1</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n1</span> <span class="o">+</span> <span class="n">n2</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">+</span> <span class="n">w2</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The cutoff point to determine group membership of the observation vector is then found.</p>
+<div class="highlight"><pre><span></span><span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">-</span> <span class="n">beetle2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">+</span> <span class="n">beetle2.means</span><span class="p">)</span>
+<span class="n">cutoff</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]</span>
+<span class="err">## [1,] -15.80538</span>
+</pre></div>
+
+
+<p>Thus if <span class="math">\(z\)</span> is greater than −15.81, the observation is assigned to group 1. Otherwise, it is assigned to group 2. We can apply the computed discriminant functions to the beetle data already collected to determine how well it performs in classifying observations.</p>
+<div class="highlight"><pre><span></span><span class="n">species.prediction</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">beetles[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">z</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">-</span> <span class="n">beetle2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">y</span> <span class="c1"># Calculate the discriminate function for the observation vector y</span>
+  <span class="nf">ifelse</span><span class="p">(</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+
+
+<p>Print a confusion matrix to display how the observations were assigned compared to their actual groups.</p>
+<div class="highlight"><pre><span></span><span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">species.prediction</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group  1  2</span>
+<span class="err">##            1 19  0</span>
+<span class="err">##            2  1 19</span>
+</pre></div>
+
+
+<p>Our predictions classified all of group 1's observations correctly but incorrectly assigned a group 2 observation to group 1. The error rate is simply the number of misclassifications divided by the total sample size.</p>
+<div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">beetles</span><span class="p">)</span><span class="n">[1]</span>
+<span class="m">1</span> <span class="o">/</span> <span class="n">n</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.02564103</span>
+</pre></div>
+
+
+<p>Thus our predictions were rather close to actual with only a 2.6% error rate. However, predictions tend to be rather optimistic when sample sizes are small, as in this case. Therefore, we will also perform leave-one-out cross-validation to find a more realistic error rate.</p>
+<p>The <code>lda()</code> function from the <a href="https://cran.r-project.org/web/packages/MASS/index.html">MASS package</a> can also be used to make predictions on the supplied data or a new data set.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">MASS</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>predict()</code> function accepts a lda object.</p>
+<div class="highlight"><pre><span></span><span class="n">beetle.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<span class="n">lda.pred</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">beetle.lda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span>
+</pre></div>
+
+
+<p>As before, print a confusion matrix to display the results of the predictions compared to the actual group memberships.</p>
+<div class="highlight"><pre><span></span><span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">lda.pred</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group  1  2</span>
+<span class="err">##            1 19  0</span>
+<span class="err">##            2  1 19</span>
+</pre></div>
+
+
+<h2>Cross-Validation of Predicted Groups</h2>
+<p>As mentioned previously, in cases with small sample sizes, prediction error rates can tend to be optimistic. <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)">Cross-validation</a> is a technique used to estimate how accurate a predictive model may be in actual practice. When larger sample sizes are available, the more common approach of splitting the data into test and training sets may still be employed. There are many different approaches to cross-validation, including <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-p-out_cross-validation">leave-p-out</a> and <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)#k-fold_cross-validation">k-fold</a> cross-validation. One particular case of leave-p-out cross-validation is the leave-one-out approach, also known as the holdout method.</p>
+<p>Leave-one-out cross-validation is performed by using all but one of the sample observation vectors to determine the classification function and then using that classification function to predict the omitted observation's group membership. The procedure is repeated for each observation so that each is classified by a function of the other observations. The leave-one-out technique is demonstrated on the beetle data below. The approach to building the discriminant and classification functions remain the same as before, with the exception that all but <span class="math">\(N − 1\)</span> observations are used.</p>
+<div class="highlight"><pre><span></span><span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
+
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">beetles[</span><span class="o">-</span><span class="n">i</span><span class="p">,</span><span class="n">]</span>
+
+  <span class="n">holdout1</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+  <span class="n">holdout2</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+
+  <span class="n">holdout1.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+  <span class="n">holdout2.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+
+  <span class="n">n1</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">holdout1</span><span class="p">)</span>
+  <span class="n">n2</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">holdout2</span><span class="p">)</span>
+
+  <span class="n">w1</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">n1</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">var</span><span class="p">(</span><span class="n">holdout1</span><span class="p">)</span>
+  <span class="n">w2</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">n2</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">var</span><span class="p">(</span><span class="n">holdout2</span><span class="p">)</span>
+
+  <span class="n">sp1</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n1</span> <span class="o">+</span> <span class="n">n2</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">+</span> <span class="n">w2</span><span class="p">)</span>
+
+  <span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">+</span> <span class="n">holdout2.means</span><span class="p">)</span>
+
+  <span class="n">ay</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">beetles[i</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">)</span>
+  <span class="n">group</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">ay</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
+  <span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">cv.prediction</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Construct a confusion matrix to display how the observations were classified.</p>
+<div class="highlight"><pre><span></span><span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">cv.prediction</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group  1  2</span>
+<span class="err">##            1 19  0</span>
+<span class="err">##            2  3 17</span>
+</pre></div>
+
+
+<p>As before, all of group 1's observations were correctly classified; however, three of group 2's observations were incorrectly assigned to group 1. Although the cross-validated error rate has increased three times to about 7.7%, it is a more realistic estimate compared to the non-cross-validated result.</p>
+<p>Cross-validation is also available in the <code>lda()</code> function with the <code>cv</code> argument.</p>
+<div class="highlight"><pre><span></span><span class="n">beetle.cv</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">CV</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+
+<span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">beetle.cv</span><span class="o">$</span><span class="n">class</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group  1  2</span>
+<span class="err">##            1 19  0</span>
+<span class="err">##            2  3 17</span>
+</pre></div>
+
+
+<h2>Summary</h2>
+<p>This post explored the predictive aspect of linear discriminant analysis as well as a brief introduction to cross-validation through the leave-one-out method. As noted, it is often important to perform some form of cross-validation on datasets with few observations to get a more realistic indication of how accurate the model will be in practice. Future posts will examine classification with linear discriminant analysis for more than two groups as well as quadratic discriminant analysis.</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/discriminant-analysis-group-separation.html">Discriminant Analysis for Group Separation</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/discriminant-analysis-several-groups.html">Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

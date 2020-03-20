@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>L'Hospital's Rule for Calculating Limits and Indeterminate Forms</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/calculus.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="L'Hospital's Rule allows us to simplify the evaluation of limits that involve indeterminate forms. An indeterminate form is defined as a limit that does not give enough information to determine the original limit. In this post, we explore several examples of indeterminate forms and how to calculate their limits using L'Hospital's Rule. We also leverage Python and SymPy to verify our answers." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="L'Hospital's Rule for Calculating Limits and Indeterminate Forms" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2019-02-21 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="L'Hospital's Rule allows us to simplify the evaluation of limits that involve indeterminate forms. An indeterminate form is defined as a limit that does not give enough information to determine the original limit. In this post, we explore several examples of indeterminate forms and how to calculate their limits using L'Hospital's Rule. We also leverage Python and SymPy to verify our answers." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html" rel="bookmark"
+                   title="Permalink to L'Hospital's Rule for Calculating Limits and Indeterminate Forms">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2019-02-21T00:00:00-08:00">
+                Thu 21 February 2019
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>L'Hospital's Rule allows us to simplify the evaluation of limits that involve indeterminate forms. An indeterminate form is defined as a limit that does not give enough information to determine the original limit. The most common indeterminate forms that occur in calculus and other areas of mathematics include:</p>
+$$ \frac{0}{0}, \qquad \frac{\infty}{\infty}, \qquad 0 \times \infty, \qquad 1^\infty, \qquad \infty - \infty, \qquad 0^0, \qquad \infty^0 $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>L'Hospital's Rule can be stated as the following:</p>
+<p>Suppose $f$ and $g$ are both differentiable functions that approach $0$ (or $\pm \infty$) as $x \rightarrow a$. Then $\frac{f(x)}{g(x)}$ approaches the same limit as $\frac{f^\prime(x)}{g^\prime(x)}$.</p>
+<p>The derivatives on the numerator and denominator are both taken separately.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Examples">Examples<a class="anchor-link" href="#Examples">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">init_printing</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">oo</span>
+<span class="kn">from</span> <span class="nn">mpmath</span> <span class="kn">import</span> <span class="n">ln</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">pi</span>
+
+<span class="n">init_printing</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-1:-Find-the-limit-of-$\lim_{x-\rightarrow-1}-\frac{x^2---1}{x^2---x}$">Example 1: Find the limit of $\lim_{x \rightarrow 1} \frac{x^2 - 1}{x^2 - x}$<a class="anchor-link" href="#Example-1:-Find-the-limit-of-$\lim_{x-\rightarrow-1}-\frac{x^2---1}{x^2---x}$">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We see the limit becomes the indeterminate form $\frac{0}{0}$ as $x \rightarrow 1$. Applying L'Hospital's Rule, we differentiate the numerator and denominator separately:</p>
+$$ \frac{\frac{d}{dx} x^2-1}{\frac{d}{dx} x^2-x} $$<p>Then carrying the derivation:</p>
+$$ \frac{\frac{d}{dx} x^2-1}{\frac{d}{dx} x^2-x} = \frac{2x}{2x-1} = \frac{2(1)}{2(1)-1)} = \frac{2}{1} = 2 $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can confirm our answer using Sympy and the <code>limit()</code> function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[2]:</div>
+
+
+
+
+<div class="output_latex output_subarea output_execute_result">
+$$2$$
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-2:-Find-the-limit-of-$\lim_{x-\rightarrow-1}-\frac{x^9-1}{x^5-1}$">Example 2: Find the limit of $\lim_{x \rightarrow 1} \frac{x^9-1}{x^5-1}$<a class="anchor-link" href="#Example-2:-Find-the-limit-of-$\lim_{x-\rightarrow-1}-\frac{x^9-1}{x^5-1}$">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As before, start by differentiating both the numerator and denominator:</p>
+$$ \frac{\frac{d}{dx} x^9-1}{\frac{d}{dx} x^5-1} = \frac{9x^8}{5x^4} = \frac{9(1)^8}{5(1)^4} = \frac{9}{5} $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">9</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">5</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># Check our above result</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[10]:</div>
+
+
+
+
+<div class="output_latex output_subarea output_execute_result">
+$$\frac{9}{5}$$
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-3:-Determine-the-limit-of-$\lim_{x-\rightarrow-(\frac{\pi}{2})^+}-\frac{\cos{x}}{1-\sin{x}}$">Example 3: Determine the limit of $\lim_{x \rightarrow (\frac{\pi}{2})^+} \frac{\cos{x}}{1-\sin{x}}$<a class="anchor-link" href="#Example-3:-Determine-the-limit-of-$\lim_{x-\rightarrow-(\frac{\pi}{2})^+}-\frac{\cos{x}}{1-\sin{x}}$">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The limit we are evaluating is on the right-hand side, for now we can proceed to calculate the limit as before:</p>
+$$ \frac{\frac{d}{dx} \cos{x}}{\frac{d}{dx} 1-\sin{x}} = \frac{-\sin{x}}{\cos{x}} = -\tan{x} $$<p>The limit we are evaluating is therefore equivalent to $\lim_{x \rightarrow \frac{\pi}{2}^+} -\tan{x}$, which approaches $-\infty$ as it is coming from the right-hand side. We can visualize this to confirm by taking advantage of Sympy's <code>plot()</code> function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[26]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;sympy.plotting.plot.Plot at 0x1117779e8&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although it's a little hard to see as we're doing a very rough plot, we see that the function shoots up to infinity near $\frac{\pi}{2}$ coming from the left-hand side and negative infinity from the right. We can verify our answer again with Sympy. The third argument <code>'+'</code> is added to the <code>limit()</code> function to instruct Sympy to only consider the limit on the right-hand side.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">x</span><span class="p">,</span> <span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[16]:</div>
+
+
+
+
+<div class="output_latex output_subarea output_execute_result">
+$$-\infty$$
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-4:-Find-the-limit-of-$\lim_{x-\rightarrow-0}-\frac{e^x-1}{x^3}$">Example 4: Find the limit of $\lim_{x \rightarrow 0} \frac{e^x-1}{x^3}$<a class="anchor-link" href="#Example-4:-Find-the-limit-of-$\lim_{x-\rightarrow-0}-\frac{e^x-1}{x^3}$">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Proceeding as before by evaluating the derivatives of the numerator and denominator of the limit:</p>
+$$ \frac{\frac{d}{dx} e^x - 1}{\frac{d}{dx} x^3} = \frac{e^x}{3x^2} = \frac{e^{(0)}}{3(0)^2} $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although we arrive at $\frac{1}{0}$ if we were to continue solving, that is not the correct limit. As $x \rightarrow 0$, the function approaches infinity. We can see this behavior by plotting a rough graph of the function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">e</span> <span class="o">**</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[37]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;sympy.plotting.plot.Plot at 0x11212c7f0&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>From the graph, we can see that the function shoots up drastically as $x \rightarrow 0$ due to the denominator approaching $0$ quicker than the numerator. We can confirm the actual limit is $\infty$ by checking against SymPy.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">((</span><span class="n">e</span> <span class="o">**</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[28]:</div>
+
+
+
+
+<div class="output_latex output_subarea output_execute_result">
+$$\infty$$
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Historical-Note">Historical Note<a class="anchor-link" href="#Historical-Note">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although known as L'Hospital's Rule, the theorem was developed by Johann Bernoulli, the Swiss mathematician, in 1694 and likely introduced to L'Hospital. The publication of L'Hospital's textbook on differential calculus in 1696, the first of its kind, included the theorem and thus L'Hospital's name became attached to the rule.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">References<a class="anchor-link" href="#References">&#182;</a></h2><p>Indeterminate form. (2017, December 23). In Wikipedia, The Free Encyclopedia. From <a href="https://en.wikipedia.org/w/index.php?title=Indeterminate_form&amp;oldid=816695609">https://en.wikipedia.org/w/index.php?title=Indeterminate_form&amp;oldid=816695609</a></p>
+<p><a href="https://amzn.to/38dnRV0">Stewart, J. (2007). Essential calculus: Early transcendentals. Belmont, CA: Thomson Higher Education.</a></p>
+<p>Weisstein, Eric W. "L'Hospital's Rule." From MathWorld--A Wolfram Web Resource. <a href="http://mathworld.wolfram.com/LHospitalsRule.html">http://mathworld.wolfram.com/LHospitalsRule.html</a></p>
+
+</div>
+</div>
+</div>
+ 
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a></li>
+                        <li><a href="https://aaronschlegel.me/fundamental-theorem-calculus.html">The Fundamental Theorem of Calculus</a></li>
+                        <li><a href="https://aaronschlegel.me/indefinite-integrals.html">Indefinite Integrals</a></li>
+                        <li><a href="https://aaronschlegel.me/substitution-rule.html">Substitution Rule</a></li>
+                        <li><a href="https://aaronschlegel.me/antiderivatives.html">Antiderivatives</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

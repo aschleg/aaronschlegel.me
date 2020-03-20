@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Image Compression with Singular Value Decomposition</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The method of image compression with singular value decomposition is" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Image Compression with Singular Value Decomposition" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2016-11-10 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The method of image compression with singular value decomposition is" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/image-compression-singular-value-decomposition.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/image-compression-singular-value-decomposition.html" rel="bookmark"
+                   title="Permalink to Image Compression with Singular Value Decomposition">Image Compression with Singular Value Decomposition</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2016-11-10T00:00:00-08:00">
+                Thu 10 November 2016
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>based on the idea that if the SVD is known, some of the singular values
+<span class="math">\(\sigma\)</span> are significant while the others are small and not significant.
+Thus, if the significant values are kept and the small values are
+discarded then only the columns of <span class="math">\(U\)</span> and <span class="math">\(V\)</span> corresponding to the
+singular values are used. We will see in the following example, as more
+and more singular values are kept, the quality and representation
+compared to the original image improves.</p>
+<p>As mentioned in a previous post, image compression with <a href="https://aaronschlegel.me/singular-value-decomposition-r.html">singular value
+decomposition</a> is a frequently occurring
+application of the method. The image is treated as a matrix of pixels
+with corresponding color values and is decomposed into smaller ranks
+that retain only the essential information that comprises the image. In
+this example, we are interested in compressing the below 600x337 image
+of a lion into a real-valued representation of the picture which will
+result in a smaller image file size.</p>
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion.jpg"></p>
+</div>
+<p>The method of image compression with singular value decomposition is
+based on the idea that if the SVD is known, some of the singular values
+<span class="math">\(\sigma\)</span> are significant while the others are small and not significant.
+Thus, if the significant values are kept and the small values are
+discarded then only the columns of <span class="math">\(U\)</span> and <span class="math">\(V\)</span> corresponding to the
+singular values are used. We will see in the following example, as more
+and more singular values are kept, the quality and representation
+compared to the original image improves.</p>
+<h2>Image Compression with Singular Value Decomposition</h2>
+<p>The <a href="https://cran.r-project.org/web/packages/jpeg/jpeg.pdf">jpeg
+package</a> provides
+handy functions for reading and writing .jpeg files which we will need
+to turn the image of the lion into a matrix.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">jpeg</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>readJPEG</code> function is used to convert the image into a matrix
+representation.</p>
+<div class="highlight"><pre><span></span><span class="n">lion</span> <span class="o">&lt;-</span> <span class="nf">readJPEG</span><span class="p">(</span><span class="s">&#39;lion.jpg&#39;</span><span class="p">)</span>
+<span class="nf">ncol</span><span class="p">(</span><span class="n">lion</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 600</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">nrow</span><span class="p">(</span><span class="n">lion</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 337</span>
+</pre></div>
+
+
+<p>The output of the function gives us an array of three matrices with 337
+rows and 600 columns, the same size as the image. Each matrice
+represents a color value that comprises the RGB color scale. To perform
+SVD on these matrices, separate the array into separate objects.</p>
+<div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">1</span><span class="n">]</span>
+<span class="n">g</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">2</span><span class="n">]</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">3</span><span class="n">]</span>
+</pre></div>
+
+
+<p>SVD is then performed on the extracted matrices that represent the
+individual RGB color values.</p>
+<div class="highlight"><pre><span></span><span class="n">lion.r.svd</span> <span class="o">&lt;-</span> <span class="nf">svd</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="n">lion.g.svd</span> <span class="o">&lt;-</span> <span class="nf">svd</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">lion.b.svd</span> <span class="o">&lt;-</span> <span class="nf">svd</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Collect the results into a list that we will use to reconstruct the
+original image.</p>
+<div class="highlight"><pre><span></span><span class="n">rgb.svds</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">lion.r.svd</span><span class="p">,</span> <span class="n">lion.g.svd</span><span class="p">,</span> <span class="n">lion.b.svd</span><span class="p">)</span>
+</pre></div>
+
+
+<p>With the singular value decompositions computed for the RGB color value
+matrices, we can take the resulting matrix factorizations and
+reconstruct the original matrix (image) as we saw in the previous post
+on SVD as we know that <span class="math">\(A = U\Sigma V^T\)</span>.</p>
+<p>As mentioned at the beginning of the post, the more significant singular
+values we keep results in a more accurate approximation of the original
+matrix. We can see this in action below. The following code takes each
+decomposed color value matrix and reconstructs the color value array
+that comprises the original lion image with increasing ranks. The loop
+will approximate the original image with eight different rank values
+starting from rank 3 to rank 300. The <code>writeJPEG()</code> function from the
+<code>jpeg</code> package takes the approximated color value array and writes it to
+a .jpeg.</p>
+<div class="highlight"><pre><span></span><span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="nf">seq.int</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="nf">round</span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">lion</span><span class="p">),</span> <span class="m">-2</span><span class="p">),</span> <span class="n">length.out</span> <span class="o">=</span> <span class="m">8</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span><span class="n">rgb.svds</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">lion.compress</span> <span class="o">&lt;-</span> <span class="n">i</span><span class="o">$</span><span class="n">u[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="n">j]</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">d[1</span><span class="o">:</span><span class="n">j]</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">v[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="n">j]</span><span class="p">)</span>
+  <span class="p">},</span> <span class="n">simplify</span> <span class="o">=</span> <span class="s">&#39;array&#39;</span><span class="p">)</span>
+
+  <span class="nf">writeJPEG</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#39;compressed/lion_compressed&#39;</span><span class="p">,</span> <span class="s">&#39;_svd_rank_&#39;</span><span class="p">,</span> <span class="nf">round</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="m">0</span><span class="p">),</span> <span class="s">&#39;.jpg&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p style="text-align: center; font-size: 1.5em;">
+Rank 3
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_3.jpg"></p>
+</div>
+<p>With just three singular values remaining the resulting image retains
+very few of the original image's characteristics.</p>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 45
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_45.jpg"></p>
+</div>
+<p>At just rank 45, the resulting image is much more representative of the
+original.</p>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 88
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_88.jpg"></p>
+</div>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 130
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_130.jpg"></p>
+</div>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 173
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_173.jpg"></p>
+</div>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 215
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_215.jpg"></p>
+</div>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 258
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_258.jpg"></p>
+</div>
+<p>At rank 300, the resulting compressed image is rather unrecognizable
+from the original (at least to me).</p>
+<p style="text-align: center; font-size: 1.5em;">
+Rank 300
+</p>
+
+<div style="text-align:center; padding-bottom: 25px">
+<p><img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_300.jpg"></p>
+</div>
+<p>We can then see how much the SVD compressed the image by finding the
+percent difference of the compressed images and the original.</p>
+<div class="highlight"><pre><span></span><span class="n">original</span> <span class="o">&lt;-</span> <span class="nf">file.info</span><span class="p">(</span><span class="s">&#39;lion.jpg&#39;</span><span class="p">)</span><span class="o">$</span><span class="n">size</span> <span class="o">/</span> <span class="m">1000</span>
+<span class="n">imgs</span> <span class="o">&lt;-</span> <span class="nf">dir</span><span class="p">(</span><span class="s">&#39;compressed/&#39;</span><span class="p">)</span>
+
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">imgs</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">full.path</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#39;compressed/&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+  <span class="nf">print</span><span class="p">(</span><span class="nf">paste</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s">&#39; size: &#39;</span><span class="p">,</span> <span class="nf">file.info</span><span class="p">(</span><span class="n">full.path</span><span class="p">)</span><span class="o">$</span><span class="n">size</span> <span class="o">/</span> <span class="m">1000</span><span class="p">,</span> <span class="s">&#39; original: &#39;</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="s">&#39; % diff: &#39;</span><span class="p">,</span> <span class="nf">round</span><span class="p">((</span><span class="nf">file.info</span><span class="p">(</span><span class="n">full.path</span><span class="p">)</span><span class="o">$</span><span class="n">size</span> <span class="o">/</span> <span class="m">1000</span> <span class="o">-</span> <span class="n">original</span><span class="p">)</span> <span class="o">/</span> <span class="n">original</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="m">100</span><span class="p">,</span> <span class="s">&#39;%&#39;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] &quot;lion_compressed_svd_rank_130.jpg size: 36.608 original: 52.05 % diff: -30%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_173.jpg size: 37.144 original: 52.05 % diff: -29%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_215.jpg size: 37.559 original: 52.05 % diff: -28%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_258.jpg size: 37.613 original: 52.05 % diff: -28%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_3.jpg size: 15.732 original: 52.05 % diff: -70%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_300.jpg size: 37.621 original: 52.05 % diff: -28%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_45.jpg size: 31.422 original: 52.05 % diff: -40%&quot;</span>
+<span class="err">## [1] &quot;lion_compressed_svd_rank_88.jpg size: 35.266 original: 52.05 % diff: -32%&quot;</span>
+</pre></div>
+
+
+<p>The rank 300 image has a file size of 37.62KB compared to the original
+image size of 52.05KB, which results in a 28% smaller file size. We can
+see the difference in the file sizes quickly converge to around -28%,
+likely indicating further ranks would not result in a more efficient
+compression ratio.</p>
+<h2>Summary</h2>
+<p>The following post was an example of image compression with singular
+value decomposition, a typical application of the method in real-world
+settings. Commercial image compression solutions use a more robust
+method than what was described here; however, I hope it serves as a good
+example of the power matrix decomposition methods such as singular value
+decomposition can have in the real-world.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/image-compression-principal-component-analysis.html">Image Compression with Principal Component Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html">Linear Discriminant Analysis for the Classification of Two Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

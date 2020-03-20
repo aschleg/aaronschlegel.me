@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Cartesian Product and Ordered and Unordered Pairs</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="A pair set is a set with two members, for example, {2, 3}, which can also be thought of as an unordered pair, in that {2, 3}={3, 2}. However, we seek a more a strict and rich object that tells us more about two sets and how their elements are ordered." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Cartesian Product and Ordered and Unordered Pairs" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-01-26 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="A pair set is a set with two members, for example, {2, 3}, which can also be thought of as an unordered pair, in that {2, 3}={3, 2}. However, we seek a more a strict and rich object that tells us more about two sets and how their elements are ordered." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/cartestian-product-ordered-unordered-pairs.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/cartestian-product-ordered-unordered-pairs.html" rel="bookmark"
+                   title="Permalink to Cartesian Product and Ordered and Unordered Pairs">Cartesian Product and Ordered and Unordered Pairs</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-01-26T00:00:00-08:00">
+                Fri 26 January 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <h2>Ordered and Unordered Pairs</h2>
+<p>A pair set is a set with two members, for example, <span class="math">\({2, 3}\)</span>, which can
+also be thought of as an unordered pair, in that <span class="math">\({2, 3}={3, 2}\)</span>. However,
+we seek a more a strict and rich object that tells us more about two
+sets and how their elements are ordered. Call this object ⟨2, 3⟩, which
+specifies that 2 is the first component and 3 is the second component.
+We also make the requirement that ⟨2, 3⟩≠⟨3, 2⟩. We can also represent
+this object, generalized as ⟨<span class="math">\(x\)</span>, <span class="math">\(y\)</span>⟩, as:</p>
+<div class="math">$$ \large{\langle x, y\rangle = \langle u, v \rangle} $$</div>
+<p>Therefore <span class="math">\(x = u\)</span> and <span class="math">\(y = v\)</span>. This property is useful in the formal
+definition of an ordered pair, which is stated here but not explored
+in-depth. The currently accepted definition of an ordered pair was given
+by Kuratowski in 1921 (Enderton, 1977, pp. 36), though there exist
+several other definitions.</p>
+<div class="math">$$ \large{\langle x, y \rangle = \big\{\{x\}, \{x, y\} \big\}} $$</div>
+<p>The pair ⟨<span class="math">\(x, y\)</span>⟩ can be represented as a point on a Cartesian
+coordinate plane.</p>
+<h2>Cartesian Product</h2>
+<p>The Cartesian product <span class="math">\(A × B\)</span> of two sets <span class="math">\(A\)</span> and <span class="math">\(B\)</span> is the
+collection of all ordered pairs ⟨<span class="math">\(x, y\)</span>⟩ with <span class="math">\(x ∈ A\)</span> and <span class="math">\(y ∈ B\)</span>.
+Therefore, the Cartesian product of two sets is a set itself consisting
+of ordered pair members. A set of ordered pairs is defined as a
+'relation.'</p>
+<p>For example, consider the sets <span class="math">\(A = {1, 2, 3}\)</span> and <span class="math">\(B = {2, 4, 6}\)</span>. The
+Cartesian product <span class="math">\(A × B\)</span> is then:</p>
+<div class="math">$$ A × B = {{1, 2},{1, 4},{1, 6},{2, 2},{2, 4},{2, 6},{3, 2},{3, 4},{3, 6}} $$</div>
+<p>Whereas the Cartesian product <span class="math">\(B × A\)</span> is:</p>
+<div class="math">$$ B × A = {{2, 1},{2, 2},{2, 3},{4, 1},{4, 2},{4, 3},{6, 1},{6, 2},{6, 3}} $$</div>
+<p>The following function implements computing the Cartesian product of two
+sets <span class="math">\(A\)</span> and <span class="math">\(B\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">cartesian</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">axb</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">axb</span><span class="o">[</span><span class="n">[k</span><span class="o">]</span><span class="err">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">c</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="p">(</span><span class="n">axb</span><span class="p">)</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</pre></div>
+
+
+<p>Let's use the function to calculate the Cartesian product <span class="math">\(A × B\)</span> and
+<span class="math">\(B × A\)</span> to see if it aligns with our results above.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="c1">##   c.1..2. c.1..4. c.1..6. c.2..2. c.2..4. c.2..6. c.3..2. c.3..4. c.3..6.</span>
+<span class="c1">## 1       1       1       1       2       2       2       3       3       3</span>
+<span class="c1">## 2       2       4       6       2       4       6       2       4       6</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="c1">##   c.2..1. c.2..2. c.2..3. c.4..1. c.4..2. c.4..3. c.6..1. c.6..2. c.6..3.</span>
+<span class="c1">## 1       2       2       2       4       4       4       6       6       6</span>
+<span class="c1">## 2       1       2       3       1       2       3       1       2       3</span>
+</pre></div>
+
+
+<p>Both outputs agree to our previous results. One could also simply use
+the <code>expand.grid()</code> function like so to get the same result for the
+Cartesian product.</p>
+<div class="highlight"><pre><span></span><span class="n">t</span><span class="p">(</span><span class="n">expand</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="o">##</span>      <span class="p">[,</span><span class="mi">1</span><span class="p">]</span> <span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="p">[,</span><span class="mi">4</span><span class="p">]</span> <span class="p">[,</span><span class="mi">5</span><span class="p">]</span> <span class="p">[,</span><span class="mi">6</span><span class="p">]</span> <span class="p">[,</span><span class="mi">7</span><span class="p">]</span> <span class="p">[,</span><span class="mi">8</span><span class="p">]</span> <span class="p">[,</span><span class="mi">9</span><span class="p">]</span>
+<span class="o">##</span> <span class="n">Var1</span>    <span class="mi">1</span>    <span class="mi">2</span>    <span class="mi">3</span>    <span class="mi">1</span>    <span class="mi">2</span>    <span class="mi">3</span>    <span class="mi">1</span>    <span class="mi">2</span>    <span class="mi">3</span>
+<span class="o">##</span> <span class="n">Var2</span>    <span class="mi">2</span>    <span class="mi">2</span>    <span class="mi">2</span>    <span class="mi">4</span>    <span class="mi">4</span>    <span class="mi">4</span>    <span class="mi">6</span>    <span class="mi">6</span>    <span class="mi">6</span>
+</pre></div>
+
+
+<h2>Some Cartesian Product Theorems</h2>
+<p>We can state some theorems related to the Cartesian product of two sets.
+The first theorem states:</p>
+<p>If <span class="math">\(A\)</span> is a set, then <span class="math">\(A × ⌀ = ⌀\)</span> and <span class="math">\(⌀ × A = ⌀\)</span>.</p>
+<p>We can demonstrate this theorem with our <code>cartesian()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="k">c</span><span class="p">())</span> <span class="o">#</span> <span class="k">c</span><span class="p">()</span> <span class="n">represents</span> <span class="n">the</span> <span class="n">empty</span> <span class="k">set</span><span class="p">.</span>
+
+<span class="o">##</span> <span class="n">list</span><span class="p">()</span>
+
+<span class="n">cartesian</span><span class="p">(</span><span class="k">c</span><span class="p">(),</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="o">##</span> <span class="n">list</span><span class="p">()</span>
+</pre></div>
+
+
+<p>The outputs are an empty list which is equivalent to the empty set ⌀ for
+our purposes of demonstration.</p>
+<p>The next theorem involves three sets <span class="math">\(A\)</span>, <span class="math">\(B\)</span>, <span class="math">\(C\)</span>.</p>
+<ul>
+<li><span class="math">\(A × (B ∩ C)=(A × B)∩(A × C)\)</span></li>
+<li><span class="math">\(A × (B ∪ C)=(A × B)∪(A × C)\)</span></li>
+<li><span class="math">\((A ∩ B) × C = (A × C) ∩ (B × C)\)</span></li>
+<li><span class="math">\((A ∪ B) × C = (A × C) ∪ (B × C)\)</span></li>
+</ul>
+<p>We can demonstrate each in turn with a combination of our <code>cartesian()</code>
+from above, and the <code>set.union()</code> and <code>set.intersection()</code> functions
+from a previous post on set unions and
+intersections. The base R functions <code>union()</code>
+and <code>intersect()</code> can be used instead of the functions we defined
+previously.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">7</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The first identity $A × (B ∩ C) = (A × B) ∩ (A × C)%.</p>
+<div class="highlight"><pre><span></span><span class="n">ident1.rhs</span> <span class="o">&lt;-</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span> <span class="c1"># Right-hand Side</span>
+<span class="n">ident1.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span> <span class="c1"># Left-hand Side</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="n">ident1.rhs</span><span class="p">,</span> <span class="n">ident1.lhs</span><span class="p">)</span>
+
+<span class="c1">## [1] TRUE</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident1.rhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..4. c.2..4. c.3..4.</span>
+<span class="c1">## 1       1       2       3</span>
+<span class="c1">## 2       4       4       4</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident1.lhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..4. c.2..4. c.3..4.</span>
+<span class="c1">## 1       1       2       3</span>
+<span class="c1">## 2       4       4       4</span>
+</pre></div>
+
+
+<p>The second identity <span class="math">\(A × (B ∪ C)=(A × B) ∪ (A × C)\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">ident2.rhs</span> <span class="o">&lt;-</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="n">ident2.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="n">ident2.rhs</span><span class="p">,</span> <span class="n">ident2.lhs</span><span class="p">)</span>
+
+<span class="c1">## [1] TRUE</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident2.rhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..2. c.1..4. c.1..6. c.1..1. c.1..7. c.2..2. c.2..4. c.2..6. c.2..1.</span>
+<span class="c1">## 1       1       1       1       1       1       2       2       2       2</span>
+<span class="c1">## 2       2       4       6       1       7       2       4       6       1</span>
+<span class="c1">##   c.2..7. c.3..2. c.3..4. c.3..6. c.3..1. c.3..7.</span>
+<span class="c1">## 1       2       3       3       3       3       3</span>
+<span class="c1">## 2       7       2       4       6       1       7</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident2.lhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..2. c.1..4. c.1..6. c.2..2. c.2..4. c.2..6. c.3..2. c.3..4. c.3..6.</span>
+<span class="c1">## 1       1       1       1       2       2       2       3       3       3</span>
+<span class="c1">## 2       2       4       6       2       4       6       2       4       6</span>
+<span class="c1">##   c.1..1. c.1..7. c.2..1. c.2..7. c.3..1. c.3..7.</span>
+<span class="c1">## 1       1       1       2       2       3       3</span>
+<span class="c1">## 2       1       7       1       7       1       7</span>
+</pre></div>
+
+
+<p>The third identity <span class="math">\((A ∩ B) × C = (A × C) ∩ (B × C)\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">ident3.rhs</span> <span class="o">&lt;-</span> <span class="nf">cartesian</span><span class="p">(</span><span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">)</span>
+<span class="n">ident3.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="n">ident3.rhs</span><span class="p">,</span> <span class="n">ident3.lhs</span><span class="p">)</span>
+
+<span class="c1">## [1] TRUE</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident3.rhs</span><span class="p">)</span>
+
+<span class="c1">##   c.2..1. c.2..4. c.2..7.</span>
+<span class="c1">## 1       2       2       2</span>
+<span class="c1">## 2       1       4       7</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident3.lhs</span><span class="p">)</span>
+
+<span class="c1">##   c.2..1. c.2..4. c.2..7.</span>
+<span class="c1">## 1       2       2       2</span>
+<span class="c1">## 2       1       4       7</span>
+</pre></div>
+
+
+<p>We finish the post with the fourth identity
+<span class="math">\((A ∪ B) × C = (A × C) ∪ (B × C)\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">ident4.rhs</span> <span class="o">&lt;-</span> <span class="nf">cartesian</span><span class="p">(</span><span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">)</span>
+<span class="n">ident4.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="nf">cartesian</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">),</span> <span class="nf">cartesian</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">))</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="n">ident4.rhs</span><span class="p">,</span> <span class="n">ident4.lhs</span><span class="p">)</span>
+
+<span class="c1">## [1] TRUE</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident4.rhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..1. c.1..4. c.1..7. c.2..1. c.2..4. c.2..7. c.3..1. c.3..4. c.3..7.</span>
+<span class="c1">## 1       1       1       1       2       2       2       3       3       3</span>
+<span class="c1">## 2       1       4       7       1       4       7       1       4       7</span>
+<span class="c1">##   c.4..1. c.4..4. c.4..7. c.6..1. c.6..4. c.6..7.</span>
+<span class="c1">## 1       4       4       4       6       6       6</span>
+<span class="c1">## 2       1       4       7       1       4       7</span>
+
+<span class="nf">as.data.frame</span><span class="p">(</span><span class="n">ident4.lhs</span><span class="p">)</span>
+
+<span class="c1">##   c.1..1. c.1..4. c.1..7. c.2..1. c.2..4. c.2..7. c.3..1. c.3..4. c.3..7.</span>
+<span class="c1">## 1       1       1       1       2       2       2       3       3       3</span>
+<span class="c1">## 2       1       4       7       1       4       7       1       4       7</span>
+<span class="c1">##   c.4..1. c.4..4. c.4..7. c.6..1. c.6..4. c.6..7.</span>
+<span class="c1">## 1       4       4       4       6       6       6</span>
+<span class="c1">## 2       1       4       7       1       4       7</span>
+</pre></div>
+
+
+<h2>References</h2>
+<p><a href="https://amzn.to/2SsiA5g">Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.</a></p>
+<p>MacGillivray, G. Cartesian Products and Relations. Victoria, BC.
+Retrieved from <a href="http://www.math.uvic.ca/faculty/gmacgill/guide/RF.pdf">http://www.math.uvic.ca/faculty/gmacgill/guide/RF.pdf</a></p>
+<p>Stacho, Juraj (n.d.). Cartesian Product [PowerPoint slides]. Retrieved
+from <a href="http://www.cs.toronto.edu/~stacho/macm101.pdf">http://www.cs.toronto.edu/~stacho/macm101.pdf</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/set-algebra-r.html">Algebra of Sets with R</a></li>
+                        <li><a href="https://aaronschlegel.me/n-set-union-intersection-r.html">N-Union and Intersection Set Operations</a></li>
+                        <li><a href="https://aaronschlegel.me/set-union-intersection-r.html">Set Union and Intersections with R</a></li>
+                        <li><a href="https://aaronschlegel.me/set-theory-r.html">Introduction to Sets and Set Theory with R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

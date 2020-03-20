@@ -37,14 +37,18 @@ TIMEZONE = 'America/Los_Angeles'
 DEFAULT_LANG = 'English'
 
 # Feed generation is usually not desired when developing
-FEED_ALL_ATOM = None
-CATEGORY_FEED_ATOM = None
+FEED_DOMAIN = SITEURL
+FEED_ALL_ATOM = 'feed/all.xml'
+CATEGORY_FEED_ATOM = 'feed/%s.xml'
+TAG_FEED_ATOM = 'feed/%s.tag.xml'
 TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-# LINKS = (('Python.org', 'http://python.org/'),)
+LINKS = (
+    ('R-Bloggers', 'https://www.r-bloggers.com'),
+)
 
 # Social widget
 SOCIAL = (('Github', 'https://github.com/aschleg'),

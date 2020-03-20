@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The first post introduced and explored the basic usage of the PetfindeR library. In this post, we take a quick look at some of the additional uses of the library and its methods to extract data from the Petfinder database." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-05-17 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The first post introduced and explored the basic usage of the PetfindeR library. In this post, we take a quick look at some of the additional uses of the library and its methods to extract data from the Petfinder database." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-two.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-two.html" rel="bookmark"
+                   title="Permalink to PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two">PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-05-17T00:00:00-07:00">
+                Thu 17 May 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <h2>Getting Started</h2>
+<p>The <a href="petfinder-r-wrapper-petfinder-api-introduction-part-one.html">first post introduced and explored the basic usage of the
+<code>PetfindeR</code> library</a>. 
+In this post, we take a quick look at some of the additional uses of the library 
+and its methods to extract data from the Petfinder database. Before getting started, 
+it is worthwhile to recall the limits imposed by Petfinder when interacting with its API.
+The following restrictions are copied from <a href="https://www.petfinder.com/developers/api-docs#restrictions">Petfinder's API
+documentation</a>:</p>
+<ul>
+<li>Total requests per day: 10,000</li>
+<li>Records per request: 1,000</li>
+<li>Maximum records per search: 2,000</li>
+</ul>
+<p>Therefore, a single call cannot exceed 2,000 records, and there is a
+maximum of 1,000 records per request. Knowing this information, we can
+construct our calls to the API to extract the maximum amount of
+information without exceeding the limitations imposed by Petfinder.</p>
+<p>After <code>PetfindeR</code> is installed, it can be loaded using the <code>library()</code>
+function. We initialize the <code>Petfinder</code> R6 class object using a key
+received from Petfinder. You can easily obtain a key by creating an
+account on Petfinder on the <a href="https://www.petfinder.com/developers/api-key">site's developers
+page</a>. Once the key is
+obtained, we use that as an argument when initializing the class. We can
+now begin to extract data from the Petfinder API!</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">PetfindeR</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">&lt;-</span> <span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&#39;PETFINDER_KEY&#39;</span><span class="p">)</span>
+<span class="n">pf</span> <span class="o">&lt;-</span> <span class="nf">Petfinder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Paging Results</h2>
+<p>The Petfinder API pages results to reduce the stress on the API when
+extracting a large number of records. Paging is the only way to exceed
+the API's limitation of 1,000 records per request. For example, to get
+2,000 animal records located in Washington State (and beyond), we could
+set the <code>count</code> parameter in the <code>pet.find</code> method to 500 and the
+<code>pages</code> parameter to 4. We could also change the <code>count</code> and <code>pages</code>
+parameters to 1, 000 and 2, respectively, which would achieve the same
+result.</p>
+<div class="highlight"><pre><span></span><span class="n">paged</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">500</span><span class="p">,</span> <span class="n">pages</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">paged2</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">1000</span><span class="p">,</span> <span class="n">pages</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="c1"># Returns the same as above</span>
+</pre></div>
+
+
+<p>The <code>PetfindeR</code> library will check to make sure the <code>count</code> parameter
+doesn't exceed 1,000 to avoid wasting an API call.</p>
+<div class="highlight"><pre><span></span><span class="n">count.too.high</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">1001</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1">## Error in check_inputs(animal = animal, size = size, sex = sex, age = age, : a single request cannot exceed 1,000 records</span>
+</pre></div>
+
+
+<p>The library will also check to make sure that the input <code>pages</code>
+parameter and <code>count</code> will not exceed 2,000.</p>
+<div class="highlight"><pre><span></span><span class="n">max.record.exceeded</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">500</span><span class="p">,</span> <span class="n">pages</span> <span class="o">=</span> <span class="m">5</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1">## Error in check_inputs(animal = animal, size = size, sex = sex, age = age, : searches cannot exceed 2,000 records.</span>
+</pre></div>
+
+
+<h2>Offsetting Results</h2>
+<p>Four of the available methods (<code>pet.find</code>, <code>shelter.find</code>,
+<code>shelter.getPets</code>, and <code>shelter.listByBreed</code>) in the Petfinder API offer
+an <code>offset</code> parameter which can be used to skip the first <em>n</em> results
+from the API. Behind the scenes, the <code>offset</code> parameter is used to page
+results if the <code>pages</code> parameter is specified, but it can also be used
+to avoid returning the same data when iterating calls. For example, the
+below two calls using the <code>pet.find</code> method would, in essence, return
+the first 100 results should the two results be appended.</p>
+<div class="highlight"><pre><span></span><span class="n">no.offset</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="c1"># Get the first 50 results</span>
+<span class="n">offsetted</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="c1"># Skip the first 25 results and get the next 50</span>
+</pre></div>
+
+
+<p>The above two calls could also be written as the below.</p>
+<div class="highlight"><pre><span></span><span class="n">paged</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">pages</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">raw_count</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="m">100</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>This short vignette explored some of the additional functionality of
+several of the methods available in the Petfinder API and <code>PetfindeR</code>
+library for further customizing the number of records and their location
+in the database using the <code>offset</code> parameter. Future vignettes will also
+explore some possible use cases of extracting and analyzing the data
+available in the Petfinder database.</p>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-one.html">PetfindeR, R Wrapper for the Petfinder API, Introduction Part One</a></li>
+                        <li><a href="https://aaronschlegel.me/introduction-rpoet.html">Introduction to Rpoet</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

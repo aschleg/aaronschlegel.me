@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The inverse of a number is its reciprocal. For example, the inverse of 8" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2016-08-18 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The inverse of a number is its reciprocal. For example, the inverse of 8" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/calculate-matrix-inverse-2x2-3x3.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/calculate-matrix-inverse-2x2-3x3.html" rel="bookmark"
+                   title="Permalink to How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices">How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2016-08-18T00:00:00-07:00">
+                Thu 18 August 2016
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>is <span class="math">\(\frac{1}{8}\)</span>, the inverse of 20 is <span class="math">\(\frac{1}{20}\)</span> and so on.
+Therefore, a number multiplied by its inverse will always equal 1. An
+inverse of a number is denoted with a <span class="math">\(-1\)</span> superscript.</p>
+<h2>Inverses of Numbers and Matrices</h2>
+<p>The inverse of a number is its reciprocal. For example, the inverse of 8
+is <span class="math">\(\frac{1}{8}\)</span>, the inverse of 20 is <span class="math">\(\frac{1}{20}\)</span> and so on.
+Therefore, a number multiplied by its inverse will always equal 1. An
+inverse of a number is denoted with a <span class="math">\(-1\)</span> superscript.</p>
+<div class="math">$$ x \cdot \frac{1}{x} = x \cdot x^{-1} = x^{-1} \cdot x = 1 $$</div>
+<p>The inverse of a matrix <span class="math">\(A\)</span> is another matrix denoted by <span class="math">\(A^{-1}\)</span> and is
+defined as:</p>
+<div class="math">$$ A^{-1}A = AA^{-1} = I $$</div>
+<p>Where <span class="math">\(I\)</span> is the <a href="https://en.wikipedia.org/wiki/Identity_matrix">identity
+matrix</a>. Thus, similar to
+a number and its inverse always equaling 1, a matrix multiplied by its
+inverse equals the identity.</p>
+<p>This post will explore several concepts related to the inverse of a
+matrix, including linear dependence and the rank of a matrix. Afterward,
+the method of computing an inverse (if one exists) of a <span class="math">\(2 \times 2\)</span> or
+<span class="math">\(3 \times 3\)</span> matrix shall be demonstrated. Finding the inverse of a
+square matrix with <span class="math">\(\geq 4\)</span> columns is computationally intensive and
+best left to R's built-in linear algebra routines which are built on
+<a href="https://en.wikipedia.org/wiki/LINPACK">LINPACK</a> and
+<a href="https://en.wikipedia.org/wiki/LAPACK">LAPACK</a>. Here is an excellent
+resource that lists the <a href="http://www.statmethods.net/advstats/matrix.html">linear algebra
+operations</a> available
+in R. Here is a good resource on how to compute a <a href="http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html">4x4 inverse
+matrix</a>
+manually for those interested.</p>
+<p>The example inverse matrix problems used in the post are from Jim
+Hefferon's excellent book <a href="http://joshua.smcvt.edu/linearalgebra">Linear
+Algebra</a> on page 249. I highly
+recommend the book to those learning more about linear algebra. The book
+is free to download and comes with many exercises and other features.</p>
+<h2>Linear Dependence of a Matrix</h2>
+<p>The following matrix A has three column vectors.</p>
+<div class="math">$$A = 
+\begin{bmatrix}
+  2 &amp; 2 &amp; 3 \\
+  1 &amp; -2 &amp; -3 \\
+  4 &amp; -2 &amp; - 3
+\end{bmatrix}$$</div>
+<p>Notice the second column vector is a multiple of the third column. The
+matrix is therefore linearly dependent as the matrix contains a column
+vector that is a multiple of another. The matrix is linearly independent
+when no column vector can be expressed as a multiple of another vector
+in the matrix.</p>
+<div class="math">$$\begin{bmatrix}
+  2 \\
+  -2 \\
+  -2
+\end{bmatrix}
+=
+\frac{3}{2}
+\begin{bmatrix}
+  3 \\
+  -3 \\
+  -3
+\end{bmatrix}$$</div>
+<h2>Rank of a Matrix</h2>
+<p>The rank of a matrix is the maximum number of linearly independent
+columns or linearly independent rows in the matrix. Therefore, the rank
+of a <span class="math">\(row \times column\)</span> matrix is the minimum of the two values. For
+example, the above matrix would have a rank of 1. Inverses only exist
+for a square <span class="math">\(r \times r\)</span> matrix with rank <span class="math">\(r\)</span>, which is called a full
+rank or nonsingular matrix.</p>
+<h2>Computing an inverse matrix</h2>
+<p>Consider a 2x2 matrix:</p>
+<div class="math">$$\underset{2 \times 2}{A} = 
+\begin{bmatrix}
+  a &amp; b \\
+  c &amp; d
+\end{bmatrix}$$</div>
+<p>The <span class="math">\(2 \times 2\)</span> inverse matrix is then:</p>
+<div class="math">$$\underset{2 \times 2}{A^{-1}} = 
+\begin{bmatrix}
+  a &amp; b \\
+  c &amp; d
+\end{bmatrix}^{-1} = 
+\frac{1}{D}
+\begin{bmatrix}
+  d &amp; -b \\
+  -c &amp; a
+\end{bmatrix}$$</div>
+<p>Where <span class="math">\(D = ad - bc\)</span>. <span class="math">\(D\)</span> is called the determinant of the matrix.</p>
+<p>The <span class="math">\(3 \times 3\)</span> matrix can be defined as:</p>
+<div class="math">$$\underset{3 \times 3}{B} = 
+\begin{bmatrix}
+  a &amp; b &amp; c \\
+  d &amp; e &amp; f \\
+  g &amp; h &amp; k
+\end{bmatrix}$$</div>
+<p>Then the inverse matrix is:</p>
+<div class="math">$$\underset{3 \times 3}{B^{-1}} = 
+\begin{bmatrix}
+  a &amp; b &amp; c \\
+  d &amp; e &amp; f \\
+  g &amp; h &amp; k
+\end{bmatrix}^{-1} = 
+\frac{1}{det(B)}
+\begin{bmatrix}
+  (ek - fh) &amp; -(bk - ch) &amp; (bf - ce) \\
+  -(dk - fg) &amp; (ak - cg) &amp; -(af - cd) \\
+  (dh - eg) &amp; -(ah - bg) &amp; (ae - bd)
+\end{bmatrix}$$</div>
+<p>Where <span class="math">\(det(B)\)</span> is equal to:</p>
+<div class="math">$$ det(B) = a(ek - fh) - b(dk -fg) + c(dh - eg) $$</div>
+<p>The following function implements a quick and rough routine to find the
+inverse of a <span class="math">\(2 \times 2\)</span> or <span class="math">\(3 \times 3\)</span> matrix should one exist.</p>
+<div class="highlight"><pre><span></span><span class="n">matrix.inverse</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">A</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+
+  <span class="c1"># If there are more than four columns in the supplied matrix, stop routine</span>
+  <span class="nf">if </span><span class="p">((</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="m">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="m">4</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nf">stop</span><span class="p">(</span><span class="s">&#39;Matrix is not 2x2 or 3x3&#39;</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="c1"># Stop if matrix is a single column vector</span>
+  <span class="nf">if </span><span class="p">(</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">stop</span><span class="p">(</span><span class="s">&#39;Matrix is a vector&#39;</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="c1"># 2x2 inverse matrix</span>
+  <span class="nf">if</span><span class="p">(</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="m">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1"># Determinant</span>
+    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A[1]</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A[3]</span>
+    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A[2]</span>
+    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A[4]</span>
+    <span class="n">det</span> <span class="o">&lt;-</span> <span class="n">a</span> <span class="o">*</span> <span class="n">d</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="c1"># Check to see if matrix is singular</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">det</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nf">stop</span><span class="p">(</span><span class="s">&#39;Determinant of matrix equals 0, no inverse exists&#39;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="c1"># Compute inverse matrix elements</span>
+    <span class="n">a.inv</span> <span class="o">&lt;-</span> <span class="n">d</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">b.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="n">b</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">c.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="n">c</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">d.inv</span> <span class="o">&lt;-</span> <span class="n">a</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="c1"># Collect the results into a new matrix</span>
+    <span class="n">inv.mat</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">a.inv</span><span class="p">,</span><span class="n">c.inv</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="n">b.inv</span><span class="p">,</span><span class="n">d.inv</span><span class="p">)))</span>
+  <span class="p">}</span>
+
+  <span class="c1"># 3x3 inverse matrix</span>
+  <span class="nf">if </span><span class="p">(</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="m">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1"># Extract the entries from the matrix</span>
+    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A[1]</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A[4]</span>
+    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A[7]</span>
+    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A[2]</span>
+    <span class="n">e</span> <span class="o">&lt;-</span> <span class="n">A[5]</span>
+    <span class="n">f</span> <span class="o">&lt;-</span> <span class="n">A[8]</span>
+    <span class="n">g</span> <span class="o">&lt;-</span> <span class="n">A[3]</span>
+    <span class="n">h</span> <span class="o">&lt;-</span> <span class="n">A[6]</span>
+    <span class="n">k</span> <span class="o">&lt;-</span> <span class="n">A[9]</span>
+
+    <span class="c1"># Compute the determinant and check that it is not 0</span>
+    <span class="n">det</span> <span class="o">&lt;-</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">h</span> <span class="o">-</span> <span class="n">e</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">det</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nf">stop</span><span class="p">(</span><span class="s">&#39;Determinant of matrix equals 0, no inverse exists&#39;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Using the equations defined above, calculate the inverse matrix entries.</span>
+    <span class="n">A.inv</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">B.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">C.inv</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">D.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">E.inv</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="bp">F</span><span class="n">.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">G.inv</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">h</span> <span class="o">-</span> <span class="n">e</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">H.inv</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">h</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">K.inv</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+
+    <span class="c1"># Collect the results into a new matrix</span>
+    <span class="n">inv.mat</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">A.inv</span><span class="p">,</span><span class="n">D.inv</span><span class="p">,</span><span class="n">G.inv</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="n">B.inv</span><span class="p">,</span><span class="n">E.inv</span><span class="p">,</span><span class="n">H.inv</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="n">C.inv</span><span class="p">,</span><span class="bp">F</span><span class="n">.inv</span><span class="p">,</span><span class="n">K.inv</span><span class="p">)))</span>
+  <span class="p">}</span>
+
+<span class="nf">return</span><span class="p">(</span><span class="n">inv.mat</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>The results from the above function can be used to verify the
+definitions and equations of the inverse matrix above in conjunction
+with R's built-in methods.</p>
+<div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">0</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">)))</span>
+<span class="n">A</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2]</span>
+<span class="err">## [1,]    3    1</span>
+<span class="err">## [2,]    0    2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">A1</span> <span class="o">&lt;-</span> <span class="nf">matrix.inverse</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">A1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]       [,2]</span>
+<span class="err">## [1,] 0.3333333 -0.1666667</span>
+<span class="err">## [2,] 0.0000000  0.5000000</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">solve</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]       [,2]</span>
+<span class="err">## [1,] 0.3333333 -0.1666667</span>
+<span class="err">## [2,] 0.0000000  0.5000000</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">-1</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">0</span><span class="p">)))</span>
+<span class="n">B</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    1    1    3</span>
+<span class="err">## [2,]    0    2    4</span>
+<span class="err">## [3,]   -1    1    0</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">B1</span> <span class="o">&lt;-</span> <span class="nf">matrix.inverse</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">B1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    2 -1.5    1</span>
+<span class="err">## [2,]    2 -1.5    2</span>
+<span class="err">## [3,]   -1  1.0   -1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">solve</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    2 -1.5    1</span>
+<span class="err">## [2,]    2 -1.5    2</span>
+<span class="err">## [3,]   -1  1.0   -1</span>
+</pre></div>
+
+
+<p>Recall the product of the matrix and its inverse will always equal the
+identity matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">%*%</span> <span class="n">A1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2]</span>
+<span class="err">## [1,]    1    0</span>
+<span class="err">## [2,]    0    1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">%*%</span> <span class="n">B1</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    1    0    0</span>
+<span class="err">## [2,]    0    1    0</span>
+<span class="err">## [3,]    0    0    1</span>
+</pre></div>
+
+
+<p>Matrices that are singular or not of full rank will have a determinant
+of 0, and thus no inverse exists.</p>
+<div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">-1</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">-4</span><span class="p">,</span><span class="m">2</span><span class="p">)))</span>
+<span class="n">C</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2]</span>
+<span class="err">## [1,]    2   -4</span>
+<span class="err">## [2,]   -1    2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">solve</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Error in solve.default(C): Lapack routine dgesv: system is exactly singular: U[2,2] = 0</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">D</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">-2</span><span class="p">,</span><span class="m">-2</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">-3</span><span class="p">,</span><span class="m">-3</span><span class="p">)))</span>
+<span class="n">D</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    2    2    3</span>
+<span class="err">## [2,]    1   -2   -3</span>
+<span class="err">## [3,]    4   -2   -3</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">solve</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Error in solve.default(D): Lapack routine dgesv: system is exactly singular: U[3,3] = 0</span>
+</pre></div>
+
+
+<h2>Summary</h2>
+<p>The inverse matrix was explored by examining several concepts such as
+linear dependency and the rank of a matrix. The method of calculating an
+inverse of a <span class="math">\(2 \times 2\)</span> and <span class="math">\(3 \times 3\)</span> matrix (if one exists) was
+also demonstrated. As stated earlier, finding an inverse matrix is best
+left to a computer, especially when dealing with matrices of
+<span class="math">\(4 \times 4\)</span> or above.</p>
+<h2>References</h2>
+<p>Hefferon, J. (n.d.). Linear Algebra</p>
+<p>Inverse matrix of 2x2 matrix, 3x3 matrix, 4x4 matrix. Retrieved August
+10, 2016, from
+<a href="http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html">http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html</a></p>
+<p><a href="https://amzn.to/2vcB1my">Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., &amp; Wasserman, W.
+(2004). Applied linear statistical models (5th ed.). Boston, MA:
+McGraw-Hill Higher Education.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/principal-component-analysis-r-example.html">Principal Component Analysis with R Example</a></li>
+                        <li><a href="https://aaronschlegel.me/singular-value-decomposition-r.html">Singular Value Decomposition and R Example</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Factor Analysis with Principal Factor Method and R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="As discussed in a previous post on the principal component method of factor analysis, the \(\hat{\Psi}\) term in the estimated covariance matrix \(S\), \(S = \hat{\Lambda} \hat{\Lambda}' + \hat{\Psi}\), was excluded and we proceeded directly to factoring \(S\) and \(R\). The principal factor method of factor analysis (also called the principal axis method) finds an initial estimate of \(\hat{\Psi}\) and factors \(S - \hat{\Psi}\), or \(R - \hat{\Psi}\) for the correlation matrix. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Factor Analysis with Principal Factor Method and R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2017-02-23 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="As discussed in a previous post on the principal component method of factor analysis, the \(\hat{\Psi}\) term in the estimated covariance matrix \(S\), \(S = \hat{\Lambda} \hat{\Lambda}' + \hat{\Psi}\), was excluded and we proceeded directly to factoring \(S\) and \(R\). The principal factor method of factor analysis (also called the principal axis method) finds an initial estimate of \(\hat{\Psi}\) and factors \(S - \hat{\Psi}\), or \(R - \hat{\Psi}\) for the correlation matrix. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/factor-analysis-principal-factor-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/factor-analysis-principal-factor-r.html" rel="bookmark"
+                   title="Permalink to Factor Analysis with Principal Factor Method and R">Factor Analysis with Principal Factor Method and R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2017-02-23T00:00:00-08:00">
+                Thu 23 February 2017
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>As discussed in a previous post on the <a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r.html">principal component method of
+factor analysis</a>, the <span class="math">\(\hat{\Psi}\)</span> term in the
+estimated covariance matrix <span class="math">\(S\)</span>,
+<span class="math">\(S = \hat{\Lambda} \hat{\Lambda}' + \hat{\Psi}\)</span>, was excluded and we
+proceeded directly to factoring <span class="math">\(S\)</span> and <span class="math">\(R\)</span>. The principal factor method
+of factor analysis (also called the principal axis method) finds an
+initial estimate of <span class="math">\(\hat{\Psi}\)</span> and factors <span class="math">\(S - \hat{\Psi}\)</span>, or
+<span class="math">\(R - \hat{\Psi}\)</span> for the correlation matrix. Rearranging the estimated
+covariance and correlation matrices with the estimated <span class="math">\(p \times m\)</span>
+<span class="math">\(\hat{\Lambda}\)</span> matrix yields:</p>
+<div class="math">$$ S - \hat{\Psi} = \hat{\Lambda} \hat{\Lambda}^\prime $$</div>
+<div class="math">$$ R - \hat{\Psi} = \hat{\Lambda} \hat{\Lambda}^\prime $$</div>
+<p>Therefore the principal factor method begins with eigenvalues and
+eigenvectors of <span class="math">\(S - \hat{\Psi}\)</span> or <span class="math">\(R - \hat{\Psi}\)</span>. <span class="math">\(\hat{\Psi}\)</span> is a
+diagonal matrix of the <span class="math">\(i\)</span>th communality. As in the principal component
+method, the <span class="math">\(i\)</span>th communality, <span class="math">\(\hat{h}^2_i\)</span>, is equal to
+<span class="math">\(s_{ii} - \hat{\psi}_i\)</span> for <span class="math">\(S - \hat{\Psi}\)</span> and <span class="math">\(1 - \hat{\psi}_i\)</span> for
+<span class="math">\(R - \hat{\Psi}\)</span>. The diagonal of <span class="math">\(S\)</span> or <span class="math">\(R\)</span> is replaced by their
+respective communalities in <span class="math">\(\hat{\psi}_i\)</span> which gives us the following
+forms:</p>
+<div class="math">$$ S - \hat{\Psi} = 
+\begin{bmatrix}
+  \hat{h}^2_1 &amp; s_{12} &amp; \cdots &amp; s_{1p} \\
+  s_{21} &amp; \hat{h}^2_2 &amp; \cdots &amp; s_{2p} \\
+  \vdots &amp; \vdots &amp; &amp; \vdots \\
+  s_{p1} &amp; s_{p2} &amp; \cdots &amp; \hat{h}^2_p \\
+\end{bmatrix}$$</div>
+<div class="math">$$ R - \hat{\Psi} = 
+\begin{bmatrix}
+  \hat{h}^2_1 &amp; r_{12} &amp; \cdots &amp; r_{1p} \\
+  r_{21} &amp; \hat{h}^2_2 &amp; \cdots &amp; r_{2p} \\
+  \vdots &amp; \vdots &amp; &amp; \vdots \\
+  r_{p1} &amp; r_{p2} &amp; \cdots &amp; \hat{h}^2_p \\
+\end{bmatrix}$$</div>
+<p>An initial estimate of the communalities is made using the squared
+multiple correlation between the observation vector <span class="math">\(y_i\)</span> and the other
+<span class="math">\(p - 1\)</span> variables. The squared multiple correlation in the case of
+<span class="math">\(R - \hat{\Psi}\)</span> is equivalent to the following:</p>
+<div class="math">$$ \hat{h}^2_i = 1 - \frac{1}{r^{ii}} $$</div>
+<p>Where <span class="math">\(r^{ii}\)</span> is the <span class="math">\(i\)</span>th diagonal element of <span class="math">\(R^{-1}\)</span>. In the case of
+<span class="math">\(S - \hat{\Psi}\)</span>, the above is multiplied by the variance of the
+respective variable.</p>
+<p>The factor loadings are then calculated by finding the eigenvalues and
+eigenvectors of the <span class="math">\(R - \hat{\Psi}\)</span> or <span class="math">\(S - \hat{\Psi}\)</span> matrix.</p>
+<h2>Factor Analysis with the Principal Factor Method in R</h2>
+<p>We will perform factor analysis using the principal factor method on the
+rootstock data as done previously with the principal component method to
+see if the approaches differ significantly. The data were obtained from
+the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book Methods of
+Multivariate Analysis by Alvin Rencher. The data contains four dependent
+variables as follows:</p>
+<ul>
+<li>trunk girth at four years (mm <span class="math">\(\times\)</span> 100)</li>
+<li>extension growth at four years (m)</li>
+<li>trunk girth at 15 years (mm <span class="math">\(\times\)</span> 100)</li>
+<li>weight of tree above ground at 15 years (lb <span class="math">\(\times\)</span> 1000)</li>
+</ul>
+<p>Load the data and name the columns</p>
+<div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;ROOT.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Tree.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Ext.Growth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.15.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Weight.Above.Ground.15.Years&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Since the variables of the rootstock data were measured on different
+scales, we will proceed with using the correlation matrix <span class="math">\(R\)</span> to perform
+factor analysis.</p>
+<p>Find the correlation matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<span class="nf">round</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                              Trunk.Girth.4.Years Ext.Growth.4.Years</span>
+<span class="err">## Trunk.Girth.4.Years                         1.00               0.88</span>
+<span class="err">## Ext.Growth.4.Years                          0.88               1.00</span>
+<span class="err">## Trunk.Girth.15.Years                        0.44               0.52</span>
+<span class="err">## Weight.Above.Ground.15.Years                0.33               0.45</span>
+<span class="err">##                              Trunk.Girth.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                          0.44</span>
+<span class="err">## Ext.Growth.4.Years                           0.52</span>
+<span class="err">## Trunk.Girth.15.Years                         1.00</span>
+<span class="err">## Weight.Above.Ground.15.Years                 0.95</span>
+<span class="err">##                              Weight.Above.Ground.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                                  0.33</span>
+<span class="err">## Ext.Growth.4.Years                                   0.45</span>
+<span class="err">## Trunk.Girth.15.Years                                 0.95</span>
+<span class="err">## Weight.Above.Ground.15.Years                         1.00</span>
+</pre></div>
+
+
+<p>Calculate and replace the diagonal of <span class="math">\(R\)</span> with the estimated
+communalities.</p>
+<div class="highlight"><pre><span></span><span class="n">R.smc</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="m">1</span> <span class="o">-</span> <span class="m">1</span> <span class="o">/</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">solve</span><span class="p">(</span><span class="n">R</span><span class="p">)))</span>
+<span class="nf">diag</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">R.smc</span>
+<span class="nf">round</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                              Trunk.Girth.4.Years Ext.Growth.4.Years</span>
+<span class="err">## Trunk.Girth.4.Years                         0.80               0.88</span>
+<span class="err">## Ext.Growth.4.Years                          0.88               0.81</span>
+<span class="err">## Trunk.Girth.15.Years                        0.44               0.52</span>
+<span class="err">## Weight.Above.Ground.15.Years                0.33               0.45</span>
+<span class="err">##                              Trunk.Girth.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                          0.44</span>
+<span class="err">## Ext.Growth.4.Years                           0.52</span>
+<span class="err">## Trunk.Girth.15.Years                         0.91</span>
+<span class="err">## Weight.Above.Ground.15.Years                 0.95</span>
+<span class="err">##                              Weight.Above.Ground.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                                  0.33</span>
+<span class="err">## Ext.Growth.4.Years                                   0.45</span>
+<span class="err">## Trunk.Girth.15.Years                                 0.95</span>
+<span class="err">## Weight.Above.Ground.15.Years                         0.91</span>
+</pre></div>
+
+
+<p>Now that we have an initial estimate of the communalities, we can find
+the eigenvalues and eigenvectors of the <span class="math">\(R - \hat{\Psi}\)</span> matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">r.eigen</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+<span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1]  2.64598796  0.90756969 -0.03306996 -0.09008523</span>
+</pre></div>
+
+
+<p>The <span class="math">\(R\)</span> matrix is no longer positive semidefinite due to replacing the
+diagonal with the communalities. Thus there are a few small negative
+eigenvalues. Since negative eigenvalues cannot be used to estimate
+<span class="math">\(\hat{\Lambda}\)</span> (due to taking the square root of the <span class="math">\(D\)</span> matrix), we
+can proceed with <span class="math">\(m = 2\)</span>.</p>
+<p>An interesting note is when negative eigenvalues exist, the cumulative
+proportion of variance calculated from the eigenvalues will exceed <span class="math">\(1\)</span>
+and then decline back to <span class="math">\(1\)</span> after considering the negative eigenvalues.
+The following loop demonstrates this phenomenon:</p>
+<div class="highlight"><pre><span></span><span class="n">tot.prop</span> <span class="o">&lt;-</span> <span class="m">0</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">tot.prop</span> <span class="o">&lt;-</span> <span class="n">tot.prop</span> <span class="o">+</span> <span class="n">i</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">)</span>
+  <span class="nf">print</span><span class="p">(</span><span class="n">tot.prop</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.7713346</span>
+<span class="err">## [1] 1.035901</span>
+<span class="err">## [1] 1.026261</span>
+<span class="err">## [1] 1</span>
+</pre></div>
+
+
+<p>Obtain the factor loadings as before by multiplying the square root of
+the first two eigenvalues by their respective eigenvectors.</p>
+<div class="highlight"><pre><span></span><span class="n">r.lambda</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">))</span>
+<span class="n">r.lambda</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]       [,2]</span>
+<span class="err">## [1,] -0.7402973  0.5421762</span>
+<span class="err">## [2,] -0.8034091  0.4520610</span>
+<span class="err">## [3,] -0.8770380 -0.4050851</span>
+<span class="err">## [4,] -0.8266112 -0.4951379</span>
+</pre></div>
+
+
+<p>The communalities, specific variances and complexity of the factor
+loadings can then be calculated.</p>
+<div class="highlight"><pre><span></span><span class="n">r.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^2</span><span class="p">)</span>
+<span class="n">r.u2</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">-</span> <span class="n">r.h2</span>
+<span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^2</span><span class="p">)</span><span class="n">^2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^4</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Collect the results into a <code>data.frame</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">cor.pa</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="n">r.lambda</span><span class="p">,</span> <span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">r.h2</span><span class="p">,</span> <span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">r.u2</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">com</span><span class="p">,</span> <span class="m">1</span><span class="p">)))</span>
+<span class="nf">colnames</span><span class="p">(</span><span class="n">cor.pa</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;PA1&#39;</span><span class="p">,</span> <span class="s">&#39;PA2&#39;</span><span class="p">,</span> <span class="s">&#39;h2&#39;</span><span class="p">,</span> <span class="s">&#39;u2&#39;</span><span class="p">,</span> <span class="s">&#39;com&#39;</span><span class="p">)</span>
+<span class="n">cor.pa</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##     PA1   PA2   h2    u2 com</span>
+<span class="err">## 1 -0.74  0.54 0.84 0.158 1.8</span>
+<span class="err">## 2 -0.80  0.45 0.85 0.150 1.6</span>
+<span class="err">## 3 -0.88 -0.41 0.93 0.067 1.4</span>
+<span class="err">## 4 -0.83 -0.50 0.93 0.072 1.6</span>
+</pre></div>
+
+
+<h2>Principal Factor Method with the <code>psych</code> Package</h2>
+<p>The <a href="https://cran.r-project.org/web/packages/psych/">psych package</a> also
+performs factor analysis using the principal method with the <code>fa()</code>
+function.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">psych</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>fa()</code> function performs the iterated principal factor method by
+default, which, as the name implies, iterates the initial communality
+estimates with those of the resulting <span class="math">\(\hat{\Lambda}\)</span> matrix until they
+converge. This approach to factor analysis will be demonstrated in a
+future post. Setting the <code>max.iter</code> argument to 1 will output the
+non-iterated principal factor method results.</p>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">root.cor.fa</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Factor Analysis using method =  pa</span>
+<span class="err">## Call: fa(r = root[, 2:5], nfactors = 2, rotate = &quot;none&quot;, max.iter = 1, </span>
+<span class="err">##     fm = &quot;pa&quot;)</span>
+<span class="err">## Standardized loadings (pattern matrix) based upon correlation matrix</span>
+<span class="err">##                               PA1   PA2   h2    u2 com</span>
+<span class="err">## Trunk.Girth.4.Years          0.74  0.54 0.84 0.158 1.8</span>
+<span class="err">## Ext.Growth.4.Years           0.80  0.45 0.85 0.150 1.6</span>
+<span class="err">## Trunk.Girth.15.Years         0.88 -0.41 0.93 0.067 1.4</span>
+<span class="err">## Weight.Above.Ground.15.Years 0.83 -0.50 0.93 0.072 1.6</span>
+<span class="err">## </span>
+<span class="err">##                        PA1  PA2</span>
+<span class="err">## SS loadings           2.65 0.91</span>
+<span class="err">## Proportion Var        0.66 0.23</span>
+<span class="err">## Cumulative Var        0.66 0.89</span>
+<span class="err">## Proportion Explained  0.74 0.26</span>
+<span class="err">## Cumulative Proportion 0.74 1.00</span>
+<span class="err">## </span>
+<span class="err">## Mean item complexity =  1.6</span>
+<span class="err">## Test of the hypothesis that 2 factors are sufficient.</span>
+<span class="err">## </span>
+<span class="err">## The degrees of freedom for the null model are  6  and the objective function was  4.19 with Chi Square of  187.92</span>
+<span class="err">## The degrees of freedom for the model are -1  and the objective function was  0.17 </span>
+<span class="err">## </span>
+<span class="err">## The root mean square of the residuals (RMSR) is  0.02 </span>
+<span class="err">## The df corrected root mean square of the residuals is  NA </span>
+<span class="err">## </span>
+<span class="err">## The harmonic number of observations is  48 with the empirical chi square  0.24  with prob &lt;  NA </span>
+<span class="err">## The total number of observations was  48  with Likelihood Chi Square =  7.26  with prob &lt;  NA </span>
+<span class="err">## </span>
+<span class="err">## Tucker Lewis Index of factoring reliability =  1.281</span>
+<span class="err">## Fit based upon off diagonal values = 1</span>
+<span class="err">## Measures of factor score adequacy             </span>
+<span class="err">##                                                    PA1  PA2</span>
+<span class="err">## Correlation of (regression) scores with factors   0.98 0.93</span>
+<span class="err">## Multiple R square of scores with factors          0.95 0.86</span>
+<span class="err">## Minimum correlation of possible factor scores     0.90 0.72</span>
+</pre></div>
+
+
+<p>The results of the <code>fa()</code> function align to our own other than an
+arbitrary scaling of the first factor by <span class="math">\(-1\)</span>.</p>
+<h2>Rotation of Factor Loadings</h2>
+<p>Rotate the factors using <a href="https://en.wikipedia.org/wiki/Varimax_rotation">varimax
+rotation</a> to improve
+interpretation. Varimax rotation of the loadings can be done with the
+<code>varimax()</code> function, or in the <code>fa()</code> function by setting the <code>rotate</code>
+argument to <code>varimax</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa.v</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">root.cor.fa.v</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Factor Analysis using method =  pa</span>
+<span class="err">## Call: fa(r = root[, 2:5], nfactors = 2, rotate = &quot;varimax&quot;, max.iter = 1, </span>
+<span class="err">##     fm = &quot;pa&quot;)</span>
+<span class="err">## Standardized loadings (pattern matrix) based upon correlation matrix</span>
+<span class="err">##                               PA1  PA2   h2    u2 com</span>
+<span class="err">## Trunk.Girth.4.Years          0.19 0.90 0.84 0.158 1.1</span>
+<span class="err">## Ext.Growth.4.Years           0.30 0.87 0.85 0.150 1.2</span>
+<span class="err">## Trunk.Girth.15.Years         0.92 0.29 0.93 0.067 1.2</span>
+<span class="err">## Weight.Above.Ground.15.Years 0.95 0.18 0.93 0.072 1.1</span>
+<span class="err">## </span>
+<span class="err">##                        PA1  PA2</span>
+<span class="err">## SS loadings           1.87 1.68</span>
+<span class="err">## Proportion Var        0.47 0.42</span>
+<span class="err">## Cumulative Var        0.47 0.89</span>
+<span class="err">## Proportion Explained  0.53 0.47</span>
+<span class="err">## Cumulative Proportion 0.53 1.00</span>
+<span class="err">## </span>
+<span class="err">## Mean item complexity =  1.1</span>
+<span class="err">## Test of the hypothesis that 2 factors are sufficient.</span>
+<span class="err">## </span>
+<span class="err">## The degrees of freedom for the null model are  6  and the objective function was  4.19 with Chi Square of  187.92</span>
+<span class="err">## The degrees of freedom for the model are -1  and the objective function was  0.17 </span>
+<span class="err">## </span>
+<span class="err">## The root mean square of the residuals (RMSR) is  0.02 </span>
+<span class="err">## The df corrected root mean square of the residuals is  NA </span>
+<span class="err">## </span>
+<span class="err">## The harmonic number of observations is  48 with the empirical chi square  0.24  with prob &lt;  NA </span>
+<span class="err">## The total number of observations was  48  with Likelihood Chi Square =  7.26  with prob &lt;  NA </span>
+<span class="err">## </span>
+<span class="err">## Tucker Lewis Index of factoring reliability =  1.281</span>
+<span class="err">## Fit based upon off diagonal values = 1</span>
+<span class="err">## Measures of factor score adequacy             </span>
+<span class="err">##                                                    PA1  PA2</span>
+<span class="err">## Correlation of (regression) scores with factors   0.97 0.94</span>
+<span class="err">## Multiple R square of scores with factors          0.94 0.87</span>
+<span class="err">## Minimum correlation of possible factor scores     0.88 0.75</span>
+</pre></div>
+
+
+<h2>Principal Component and Principal Factor Methods Comparison</h2>
+<p>The principal factor method (and iterated principal factor method) will
+usually yield results close to the principal component method if either
+the correlations or the number of variables is large (Rencher, 2002, pp.
+424).</p>
+<p>Perform the principal component method of factor analysis and compare
+with the principal factor method.</p>
+<div class="highlight"><pre><span></span><span class="n">root.cor.pa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
+<span class="n">root.cor.pa</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Principal Components Analysis</span>
+<span class="err">## Call: principal(r = root[, 2:5], nfactors = 2, rotate = &quot;varimax&quot;)</span>
+<span class="err">## Standardized loadings (pattern matrix) based upon correlation matrix</span>
+<span class="err">##                               RC1  RC2   h2    u2 com</span>
+<span class="err">## Trunk.Girth.4.Years          0.16 0.96 0.95 0.051 1.1</span>
+<span class="err">## Ext.Growth.4.Years           0.28 0.93 0.94 0.061 1.2</span>
+<span class="err">## Trunk.Girth.15.Years         0.94 0.29 0.97 0.027 1.2</span>
+<span class="err">## Weight.Above.Ground.15.Years 0.97 0.19 0.98 0.022 1.1</span>
+<span class="err">## </span>
+<span class="err">##                        RC1  RC2</span>
+<span class="err">## SS loadings           1.94 1.90</span>
+<span class="err">## Proportion Var        0.48 0.48</span>
+<span class="err">## Cumulative Var        0.48 0.96</span>
+<span class="err">## Proportion Explained  0.50 0.50</span>
+<span class="err">## Cumulative Proportion 0.50 1.00</span>
+<span class="err">## </span>
+<span class="err">## Mean item complexity =  1.1</span>
+<span class="err">## Test of the hypothesis that 2 components are sufficient.</span>
+<span class="err">## </span>
+<span class="err">## The root mean square of the residuals (RMSR) is  0.03 </span>
+<span class="err">##  with the empirical chi square  0.39  with prob &lt;  NA </span>
+<span class="err">## </span>
+<span class="err">## Fit based upon off diagonal values = 1</span>
+</pre></div>
+
+
+<p>Both methods achieved a simple structure of the loadings following
+rotation. The loadings from each method are rather similar and don't
+differ significantly, though the principal component method yielded
+factors that load more heavily on the variables which the factors
+hypothetically represent. However, the factors resulting from the
+principal component method explain 96% of the cumulative variance
+compared to 89% from the principal factor method. Though not a drastic
+difference, one is inclined to proceed with the principal component
+method in this case as the factors account for almost all of the
+variance in the variables.</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/factor-analysis-iterated-factor-method-r.html">Factor Analysis with the Iterated Factor Method and R</a></li>
+                        <li><a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r-part-two.html">Factor Analysis with the Principal Component Method and R Part Two</a></li>
+                        <li><a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r.html">Factor Analysis with the Principal Component Method and R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

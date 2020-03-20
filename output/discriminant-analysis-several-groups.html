@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Discriminant Analysis of Several Groups</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Discriminant analysis is also applicable in the case of more than two groups. In the first post on discriminant analysis, there was only one linear discriminant function as the number of linear discriminant functions is \(s = min(p, k − 1)\), where \(p\) is the number of dependent variables and \(k\) is the number of groups. In the case of more than two groups, there will be more than one linear discriminant function, which allows us to examine the groups' separation in more than one dimension. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Discriminant Analysis of Several Groups" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-08-17 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Discriminant analysis is also applicable in the case of more than two groups. In the first post on discriminant analysis, there was only one linear discriminant function as the number of linear discriminant functions is \(s = min(p, k − 1)\), where \(p\) is the number of dependent variables and \(k\) is the number of groups. In the case of more than two groups, there will be more than one linear discriminant function, which allows us to examine the groups' separation in more than one dimension. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/discriminant-analysis-several-groups.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/discriminant-analysis-several-groups.html" rel="bookmark"
+                   title="Permalink to Discriminant Analysis of Several Groups">Discriminant Analysis of Several Groups</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-08-17T00:00:00-07:00">
+                Fri 17 August 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>Discriminant analysis is also applicable in the case of more than two groups. In the first post on <a href="http://wp.me/p4aZEo-5Os">discriminant analysis</a>, there was only one linear discriminant function as the number of linear discriminant functions is <span class="math">\(s = min(p, k − 1)\)</span>, where <span class="math">\(p\)</span> is the number of dependent variables and <span class="math">\(k\)</span> is the number of groups. In the case of more than two groups, there will be more than one linear discriminant function, which allows us to examine the groups' separation in more than one dimension. Discriminant analysis of several groups also makes it possible to rank the variables regarding their relative importance to group separation.</p>
+<h2>Discriminant Analysis of Several Groups</h2>
+<p>Similar to the two-group case, the goal is to find a vector <span class="math">\(a\)</span> that separates the discriminant functions <span class="math">\(\bar{z}_1, \bar{z}_2, \cdots, \bar{z}_k\)</span> at a maximum. To extend the separation criteria to the <span class="math">\(k &gt; 2\)</span> case, we take the two-group equation:</p>
+<div class="math">$$ \frac{(\bar{z}_1 - \bar{z}_2)}{s_z^2} = \frac{[a'(\bar{y}_1 - \bar{y}_2)]^2}{a'S_{p1}a} $$</div>
+<p>And express it in the form:</p>
+<div class="math">$$ \frac{(\bar{z}_1 - \bar{z}_2)}{s_z^2} = \frac{a'(\bar{y}_1 - \bar{y}_2)(\bar{y}_1 - \bar{y}_2)'a}{a'S_{p1}a} $$</div>
+<p>In the discriminant analysis of several groups setting, the <span class="math">\(H\)</span> hypothesis matrix and <span class="math">\(E\)</span> error matrix from MANOVA are utilized. <span class="math">\(H\)</span> replaces <span class="math">\((\bar{y}_1 - \bar{y}_2)(\bar{y}_1 - \bar{y}_2)'\)</span> while <span class="math">\(E\)</span> replaces <span class="math">\(S_{p1}\)</span>, which gives us:</p>
+<div class="math">$$ \lambda = \frac{a'Ha}{a'Ea} $$</div>
+<p>Rearranging the above yields:</p>
+<div class="math">$$ a(Ha − \lambda Ea)=0 $$</div>
+<p>Which can also be written as:</p>
+<div class="math">$$(E^{−1}H − \lambda I)a = 0 $$</div>
+<p>The solutions of which are the eigenvalues <span class="math">\(\lambda_1, \lambda_2, \cdots, \lambda_s\)</span> and their corresponding eigenvectors <span class="math">\(a_1, a_2, \cdots, a_s\)</span> of the matrix <span class="math">\(E^{−1}H\)</span>. Therefore, the first and largest eigenvalue <span class="math">\(\lambda_1\)</span> and its eigenvector <span class="math">\(a_1\)</span> maximally separate the groups.</p>
+<p>The number of eigenvalues and associated eigenvectors of <span class="math">\(E^{−1}H\)</span>, <span class="math">\(s\)</span>, is also the number of discriminant functions that are obtained by discriminant analysis of several groups.</p>
+<h2>Discriminant Analysis of Several Groups in R</h2>
+<p>This example will analyze the rootstock data as in the previous MANOVA post. The rootstock data were obtained from the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book Methods of Multivariate Analysis by Alvin Rencher. The data contains four dependent variables as follows:</p>
+<ul>
+<li>trunk girth at four years (mm × 100)</li>
+<li>extension growth at four years (m)</li>
+<li>trunk girth at 15 years (mm × 100)</li>
+<li>weight of tree above ground at 15 years (lb × 1000)</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;ROOT.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Tree.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Ext.Growth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.15.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Weight.Above.Ground.15.Years&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>To calculate the discriminant functions of more than two groups, the <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices from MANOVA must be computed.</p>
+<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+<span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+<span class="p">},</span> <span class="n">simplify</span> <span class="o">=</span> <span class="s">&#39;data.frame&#39;</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span> <span class="o">/</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+<span class="n">total.means</span> <span class="o">&lt;-</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+
+<span class="n">H</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">H[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">))</span>
+    <span class="n">H[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">E</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> 
+    <span class="nf">for </span><span class="p">(</span><span class="n">k</span> <span class="n">in</span> <span class="n">root.group</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">((</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span><span class="p">)))</span>
+      <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">E[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">E[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Then find the eigenvalues and eigenvectors of the matrix <span class="math">\(E^{−1}H\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">eigens</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="nf">solve</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">H</span><span class="p">)</span>
+<span class="n">eigens</span><span class="o">$</span><span class="n">values</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 1.87567112 0.79069454 0.22904907 0.02595357</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">eigens</span><span class="o">$</span><span class="n">vectors</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             [,1]        [,2]       [,3]        [,4]</span>
+<span class="err">## [1,] -0.55337105  0.08340397 -0.1521720  0.97955535</span>
+<span class="err">## [2,]  0.30911038  0.08894955  0.2539187 -0.12869430</span>
+<span class="err">## [3,] -0.76855963 -0.52426558  0.4623164 -0.08413202</span>
+<span class="err">## [4,]  0.08687548  0.84277954 -0.8358424  0.12973396</span>
+</pre></div>
+
+
+<p>Thus there are four discriminant functions. The largest eigenvalue 1.8757 and its associated eigenvector ( − 0.5534, .3091, −0.7686, 0.0868) represent the discriminant function that maximally separates the groups.</p>
+<p>We can see the first eigenvector is the solution to the above equation <span class="math">\(\lambda = \frac{a'Ha}{a'Ea}\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">crossprod</span><span class="p">(</span><span class="n">eigens</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">eigens</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span> <span class="o">/</span>  <span class="p">(</span><span class="nf">crossprod</span><span class="p">(</span><span class="n">eigens</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">,</span> <span class="n">E</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">eigens</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          [,1]</span>
+<span class="err">## [1,] 1.875671</span>
+</pre></div>
+
+
+<p>The above can also be done with the <code>lda()</code> function available in the <a href="https://cran.r-project.org/web/packages/MASS/index.html">MASS package</a>.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">MASS</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>lda()</code> function takes a formula argument.</p>
+<div class="highlight"><pre><span></span><span class="n">root.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">)</span>
+<span class="n">root.lda</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Call:</span>
+<span class="err">## lda(Tree.Number ~ ., data = root)</span>
+<span class="err">## </span>
+<span class="err">## Prior probabilities of groups:</span>
+<span class="err">##         1         2         3         4         5         6 </span>
+<span class="err">## 0.1666667 0.1666667 0.1666667 0.1666667 0.1666667 0.1666667 </span>
+<span class="err">## </span>
+<span class="err">## Group means:</span>
+<span class="err">##   Trunk.Girth.4.Years Ext.Growth.4.Years Trunk.Girth.15.Years</span>
+<span class="err">## 1             1.13750           2.977125              3.73875</span>
+<span class="err">## 2             1.15750           3.109125              4.51500</span>
+<span class="err">## 3             1.10750           2.815250              4.45500</span>
+<span class="err">## 4             1.09750           2.879750              3.90625</span>
+<span class="err">## 5             1.08000           2.557250              4.31250</span>
+<span class="err">## 6             1.03625           2.214625              3.59625</span>
+<span class="err">##   Weight.Above.Ground.15.Years</span>
+<span class="err">## 1                     0.871125</span>
+<span class="err">## 2                     1.280500</span>
+<span class="err">## 3                     1.391375</span>
+<span class="err">## 4                     1.039000</span>
+<span class="err">## 5                     1.181000</span>
+<span class="err">## 6                     0.735000</span>
+<span class="err">## </span>
+<span class="err">## Coefficients of linear discriminants:</span>
+<span class="err">##                                     LD1        LD2       LD3       LD4</span>
+<span class="err">## Trunk.Girth.4.Years           3.0479952  -1.140083 -1.002448 23.419063</span>
+<span class="err">## Ext.Growth.4.Years           -1.7025953  -1.215888  1.672714 -3.076804</span>
+<span class="err">## Trunk.Girth.15.Years          4.2332645   7.166403  3.045553 -2.011416</span>
+<span class="err">## Weight.Above.Ground.15.Years -0.4785144 -11.520302 -5.506192  3.101660</span>
+<span class="err">## </span>
+<span class="err">## Proportion of trace:</span>
+<span class="err">##    LD1    LD2    LD3    LD4 </span>
+<span class="err">## 0.6421 0.2707 0.0784 0.0089</span>
+</pre></div>
+
+
+<p>The output of the <code>lda()</code> function also shows there are four discriminant functions. The coefficients are different than what we computed; however, this is just a matter of scaling.</p>
+<div class="highlight"><pre><span></span><span class="n">root.lda</span><span class="o">$</span><span class="n">scaling</span> <span class="o">/</span> <span class="n">eigens</span><span class="o">$</span><span class="n">vectors</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                                   LD1       LD2      LD3      LD4</span>
+<span class="err">## Trunk.Girth.4.Years          -5.50805 -13.66941 6.587596 23.90785</span>
+<span class="err">## Ext.Growth.4.Years           -5.50805 -13.66941 6.587596 23.90785</span>
+<span class="err">## Trunk.Girth.15.Years         -5.50805 -13.66941 6.587596 23.90785</span>
+<span class="err">## Weight.Above.Ground.15.Years -5.50805 -13.66941 6.587596 23.90785</span>
+</pre></div>
+
+
+<p>Thus either set of coefficients is a solution as a multiple of an eigenvector is still the same eigenvector. The proportion of the trace output of the <code>lda()</code> function is the relative importance of each discriminant function.</p>
+<h2>Relative Importance of Discriminant Functions</h2>
+<p>The relative importance of each discriminant function is found by finding the associated eigenvalue's proportion to the total sum of the eigenvalues.</p>
+<div class="math">$$ \frac{\lambda_i}{\sum^s_{j=1} \lambda_i} $$</div>
+<div class="highlight"><pre><span></span><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">eigens</span><span class="o">$</span><span class="n">values</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">print</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">eigens</span><span class="o">$</span><span class="n">values</span><span class="p">),</span> <span class="m">4</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.6421</span>
+<span class="err">## [1] 0.2707</span>
+<span class="err">## [1] 0.0784</span>
+<span class="err">## [1] 0.0089</span>
+</pre></div>
+
+
+<p>The first and second discriminant functions account for 91% of the proportion of the total. Therefore the mean vectors lie primarily in one dimension and slightly in another dimension.</p>
+<h2>Test of Significance of Discriminant Functions</h2>
+<p>Wilks <span class="math">\(\LambdaΛ\)</span>-test, a common <a href="http://wp.me/p4aZEo-5Pu">MANOVA test statistic</a>, is also employed in the discriminant analysis for several groups setting. Wilks test is defined as:</p>
+<div class="math">$$ \Lambda_1 = \prod^s_{i=1} \frac{1}{1 + \lambda_i} $$</div>
+<p>Which is distributed as <span class="math">\(\Lambda^p_{k − 1, N − k}\)</span>. An approximate F-test is used for each <span class="math">\(\Lambda_i\)</span>.</p>
+<div class="math">$$ F = \frac{1 - \Lambda_1^{(1/t)}}{\Lambda_1^{(1/t)}} \frac{df_2}{df_1} $$</div>
+<p>Where,</p>
+<div class="math">$$ t = \sqrt{\frac{p^2(k-1)^2 - 4}{p^2 + (k - 1)^2 - 5}} $$</div>
+<div class="math">$$ w = N - 1 - \frac{1}{2}(p + k) $$</div>
+<div class="math">$$ df_1 = p(k − 1) $$</div>
+<div class="math">$$ df_2 = wt - \frac{1}{2}[p(k-1) -2] $$</div>
+<p>Denote <span class="math">\(\Lambda_m\)</span> after <span class="math">\(\Lambda_1\)</span> for each successive value as <span class="math">\(m = 2, 3, \cdots, s\)</span>, where <span class="math">\(s\)</span> is the number of non-zero eigenvalues of <span class="math">\(E^{−1}H\)</span>.</p>
+<div class="math">$$ \Lambda_m = \prod_{i=m}^s \frac{1}{1 + \lambda_i} $$</div>
+<p>The approximate F-test becomes:</p>
+<div class="math">$$ F = \frac{1 - \Lambda_m^{(1/t)}}{\Lambda_m^{(1/t)}} \frac{df_2}{df_1} $$</div>
+<p><span class="math">\(p − m + 1\)</span> replaces <span class="math">\(p\)</span> and <span class="math">\(k − m\)</span> replaces <span class="math">\(k − 1\)</span>:</p>
+<div class="math">$$ t = \sqrt{\frac{p-m+1)^2(k-m)^2-4}{(p-m+1)^2+(k-m)^2-5}} $$</div>
+<div class="math">$$ w = N - 1 - \frac{1}{2}(p + k) $$</div>
+<div class="math">$$ df_1 = (p − m + 1)(k − m) $$</div>
+<div class="math">$$ df_2 = wt - \frac{1}{2}[(p - m + 1)(k - m) - 2] $$</div>
+<p>The following function implements the above to test the significance of each discriminant function. As noted previously, the first two discriminant functions represent 91% of the proportion of the total, so it is likely at least these functions will be significant.</p>
+<div class="highlight"><pre><span></span><span class="n">discriminant.significance</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">w</span> <span class="o">&lt;-</span> <span class="n">N</span> <span class="o">-</span> <span class="m">1</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">((</span><span class="n">p^2</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span><span class="n">^2</span> <span class="o">-</span> <span class="m">4</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p^2</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span><span class="n">^2</span> <span class="o">-</span> <span class="m">5</span><span class="p">))</span>
+  <span class="n">df1</span> <span class="o">&lt;-</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+  <span class="n">df2</span> <span class="o">&lt;-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span>
+  <span class="n">lambda1</span> <span class="o">&lt;-</span> <span class="nf">prod</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="n">eigenvalues</span><span class="p">))</span>
+  <span class="n">f1</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="m">1</span> <span class="o">-</span> <span class="n">lambda1</span><span class="nf">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="n">t</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">lambda1</span><span class="nf">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">df2</span> <span class="o">/</span> <span class="n">df1</span>
+  <span class="n">p1</span> <span class="o">&lt;-</span> <span class="nf">pf</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">lower.tail</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+
+  <span class="n">result</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">2</span><span class="o">:</span><span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">m</span> <span class="o">&lt;-</span> <span class="n">i</span>
+
+    <span class="nf">if </span><span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">t.i</span> <span class="o">&lt;-</span> <span class="m">1</span>
+    <span class="p">}</span> <span class="n">else</span> <span class="p">{</span>
+      <span class="n">t.i</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(((</span><span class="n">p</span> <span class="o">-</span> <span class="n">m</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span><span class="n">^2</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span><span class="n">^2</span> <span class="o">-</span> <span class="m">4</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="n">m</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span><span class="n">^2</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span><span class="n">^2</span> <span class="o">-</span> <span class="m">5</span><span class="p">))</span>
+    <span class="p">}</span>
+
+    <span class="n">df1.i</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">m</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">df2.i</span> <span class="o">&lt;-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">t.i</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="n">m</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span>
+    <span class="n">lambda.i</span> <span class="o">&lt;-</span> <span class="nf">prod</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="n">eigenvalues[i</span><span class="o">:</span><span class="n">p]</span><span class="p">))</span>
+    <span class="n">f.i</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="m">1</span> <span class="o">-</span> <span class="n">lambda.i</span><span class="nf">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="n">t.i</span><span class="p">))</span> <span class="o">/</span> <span class="n">lambda.i</span><span class="nf">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="n">t.i</span><span class="p">)</span> <span class="o">*</span> <span class="n">df2.i</span> <span class="o">/</span> <span class="n">df1.i</span>
+    <span class="n">p.i</span> <span class="o">&lt;-</span> <span class="nf">pf</span><span class="p">(</span><span class="n">f.i</span><span class="p">,</span> <span class="n">df1.i</span><span class="p">,</span> <span class="n">df2.i</span><span class="p">,</span> <span class="n">lower.tail</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>    
+    <span class="n">result</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">lambda.i</span><span class="p">,</span> <span class="n">f.i</span><span class="p">,</span> <span class="n">p.i</span><span class="p">))</span>
+  <span class="p">}</span>
+  <span class="n">res</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">lambda1</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">p1</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
+  <span class="nf">colnames</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Lambda&#39;</span><span class="p">,</span> <span class="s">&#39;Approximate F&#39;</span><span class="p">,</span> <span class="s">&#39;p-value&#39;</span><span class="p">)</span>
+  <span class="nf">return</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">N</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+<span class="n">p</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[2]</span> <span class="o">-</span> <span class="m">1</span>
+<span class="n">k</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+
+<span class="nf">discriminant.significance</span><span class="p">(</span><span class="n">eigens</span><span class="o">$</span><span class="n">values</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      Lambda Approximate F      p-value</span>
+<span class="err">## 1 0.1540077     4.9368880 7.713766e-09</span>
+<span class="err">## 2 0.4428754     3.1879149 6.382962e-04</span>
+<span class="err">## 3 0.7930546     1.6798943 1.363020e-01</span>
+<span class="err">## 4 0.9747030     0.5450251 5.838726e-01</span>
+</pre></div>
+
+
+<p>The first two discriminant functions are indeed significant while the remaining two can be ignored.</p>
+<div class="highlight"><pre><span></span><span class="nf">abs</span><span class="p">(</span><span class="n">root.lda</span><span class="o">$</span><span class="n">scaling[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                                    LD1       LD2</span>
+<span class="err">## Trunk.Girth.4.Years          3.0479952  1.140083</span>
+<span class="err">## Ext.Growth.4.Years           1.7025953  1.215888</span>
+<span class="err">## Trunk.Girth.15.Years         4.2332645  7.166403</span>
+<span class="err">## Weight.Above.Ground.15.Years 0.4785144 11.520302</span>
+</pre></div>
+
+
+<p>The dependent variable trunk girth at 15 years appears to separate the groups the most in both dimensions, while trunk girth at four years and weight above ground at 15 years are the most significant variables to separating the groups in their respective discriminant functions.</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/cholesky-decomposition-r-example.html">Cholesky Decomposition with R Example</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html">Linear Discriminant Analysis for the Classification of Two Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

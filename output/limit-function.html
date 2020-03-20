@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Limit of a Function</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/calculus.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="A function limit, roughly speaking, describes the behavior of a function around a specific value. Limits play a role in the definition of the derivative and function continuity and are also used in the convergent sequences. In this post, we will explore the definition of a function limit and some other limit laws using examples with Python." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Limit of a Function" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2019-02-17 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="A function limit, roughly speaking, describes the behavior of a function around a specific value. Limits play a role in the definition of the derivative and function continuity and are also used in the convergent sequences. In this post, we will explore the definition of a function limit and some other limit laws using examples with Python." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/limit-function.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/limit-function.html" rel="bookmark"
+                   title="Permalink to Limit of a Function">Limit of a Function</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2019-02-17T00:00:00-08:00">
+                Sun 17 February 2019
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A function limit, roughly speaking, describes the behavior of a function around a specific value. Limits play a role in the definition of the derivative and function continuity and are also used in the convergent sequences.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before getting to the precise definition of a limit, we can investigate limit of a function by plotting it and examining the area around the limit value.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For example, consider the limit (taken from James Stewart's <em>Calculus Early Transcendentals</em>, Exercise 11, page 107)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ \lim_{x\to 2} \frac{x^2 - x - 6}{x - 2} $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can plot this limit using the <a href="https://matplotlib.org/api/pyplot_summary.html"><code>matplotlib.pylot</code></a> module. The <a href="http://www.numpy.org/">numpy</a> library is also imported for some convenience functions.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Get a set of values for $x$ using the <a href="https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linspace.html"><code>linspace</code></a> function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[50]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then plot the function using <code>matplotlib</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The plot shows that as $x$ gets closer to $2$, the function gets close to $5$. One way to verify this is to look closer at the values of the function around the limit.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xvals2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.90</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">xvals2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[41]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([ 4.9  ,  4.901,  4.902,  4.903,  4.904,  4.905,  4.906,  4.907,
+        4.908,  4.909,  4.91 ,  4.911,  4.912,  4.913,  4.914,  4.915,
+        4.916,  4.917,  4.918,  4.919,  4.92 ,  4.921,  4.922,  4.923,
+        4.924,  4.925,  4.926,  4.927,  4.928,  4.929,  4.93 ,  4.931,
+        4.932,  4.933,  4.934,  4.935,  4.936,  4.937,  4.938,  4.939,
+        4.94 ,  4.941,  4.942,  4.943,  4.944,  4.945,  4.946,  4.947,
+        4.948,  4.949,  4.95 ,  4.951,  4.952,  4.953,  4.954,  4.955,
+        4.956,  4.957,  4.958,  4.959,  4.96 ,  4.961,  4.962,  4.963,
+        4.964,  4.965,  4.966,  4.967,  4.968,  4.969,  4.97 ,  4.971,
+        4.972,  4.973,  4.974,  4.975,  4.976,  4.977,  4.978,  4.979,
+        4.98 ,  4.981,  4.982,  4.983,  4.984,  4.985,  4.986,  4.987,
+        4.988,  4.989,  4.99 ,  4.991,  4.992,  4.993,  4.994,  4.995,
+        4.996,  4.997,  4.998,  4.999])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also use SymPy's <a href="http://docs.sympy.org/latest/tutorial/calculus.html#limits"><code>limit</code></a> function to calculate the limit.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">init_printing</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">init_printing</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Using this information, we can construct a more precise definition of a limit.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Definition-of-a-Limit">Definition of a Limit<a class="anchor-link" href="#Definition-of-a-Limit">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Limits are typically denoted as:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ \lim_{x\to a} \space f(x) = L $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Or, alternatively:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ f(x) \rightarrow L, \qquad x \rightarrow a $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In plain language, we can state the limit as, "the limit of the a function $f(x)$ as $x$ approaches $a$ is equal to $L$. For example, if we were considering the limit:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ \lim_{x \to 2} \space f(x) = 5 $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can state it as, "the limit of the function $f(x)$ as $x$ approaches $2$ is equal to $5$.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="One-Sided-Limits">One-Sided Limits<a class="anchor-link" href="#One-Sided-Limits">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>One-sided limits are used to express a limit as it approaches $a$ from a particular direction. The notation is similar to the limit seen above but with a slight change to indicate which direction $x$ is headed.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ \lim_{x \to a^+} \space f(x) = L, \qquad \lim_{x \to a^-} \space f(x) = L $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The notation $x \to a^+$ states we are only interested in values of $x$ that are greater than $a$. Similarly, the notation $x \to a^-$ denotes our desire to investigate values of $x$ less than $a$. These one-sided limits are also referred to as the "right-hand limit" and "left-hand limit", respectively.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For example, consider the function:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$ \lim_{x \to -3^+} \space \frac{x + 2}{x + 3} $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The $-3^+$ notation tells us we are only interested values greater than -3; thus the limit is a right-hand limit.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The function is not defined for $x = 3$; therefore we are dealing with an infinite limit. We can see the behavior of the function as $x$ approaches $-3$ by plotting.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[51]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[90]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xvals2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">xvals3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[91]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvals2</span><span class="p">,</span> <span class="n">f2</span><span class="p">(</span><span class="n">xvals2</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvals3</span><span class="p">,</span> <span class="n">f2</span><span class="p">(</span><span class="n">xvals3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mf">3.005</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.99</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Both graphs approach $x = -3$ from the right and we can see the function quickly drop off as it gets closer to its limit. The graph on the right is a magnified representation of the graph on the left to better illustrate the infinite limit. Therefore, the limit of the function is $-\infty$, which we can confirm with SymPy.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[99]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">limit</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[99]:</div>
+
+
+
+
+<div class="output_latex output_subarea output_execute_result">
+$$-\infty$$
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">References<a class="anchor-link" href="#References">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://amzn.to/38dnRV0">Stewart, J. (2007). Essential calculus: Early transcendentals. Belmont, CA: Thomson Higher Education.</a></p>
+<p><a href="https://amzn.to/2vVY0SZ">Strang, G. (2010). Calculus. Wellesley, MA: Wellesley-Cambridge.</a></p>
+
+</div>
+</div>
+</div>
+ 
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a></li>
+                        <li><a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a></li>
+                        <li><a href="https://aaronschlegel.me/fundamental-theorem-calculus.html">The Fundamental Theorem of Calculus</a></li>
+                        <li><a href="https://aaronschlegel.me/indefinite-integrals.html">Indefinite Integrals</a></li>
+                        <li><a href="https://aaronschlegel.me/substitution-rule.html">Substitution Rule</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

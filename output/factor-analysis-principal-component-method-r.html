@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Factor Analysis with the Principal Component Method and R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The goal of factor analysis, similar to principal component analysis, is to reduce the original variables into a smaller number of factors that allows for easier interpretation. PCA and factor analysis still defer in several respects. One difference is principal components are defined as linear combinations of the variables while factors are defined as linear combinations of the underlying latent variables." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Factor Analysis with the Principal Component Method and R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2017-02-09 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The goal of factor analysis, similar to principal component analysis, is to reduce the original variables into a smaller number of factors that allows for easier interpretation. PCA and factor analysis still defer in several respects. One difference is principal components are defined as linear combinations of the variables while factors are defined as linear combinations of the underlying latent variables." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/factor-analysis-principal-component-method-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r.html" rel="bookmark"
+                   title="Permalink to Factor Analysis with the Principal Component Method and R">Factor Analysis with the Principal Component Method and R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2017-02-09T00:00:00-08:00">
+                Thu 09 February 2017
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>Factor analysis is a controversial technique that represents the
+variables of a dataset <span class="math">\(y_1, y_2, \cdots, y_p\)</span> as linearly related to
+random, unobservable variables called factors, denoted
+<span class="math">\(f_1, f_2, \cdots, f_m\)</span> where <span class="math">\((m &lt; p)\)</span>. The factors are representative
+of 'latent variables' underlying the original variables. The existence
+of the factors is hypothetical as they cannot be measured or observed.
+Thus factor analysis remains controversial among statisticians (Rencher,
+2002, pp. 443) and continues to be heavily researched.</p>
+<p>The goal of factor analysis, similar to principal component analysis, is
+to reduce the original variables into a smaller number of factors that
+allows for easier interpretation. PCA and factor analysis still defer in
+several respects. One difference is principal components are defined as
+linear combinations of the variables while factors are defined as linear
+combinations of the underlying latent variables.</p>
+<h2>Factor Analysis</h2>
+<p>As mentioned, the factor analysis model is a linear combination of the
+underlying latent variables, <span class="math">\(f_1, f_2, \cdots, f_m\)</span>, that are
+hypothetical in nature and may not actually exist. For the variables in
+any of the observation vectors in a sample, the model is defined as:</p>
+<div class="math">$$ y_1 - \mu_1 = \lambda_{11} f_1 + \lambda_{12} f_2 + \cdots + \lambda_{1m} f_m + \epsilon_1 $$</div>
+<div class="math">$$ y_2 - \mu_2 = \lambda_{21} f_1 + \lambda_{22} f_2 + \cdots + \lambda_{2m} f_m + \epsilon_2 $$</div>
+<div class="math">$$ \vdots $$</div>
+<div class="math">$$ y_p - \mu_p = \lambda_{p1} f_1 + \lambda_{p2} f_2 + \cdots + \lambda_{pm} f_m + \epsilon_p $$</div>
+<p>Where <span class="math">\(\mu\)</span> is the mean vector and <span class="math">\(\epsilon\)</span> is a random error term to
+show the relationship between the factors is not exact. There are
+several assumptions that must be made regarding the relationships of the
+factor model described above.</p>
+<ul>
+<li>
+<p>Assume the unobservable factors (latent variables) are independent
+    of each other and of the error terms. For the factors
+    <span class="math">\(j = 1, 2, \cdots, m\)</span>, the expected value of the <span class="math">\(j\)</span>th factor is
+    <span class="math">\(0\)</span>, <span class="math">\(E(f_j) = 0\)</span>. The variance of the factor model is <span class="math">\(1\)</span>,
+    <span class="math">\(var(f_j) = 1\)</span>, and the covariance of two factor models <span class="math">\(f_j\)</span> and
+    <span class="math">\(f_k\)</span> is <span class="math">\(0\)</span>, <span class="math">\(cov(f_j, f_k) = 0\)</span> where <span class="math">\(j \neq k\)</span>.</p>
+</li>
+<li>
+<p>Assume the error terms <span class="math">\(\epsilon_i\)</span> are independent of each other.
+    Thus, <span class="math">\(E(\epsilon) = 0\)</span>, <span class="math">\(var(\epsilon_i) = \psi_i\)</span>, and
+    <span class="math">\(cov(\epsilon_i, \epsilon_j) = 0\)</span>.</p>
+</li>
+<li>
+<p>The covariance of the error terms <span class="math">\(\epsilon_i\)</span> and the factor <span class="math">\(f_j\)</span>
+    is <span class="math">\(0\)</span>, <span class="math">\(cov(\epsilon_i, f_j) = 0\)</span>.</p>
+</li>
+</ul>
+<p>Note the assumption <span class="math">\(cov(\epsilon_i, \epsilon_j) = 0\)</span> implies the
+factors represent all correlations among the observation vectors <span class="math">\(y\)</span>.
+Thus another difference that separates PCA and factor analysis is that
+factor analysis accounts for the covariances of correlations among the
+variables while PCA explains the total variance. With the assumptions
+made above, the variance of <span class="math">\(y_i\)</span> can be expressed as:</p>
+<div class="math">$$ var(y_i) = \lambda^2_{i1} + \lambda^2_{i2} + \cdots + \lambda^2_{im} + \psi_i $$</div>
+<p>Which can be expressed more compactly in matrix notation:</p>
+<div class="math">$$ y - \mu = \Lambda f + \epsilon $$</div>
+<p>We therefore have a partitioning of the variance of the observation
+vector <span class="math">\(y_i\)</span> into a component due to the common factors, which is called
+the communality and another called the specific variance. Communality is
+also referred to as common variance and <span class="math">\(\psi_i\)</span> is also known as
+specificity, unique or residual variance. The factors are grouped into a
+new term denoting the communality, <span class="math">\(h^2_i\)</span>, with the error term <span class="math">\(\psi_i\)</span>
+representing the specific variance:</p>
+<div class="math">$$ var(y_i) = (\lambda^2_{i1} + \lambda^2_{i2} + \cdots + \lambda^2_{im}) + \psi_i $$</div>
+<div class="math">$$ = h^2_i + \psi_i $$</div>
+<p>Which is the communality plus the specific variance.</p>
+<p>It must be noted that factor analysis can fail to fit the data; however,
+a failed fit can indicate that it is not known how many factors there
+should be and what the factors are.</p>
+<h2>Estimation of Factor Loadings and Communalities with the Principal Component Method</h2>
+<p>There are several methods for estimating the factor loadings and
+communalities, including the principal component method, principal
+factor method, the iterated principal factor method and maximum
+likelihood estimation. The principal component method is one of the most
+common approaches to estimation and will be employed on the rootstock
+data seen in previous posts.</p>
+<p>The principal component method is rather misleading in its naming it
+that no principal components are calculated. The approach of the
+principal component method is to calculate the sample covariance matrix
+<span class="math">\(S\)</span> from a sample of data and then find an estimator, denoted
+<span class="math">\(\hat{\Lambda}\)</span> that can be used to factor <span class="math">\(S\)</span>.</p>
+<div class="math">$$ S = \hat{\Lambda} \hat{\Lambda}' $$</div>
+<p>Another term, <span class="math">\(\Psi\)</span>, is added to the estimate of <span class="math">\(S\)</span>, making the above
+<span class="math">\(S = \hat{\Lambda} \hat{\Lambda}' + \hat{\Psi}\)</span>. <span class="math">\(\hat{\Psi}\)</span> is a
+diagonal matrix of the specific variances
+<span class="math">\((\hat{\psi_1}, \hat{\psi_2}, \cdots, \hat{\psi_p})\)</span>. <span class="math">\(\Psi\)</span> is
+estimated in other approaches to factor analysis such as the principal
+factor method and its iterated version but is excluded in the principal
+component method of factor analysis. The reason for the term's exclusion
+is since <span class="math">\(\hat{\Psi}\)</span> equals the specific variances of the variables, it
+models the diagonal of <span class="math">\(S\)</span> exactly.</p>
+<p>Spectral decomposition is employed To factor <span class="math">\(S\)</span> into:</p>
+<div class="math">$$ S = CDC' $$</div>
+<p>Where <span class="math">\(C\)</span> is an orthogonal matrix of the normalized eigenvectors of <span class="math">\(S\)</span>
+as columns and <span class="math">\(D\)</span> is a diagonal matrix with the diagonal equaling the
+eigenvalues of <span class="math">\(S\)</span>. Recall that all covariance matrices are positive
+semidefinite. Thus the eigenvalues must be either positive or zero which
+allows us to factor the diagonal matrix <span class="math">\(D\)</span> into:</p>
+<div class="math">$$ D = D^{1/2} D^{1/2} $$</div>
+<p>The above factor of <span class="math">\(D\)</span> is substituted into the decomposition of <span class="math">\(S\)</span>.</p>
+<div class="math">$$ S = CDC' = C D^{1/2} D^{1/2} C' $$</div>
+<p>Then rearranging:</p>
+<div class="math">$$ S = (CD^{1/2})(CD^{1/2})' $$</div>
+<p>Which yields the form <span class="math">\(S = \hat{\Lambda} \hat{\Lambda}'\)</span>. Since we are
+interested in finding <span class="math">\(m\)</span> factors in the data, we want to find a
+<span class="math">\(\hat{\Lambda}\)</span> that is <span class="math">\(p \times m\)</span> with <span class="math">\(m\)</span> smaller than <span class="math">\(p\)</span>. Thus <span class="math">\(D\)</span>
+can be defined as a diagonal matrix with <span class="math">\(m\)</span> eigenvalues (making it
+<span class="math">\(m \times m\)</span>) on the diagonal and <span class="math">\(C\)</span> is therefore <span class="math">\(p \times m\)</span> with the
+corresponding eigenvectors, which makes <span class="math">\(\hat{\Lambda}\)</span> <span class="math">\(p \times m\)</span>.
+There are numerous ways to select the number of factors, some of which
+include finding the number of eigenvalues greater than the average
+eigenvalue or plotting a scree plot.</p>
+<h2>Principal Component Method of Factor Analysis in R</h2>
+<p>The following example demonstrates factor analysis using the covariance
+matrix using the rootstock data seen in other posts. As mentioned in
+several of those posts, the measurements of the variables are not
+commensurate and thus using the covariance matrix for factor analysis
+(or PCA) does not make intuitive sense. In most cases, factoring the
+correlation matrix is recommended and is, in fact, more straightforward
+than using the covariance matrix as <span class="math">\(R\)</span> does not need to be decomposed
+into <span class="math">\(CDC'\)</span> beforehand. The correlation matrix <span class="math">\(R\)</span> of the data is
+employed for factor analysis in a follow-up post.</p>
+<p>The rootstock data contains growth measurements of six different apple
+tree rootstocks from 1918 to 1934 (Andrews and Herzberg 1985, pp.
+357-360) and were obtained from the <a href="ftp://ftp.wiley.com">companion FTP
+site</a> of the book Methods of Multivariate Analysis
+by Alvin Rencher. The data contains four dependent variables as follows:</p>
+<ul>
+<li>trunk girth at four years (mm <span class="math">\(\times\)</span> 100)</li>
+<li>extension growth at four years (m)</li>
+<li>trunk girth at 15 years (mm <span class="math">\(\times\)</span> 100)</li>
+<li>weight of tree above ground at 15 years (lb <span class="math">\(\times\)</span> 1000)</li>
+</ul>
+<p>Load the data and name the columns.</p>
+<div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;ROOT.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Tree.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Ext.Growth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.15.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Weight.Above.Ground.15.Years&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Find the covariance matrix <span class="math">\(S\)</span> with the <code>cov()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<span class="n">S</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                              Trunk.Girth.4.Years Ext.Growth.4.Years</span>
+<span class="err">## Trunk.Girth.4.Years                  0.008373360         0.04753083</span>
+<span class="err">## Ext.Growth.4.Years                   0.047530829         0.34771174</span>
+<span class="err">## Trunk.Girth.15.Years                 0.018858555         0.14295747</span>
+<span class="err">## Weight.Above.Ground.15.Years         0.009055532         0.07973026</span>
+<span class="err">##                              Trunk.Girth.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                    0.01885855</span>
+<span class="err">## Ext.Growth.4.Years                     0.14295747</span>
+<span class="err">## Trunk.Girth.15.Years                   0.22137762</span>
+<span class="err">## Weight.Above.Ground.15.Years           0.13324894</span>
+<span class="err">##                              Weight.Above.Ground.15.Years</span>
+<span class="err">## Trunk.Girth.4.Years                           0.009055532</span>
+<span class="err">## Ext.Growth.4.Years                            0.079730255</span>
+<span class="err">## Trunk.Girth.15.Years                          0.133248936</span>
+<span class="err">## Weight.Above.Ground.15.Years                  0.089693957</span>
+</pre></div>
+
+
+<p>The eigenvalues and eigenvectors are then computed from the covariance
+matrix with the <code>eigen()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">S.eigen</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="n">S.eigen</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## eigen() decomposition</span>
+<span class="err">## $values</span>
+<span class="err">## [1] 0.495986813 0.162680761 0.006924035 0.001565068</span>
+<span class="err">## </span>
+<span class="err">## $vectors</span>
+<span class="err">##            [,1]        [,2]        [,3]       [,4]</span>
+<span class="err">## [1,] -0.1011191  0.09661363 -0.21551730  0.9664332</span>
+<span class="err">## [2,] -0.7516463  0.64386366  0.06099466 -0.1294103</span>
+<span class="err">## [3,] -0.5600279 -0.62651631 -0.52992316 -0.1141384</span>
+<span class="err">## [4,] -0.3334239 -0.42846553  0.81793239  0.1903481</span>
+</pre></div>
+
+
+<p>Before proceeding with factoring <span class="math">\(S\)</span> into <span class="math">\(CDC'\)</span>, the number of factors
+<span class="math">\(m\)</span> must be selected. The last two eigenvalues of <span class="math">\(S\)</span> are practically
+<span class="math">\(0\)</span>, so <span class="math">\(m = 2\)</span> is likely a good choice. Plot a scree plot to confirm
+that two factors are appropriate.</p>
+<div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">,</span> <span class="n">xlab</span> <span class="o">=</span> <span class="s">&#39;Eigenvalue Number&#39;</span><span class="p">,</span> <span class="n">ylab</span> <span class="o">=</span> <span class="s">&#39;Eigenvalue Size&#39;</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#39;Scree Graph&#39;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">xaxt</span> <span class="o">=</span> <span class="s">&#39;n&#39;</span><span class="p">)</span>
+<span class="nf">axis</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="n">at</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="m">1</span><span class="p">))</span>
+</pre></div>
+
+
+<p><img alt="" src="figure/factor_analysis_principal_component/unnamed-chunk-5-1.png"></p>
+<p>With <span class="math">\(m = 2\)</span> factors, construct the <span class="math">\(C\)</span> and <span class="math">\(D\)</span> matrices from the
+covariance matrix with the first (largest) two eigenvalues and
+corresponding eigenvectors.</p>
+<div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span>
+
+<span class="n">D</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="n">[2]</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="n">[2]</span><span class="p">)</span>
+<span class="nf">diag</span><span class="p">(</span><span class="n">D</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">S.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+</pre></div>
+
+
+<p><span class="math">\(\hat{\Lambda}\)</span> is then found from the <span class="math">\(C\)</span> and <span class="math">\(D\)</span> matrices as in
+<span class="math">\(\hat{\Lambda} = CD^{1/2}\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">S.loadings</span> <span class="o">&lt;-</span> <span class="n">C</span> <span class="o">%*%</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">S.loadings</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             [,1]        [,2]</span>
+<span class="err">## [1,] -0.07121445  0.03896785</span>
+<span class="err">## [2,] -0.52935694  0.25969406</span>
+<span class="err">## [3,] -0.39440707 -0.25269723</span>
+<span class="err">## [4,] -0.23481824 -0.17281602</span>
+</pre></div>
+
+
+<p>Which are the unrotated factor loadings. We can see where the term
+'principal component method' is derived from as the factors (columns of
+<span class="math">\(\hat{\Lambda}\)</span>) are proportional to the eigenvectors of <span class="math">\(S\)</span> which are
+equal to the corresponding coefficient of the principal components.</p>
+<div class="highlight"><pre><span></span><span class="n">root.pca</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span><span class="o">$</span><span class="n">rotation[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="c1"># Perform PCA on the rootstock data and take the resulting first two PCs</span>
+
+<span class="n">root.pca</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                                     PC1         PC2</span>
+<span class="err">## Trunk.Girth.4.Years          -0.1011191  0.09661363</span>
+<span class="err">## Ext.Growth.4.Years           -0.7516463  0.64386366</span>
+<span class="err">## Trunk.Girth.15.Years         -0.5600279 -0.62651631</span>
+<span class="err">## Weight.Above.Ground.15.Years -0.3334239 -0.42846553</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]        [,2]</span>
+<span class="err">## [1,] -0.1011191  0.09661363</span>
+<span class="err">## [2,] -0.7516463  0.64386366</span>
+<span class="err">## [3,] -0.5600279 -0.62651631</span>
+<span class="err">## [4,] -0.3334239 -0.42846553</span>
+</pre></div>
+
+
+<p>The communality, the variance of the variables explained by the common
+factors, denoted <span class="math">\(h^2_i\)</span>, as noted previously is the sum of squares of
+the rows of <span class="math">\(\hat{\Lambda}\)</span>.</p>
+<div class="math">$$ \hat{h}^2_i = \sum^m_{j=1} \hat{\lambda}^2_{ij} $$</div>
+<div class="highlight"><pre><span></span><span class="n">S.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+<span class="n">S.h2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.006589992 0.347659774 0.219412829 0.085004979</span>
+</pre></div>
+
+
+<p>The sum of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> are the respective
+eigenvalues of <span class="math">\(S\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.4959868 0.1626808</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.4959868 0.1626808</span>
+</pre></div>
+
+
+<p>The specific variance, <span class="math">\(\psi_i\)</span>, is a component unique to the particular
+variable and is found by subtracting the diagonal of <span class="math">\(S\)</span> by the
+respective communality <span class="math">\(\hat{h}^2_i\)</span>:</p>
+<div class="math">$$ \psi_i = s_{ii} - \hat{h}^2_i $$</div>
+<div class="highlight"><pre><span></span><span class="n">S.u2</span> <span class="o">&lt;-</span> <span class="nf">diag</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">-</span> <span class="n">S.h2</span>
+<span class="n">S.u2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          Trunk.Girth.4.Years           Ext.Growth.4.Years </span>
+<span class="err">##                 1.783368e-03                 5.197004e-05 </span>
+<span class="err">##         Trunk.Girth.15.Years Weight.Above.Ground.15.Years </span>
+<span class="err">##                 1.964786e-03                 4.688978e-03</span>
+</pre></div>
+
+
+<p>The proportion of variance of the loadings is found by dividing the sum
+of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> (the eigenvalues of <span class="math">\(S\)</span>) by
+the sum of the eigenvalues of <span class="math">\(S\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">prop.loadings</span> <span class="o">&lt;-</span> <span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+
+<span class="n">prop.var</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings[1]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">),</span> <span class="n">prop.loadings[2]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">))</span>
+<span class="n">prop.var</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]      [,2]</span>
+<span class="err">## [1,] 0.7434338 0.2438419</span>
+</pre></div>
+
+
+<p>The proportion of variance explained by the loadings is computed by
+dividing the sum of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> by the sum
+of those squares.</p>
+<div class="highlight"><pre><span></span><span class="n">prop.exp</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings[1]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">),</span> <span class="n">prop.loadings[2]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">))</span>
+<span class="n">prop.exp</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]      [,2]</span>
+<span class="err">## [1,] 0.7530154 0.2469846</span>
+</pre></div>
+
+
+<p>Thus the two factor model represents and explains nearly all of the
+variance of the variables.</p>
+<h2>Factor Analysis with the <code>psych</code> Package</h2>
+<p>The <a href="https://cran.r-project.org/web/packages/psych/">psych package</a> has
+many functions available for performing factor analysis.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">psych</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>principal()</code> function performs factor analysis with the principal
+component method as explained above. The rotation is set to <code>none</code> for
+now as we have not yet done any rotation of the factors. The <code>covar</code>
+argument is set to <code>TRUE</code> so the function factors the covariance matrix
+<span class="math">\(S\)</span> of the data as we did above.</p>
+<div class="highlight"><pre><span></span><span class="n">root.fa.covar</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">covar</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">root.fa.covar</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Principal Components Analysis</span>
+<span class="err">## Call: principal(r = root[, 2:5], nfactors = 2, rotate = &quot;none&quot;, covar = TRUE)</span>
+<span class="err">## Unstandardized loadings (pattern matrix) based upon covariance matrix</span>
+<span class="err">##                               PC1   PC2     h2      u2   H2      U2</span>
+<span class="err">## Trunk.Girth.4.Years          0.07 -0.04 0.0066 1.8e-03 0.79 0.21298</span>
+<span class="err">## Ext.Growth.4.Years           0.53 -0.26 0.3477 5.2e-05 1.00 0.00015</span>
+<span class="err">## Trunk.Girth.15.Years         0.39  0.25 0.2194 2.0e-03 0.99 0.00888</span>
+<span class="err">## Weight.Above.Ground.15.Years 0.23  0.17 0.0850 4.7e-03 0.95 0.05228</span>
+<span class="err">## </span>
+<span class="err">##                        PC1  PC2</span>
+<span class="err">## SS loadings           0.50 0.16</span>
+<span class="err">## Proportion Var        0.74 0.24</span>
+<span class="err">## Cumulative Var        0.74 0.99</span>
+<span class="err">## Proportion Explained  0.75 0.25</span>
+<span class="err">## Cumulative Proportion 0.75 1.00</span>
+<span class="err">## </span>
+<span class="err">##  Standardized loadings (pattern matrix)</span>
+<span class="err">##                              item  PC1   PC2   h2      u2</span>
+<span class="err">## Trunk.Girth.4.Years             1 0.78 -0.43 0.79 0.21298</span>
+<span class="err">## Ext.Growth.4.Years              2 0.90 -0.44 1.00 0.00015</span>
+<span class="err">## Trunk.Girth.15.Years            3 0.84  0.54 0.99 0.00888</span>
+<span class="err">## Weight.Above.Ground.15.Years    4 0.78  0.58 0.95 0.05228</span>
+<span class="err">## </span>
+<span class="err">##                  PC1  PC2</span>
+<span class="err">## SS loadings     2.73 1.00</span>
+<span class="err">## Proportion Var  0.68 0.25</span>
+<span class="err">## Cumulative Var  0.68 0.93</span>
+<span class="err">## Cum. factor Var 0.73 1.00</span>
+<span class="err">## </span>
+<span class="err">## Mean item complexity =  1.6</span>
+<span class="err">## Test of the hypothesis that 2 components are sufficient.</span>
+<span class="err">## </span>
+<span class="err">## The root mean square of the residuals (RMSR) is  0 </span>
+<span class="err">##  with the empirical chi square  0  with prob &lt;  NA </span>
+<span class="err">## </span>
+<span class="err">## Fit based upon off diagonal values = 1</span>
+</pre></div>
+
+
+<p>The function's output matches our calculations. H2 and U2 are the
+communality and specific variance, respectively, of the standardized
+loadings obtained from the correlation matrix <span class="math">\(R\)</span>. As the data were not
+measured on commensurate scales, it is more intuitive to employ the
+correlation matrix rather than the covariance matrix as the loadings can
+be dominated by variables with large variances on the diagonal of <span class="math">\(S\)</span>.</p>
+<h2>Summary</h2>
+<p>I hope this served as a useful introduction to factor analysis. In the
+next few posts, we will explore the principal component method of factor
+analysis with the correlation matrix <span class="math">\(R\)</span> as well as rotation of the
+loadings to help improve interpretation of the factors.</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<p><a href="http://web.stanford.edu/class/psych253/tutorials/FactorAnalysis.html">http://web.stanford.edu/class/psych253/tutorials/FactorAnalysis.html</a></p>
+<p><a href="http://www.yorku.ca/ptryfos/f1400.pdf">http://www.yorku.ca/ptryfos/f1400.pdf</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r-part-two.html">Factor Analysis with the Principal Component Method and R Part Two</a></li>
+                        <li><a href="https://aaronschlegel.me/factor-analysis-iterated-factor-method-r.html">Factor Analysis with the Iterated Factor Method and R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

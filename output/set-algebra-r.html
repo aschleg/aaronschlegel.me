@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Algebra of Sets with R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The set operations, union and intersection, the relative complement − and the inclusion relation (subsets) are known as the algebra of sets. The algebra of sets can be used to find many identities related to set relations." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Algebra of Sets with R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-01-25 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The set operations, union and intersection, the relative complement − and the inclusion relation (subsets) are known as the algebra of sets. The algebra of sets can be used to find many identities related to set relations." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/set-algebra-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/set-algebra-r.html" rel="bookmark"
+                   title="Permalink to Algebra of Sets with R">Algebra of Sets with R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-01-25T00:00:00-08:00">
+                Thu 25 January 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>The set operations, union and intersection,
+the relative complement − and the inclusion relation (subsets) <span class="math">\(\subseteq\)</span> are
+known as the algebra of sets. The algebra of sets can be used to find
+many identities related to set relations that will be discussed later.
+We turn now to introducing the relative complement.</p>
+<h2>Relative Complement</h2>
+<p>The relative complement of two sets <span class="math">\(A\)</span> and <span class="math">\(B\)</span> is defined as the
+members of <span class="math">\(A\)</span> not in <span class="math">\(B\)</span> and is denoted <span class="math">\(A − B\)</span> (or <span class="math">\(A/B\)</span>). More
+formally, the relative complement of two sets is defined as:</p>
+<div class="math">$$ \large{A - B = \{x \in A \space | \space x \notin B \}} $$</div>
+<p>Just like the set operations union and intersection, the relative
+complement can be visualized using Venn diagrams.</p>
+<p><img alt="" src="figure/set_algebra/rel_comp.png"></p>
+<p>The shaded area represents the relative complement <span class="math">\(A\)</span> − <span class="math">\(B\)</span>.</p>
+<p>For example, consider the following three sets <span class="math">\(A\)</span>, <span class="math">\(B\)</span>, <span class="math">\(C\)</span>.</p>
+<ul>
+<li>Let <span class="math">\(A\)</span> be the set of all Calico cats</li>
+<li>Let <span class="math">\(B\)</span> be the set of all Manx cats</li>
+<li>Let <span class="math">\(C\)</span> be the set of all male cats</li>
+</ul>
+<p>What are the elements of the set <span class="math">\(A ∪ (B − C)\)</span>? Start with the
+relative complement in parentheses, which is the set of all nonmale Manx
+cats. It wouldn't be as correct to state <span class="math">\(B − C\)</span> is the set of all
+female Manx cats as it hasn't been explicitly defined that the cats not
+in the set <span class="math">\(C\)</span> are female. Then the union of <span class="math">\(A\)</span> and this set is,
+therefore, the set of all cats who are either Calico or Manx nonmales
+(or both).</p>
+<p>Determining the elements of the set <span class="math">\((A ∪ B)−C\)</span> proceeds in the same
+way. The union of <span class="math">\(A\)</span> and <span class="math">\(B\)</span> represents the set of all cats who are
+Calico or Manx or both. Thus the relative complement of this set <span class="math">\(C\)</span> is
+then the set of all nonmale cats who are either or both Calico or Manx.</p>
+<p>The set <span class="math">\((A − C) ∪ (B − C)\)</span> simplifies to one of the sets discussed
+above. The relative complement <span class="math">\(A − C\)</span> is the set of all nonmale
+Calico cats while <span class="math">\(B − C\)</span> is the set of all nonmale Manx cats. The
+union of these two sets thus results in the set of all nonmale cats who
+are either Calico or Manx, which is the same as the set <span class="math">\((A ∪ B)−C\)</span>.</p>
+<p>We can define an R function to find the relative complement of two sets.</p>
+<div class="highlight"><pre><span></span><span class="n">relcomp</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">comp</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">()</span>
+
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">i</span> <span class="o">%in%</span> <span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">i</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">comp</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nf">return</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Find the relative complements of the sets <span class="math">\(A = {1, 2, 3, 4, 5}\)</span> and
+<span class="math">\(B\)</span> = {1, 3, 5, 7}$.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">7</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">relcomp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="c1">## [1] 2 4</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">relcomp</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="c1">## [1] 7</span>
+</pre></div>
+
+
+<h2>Set Identities</h2>
+<p>Many identities can be formed using the set operations we have explored.</p>
+<p>Commutative Laws</p>
+<div class="math">$$ \large{A \cup B = B \cup A} $$</div>
+<div class="math">$$ \large{A \cap B = B \cap A} $$</div>
+<p>We can show this identity using the <code>isequalset()</code> and <code>set.union()</code>
+functions we created in the previous post on union and
+intersections.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">7</span><span class="p">)</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="c1">## [1] TRUE</span>
+
+<span class="nf">isequalset</span><span class="p">(</span><span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="c1">## [1] TRUE</span>
+</pre></div>
+
+
+<p>Associative Laws</p>
+<div class="math">$$ \large{A \cup (B \cup C) = (A \cup B) \cup C} $$</div>
+<div class="math">$$ \large{A \cap (B \cap C) = (A \cap B) \cap C} $$</div>
+<p>Create a third set <span class="math">\(c\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Starting with the first associative law
+<span class="math">\(A ∪ (B ∪ C)=(A ∪ B) ∪ C\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">assoc.rhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span> <span class="c1"># Right-hand Side</span>
+<span class="n">assoc.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">)</span> <span class="c1"># Left-hand Side</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">assoc.rhs</span><span class="p">,</span> <span class="n">assoc.lhs</span><span class="p">))</span>
+
+<span class="c1">##           [,1] [,2] [,3] [,4] [,5] [,6] [,7]</span>
+<span class="c1">## assoc.rhs    1    2    3    4    5    7    6</span>
+<span class="c1">## assoc.lhs    1    2    3    4    5    7    6</span>
+</pre></div>
+
+
+<p>Showing the second associative law, <span class="math">\(A ∩ (B ∩ C)=(A ∩ B) ∩ C\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">assoc2.rhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="n">assoc2.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">assoc2.rhs</span><span class="p">,</span> <span class="n">assoc2.lhs</span><span class="p">))</span>
+
+<span class="c1">##            [,1]</span>
+<span class="c1">## assoc2.rhs    3</span>
+<span class="c1">## assoc2.lhs    3</span>
+</pre></div>
+
+
+<p>Distributive Laws</p>
+<div class="math">$$ \large{A \cap (B \cup C) = (A \cap B) \cup (A \cap C)} $$</div>
+<div class="math">$$ \large{A \cup (B \cap C) = (A \cup B) \cap (A \cup C)} $$</div>
+<p>starting with the first distributive law,
+<span class="math">\(A ∩ (B ∪ C)=(A ∩ B) ∪ (A ∩ C)\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="n">dist.rhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="n">dist.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">dist.rhs</span><span class="p">,</span> <span class="n">dist.lhs</span><span class="p">))</span>
+
+<span class="c1">##          [,1] [,2] [,3] [,4] [,5]</span>
+<span class="c1">## dist.rhs    1    2    3    4    5</span>
+<span class="c1">## dist.lhs    1    3    5    2    4</span>
+</pre></div>
+
+
+<p>Which are equal sets as member order does not matter when determining
+the equality of two sets. The second distributive law,
+<span class="math">\(A ∪ (B ∩ C)=(A ∪ B)∩(A ∪ C)\)</span> can be demonstrated likewise.</p>
+<div class="highlight"><pre><span></span><span class="n">dist2.rhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="n">dist2.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">dist2.rhs</span><span class="p">,</span> <span class="n">dist2.lhs</span><span class="p">))</span>
+
+<span class="c1">##           [,1] [,2] [,3] [,4] [,5]</span>
+<span class="c1">## dist2.rhs    1    2    3    4    5</span>
+<span class="c1">## dist2.lhs    1    2    3    4    5</span>
+</pre></div>
+
+
+<p>De Morgan's Laws</p>
+<div class="math">$$ \large{C - (A \cup B) = (C - A) \cap (C - B)} $$</div>
+<div class="math">$$ \large{C - (A \cap B) = (C - A) \cup (C - B)} $$</div>
+<p>We can use the function to find the relative complement of two sets we
+wrote earlier to show De Morgan's laws. Starting with the first law,
+<span class="math">\(C − (A ∪ B)=(C − A) ∩ (C − B)\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">morgan.rhs</span> <span class="o">&lt;-</span> <span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nf">set.union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="n">morgan.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">morgan.rhs</span><span class="p">,</span> <span class="n">morgan.lhs</span><span class="p">))</span>
+
+<span class="c1">##            [,1]</span>
+<span class="c1">## morgan.rhs    6</span>
+<span class="c1">## morgan.lhs    6</span>
+</pre></div>
+
+
+<p>The second De Morgan's law, <span class="math">\(C − (A ∩ B)=(C − A) ∪ (C − B)\)</span>
+can be shown similarly.</p>
+<div class="highlight"><pre><span></span><span class="n">morgan2.rhs</span> <span class="o">&lt;-</span> <span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nf">set.intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="n">morgan2.lhs</span> <span class="o">&lt;-</span> <span class="nf">set.union</span><span class="p">(</span><span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="nf">relcomp</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="n">morgan2.rhs</span><span class="p">,</span> <span class="n">morgan2.lhs</span><span class="p">))</span>
+
+<span class="c1">##             [,1] [,2] [,3]</span>
+<span class="c1">## morgan2.rhs    2    4    6</span>
+<span class="c1">## morgan2.lhs    6    2    4</span>
+</pre></div>
+
+
+<p>De Morgan's laws are often stated without <span class="math">\(C\)</span>, being understood as a
+fixed set. All sets are a subset of some larger set, which can be called
+a 'space,' or <span class="math">\(S\)</span>. If one considers the space to be the set of all real
+numbers ℝ, and <span class="math">\(A\)</span> and <span class="math">\(B\)</span> to be two subsets of <span class="math">\(S\)</span> (ℝ), then De
+Morgan's laws can be abbreviated as:</p>
+<div class="math">$$ \large{-(A \cup B) = - A \cap - B} $$</div>
+<div class="math">$$ \large{-(A \cap B) = - A \cup - B} $$</div>
+<p>We will close the post by stating some identities with the assumption
+<span class="math">\(A ⊆ S\)</span></p>
+<div class="math">$$ \large{A \cup S = S \qquad A \cap S = A} $$</div>
+<div class="math">$$ \large{A \cup - A = S \qquad A \cap - A = \varnothing} $$</div>
+<p>Though we cannot directly program the set of all real numbers ℝ as it is
+an uncountable set, we can show these identities by using a subset of ℝ
+where a set <span class="math">\(A\)</span> is a subset of that subset.</p>
+<p>Generate the set <span class="math">\(A\)</span> as the set of integers from one to ten and <span class="math">\(S\)</span>, our
+simulated set of all real numbers, as the set of integers from one to
+100.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">seq.int</span><span class="p">(</span><span class="m">10</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">&lt;-</span> <span class="nf">seq.int</span><span class="p">(</span><span class="m">100</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Show the first identity: <span class="math">\(A ∪ S = S\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">isequalset</span><span class="p">(</span><span class="k">set</span><span class="p">.</span><span class="k">union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="o">##</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">TRUE</span>
+</pre></div>
+
+
+<p>Second identity: <span class="math">\(A ∩ S = A\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">isequalset</span><span class="p">(</span><span class="k">set</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="o">##</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">TRUE</span>
+</pre></div>
+
+
+<p>Third identity: <span class="math">\(A ∪ −A = S\)</span></p>
+<div class="highlight"><pre><span></span><span class="n">isequalset</span><span class="p">(</span><span class="k">set</span><span class="p">.</span><span class="k">union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">relcomp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">)),</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="o">##</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">TRUE</span>
+</pre></div>
+
+
+<p>Fourth identity: <span class="math">\(A ∩ −A = ⌀\)</span></p>
+<div class="highlight"><pre><span></span><span class="k">set</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">relcomp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="o">##</span> <span class="n">logical</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>References</h2>
+<p><a href="https://amzn.to/2SsiA5g">Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/cartestian-product-ordered-unordered-pairs.html">Cartesian Product and Ordered and Unordered Pairs</a></li>
+                        <li><a href="https://aaronschlegel.me/n-set-union-intersection-r.html">N-Union and Intersection Set Operations</a></li>
+                        <li><a href="https://aaronschlegel.me/set-union-intersection-r.html">Set Union and Intersections with R</a></li>
+                        <li><a href="https://aaronschlegel.me/set-theory-r.html">Introduction to Sets and Set Theory with R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

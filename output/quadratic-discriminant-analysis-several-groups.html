@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Quadratic Discriminant Analysis of Several Groups</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Quadratic discriminant analysis for classification is a modification of linear discriminant analysis that does not assume equal covariance matrices amongst the groups (\(\Sigma_1, \Sigma_2, \cdots, \Sigma_k\)). Similar to LDA for several groups, quadratic discriminant analysis for several groups classification seeks to find the group that maximizes the quadratic classification function and assign the observation vector \(y\) to that group. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Quadratic Discriminant Analysis of Several Groups" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-09-03 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Quadratic discriminant analysis for classification is a modification of linear discriminant analysis that does not assume equal covariance matrices amongst the groups (\(\Sigma_1, \Sigma_2, \cdots, \Sigma_k\)). Similar to LDA for several groups, quadratic discriminant analysis for several groups classification seeks to find the group that maximizes the quadratic classification function and assign the observation vector \(y\) to that group. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html" rel="bookmark"
+                   title="Permalink to Quadratic Discriminant Analysis of Several Groups">Quadratic Discriminant Analysis of Several Groups</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-09-03T00:00:00-07:00">
+                Mon 03 September 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>Quadratic discriminant analysis for classification is a modification of linear discriminant analysis that does not assume equal covariance matrices amongst the groups (<span class="math">\(\Sigma_1, \Sigma_2, \cdots, \Sigma_k\)</span>). Similar to LDA for several groups, quadratic discriminant analysis for several groups classification seeks to find the group that maximizes the quadratic classification function and assign the observation vector <span class="math">\(y\)</span> to that group.</p>
+<p>As noted in a previous post on quadratic discriminant analysis of two groups, QDA employs the group covariance matrix <span class="math">\(S_i\)</span> rather than the pooled covariance matrix <span class="math">\(S_{p1}\)</span>. In the several group case, the prior probabilities <span class="math">\(p_1, p_2, \cdots, p_k\)</span> are also used in the quadratic classification function. If the prior probabilities of the groups are unknown, it is set to <span class="math">\(p_i = n_i/N\)</span>.</p>
+<p>The quadratic classification function is:</p>
+<div class="math">$$ Q_i(y) = -\frac{1}{2} ln \left|\Sigma_k \right| - \frac{1}{2}(y - \mu_k)^T \Sigma_k^{-1} (y - u_k) + ln \pi_k $$</div>
+<p>The observation vector <span class="math">\(y\)</span> is assigned to the group which maximizes the function.</p>
+<h2>Quadratic Discriminant Analysis of Several Groups</h2>
+<p>The rootstock data from previous posts will be classified using quadratic discriminant analysis. The rootstock data were obtained from the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book Methods of Multivariate Analysis by Alvin Rencher. The data contains four dependent variables as follows:</p>
+<ul>
+<li>trunk girth at four years (mm × 100)</li>
+<li>extension growth at four years (m)</li>
+<li>trunk girth at 15 years (mm × 100)</li>
+<li>weight of tree above ground at 15 years (lb × 1000)</li>
+</ul>
+<p>Load the data and inspect the first few rows.</p>
+<div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;ROOT.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Tree.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Ext.Growth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.15.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Weight.Above.Ground.15.Years&#39;</span><span class="p">))</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##   Tree.Number Trunk.Girth.4.Years Ext.Growth.4.Years Trunk.Girth.15.Years</span>
+<span class="err">## 1           1                1.11              2.569                 3.58</span>
+<span class="err">## 2           1                1.19              2.928                 3.75</span>
+<span class="err">## 3           1                1.09              2.865                 3.93</span>
+<span class="err">## 4           1                1.25              3.844                 3.94</span>
+<span class="err">## 5           1                1.11              3.027                 3.60</span>
+<span class="err">## 6           1                1.08              2.336                 3.51</span>
+<span class="err">##   Weight.Above.Ground.15.Years</span>
+<span class="err">## 1                        0.760</span>
+<span class="err">## 2                        0.821</span>
+<span class="err">## 3                        0.928</span>
+<span class="err">## 4                        1.009</span>
+<span class="err">## 5                        0.766</span>
+<span class="err">## 6                        0.726</span>
+</pre></div>
+
+
+<p>Before classifying the observations in the data first split the data into groups using the <code>split()</code> function. The groups' covariance matrix and mean vectors are then found.</p>
+<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+<span class="n">Si</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">cov</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">c</span><span class="p">(</span><span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">))</span>
+<span class="p">})</span>
+</pre></div>
+
+
+<p>The following loop performs quadratic discriminant analysis for several groups. For each observation vector <span class="math">\(y\)</span> in the data, the classification function above is calculated for each group. The group that maximizes the function is the predicted group the observation vector belongs and is thus appended to the <code>l2i.y</code> object.</p>
+<div class="highlight"><pre><span></span><span class="n">l2i.y</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> <span class="c1"># Initialize the vector to store the classified results</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root[i</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span> <span class="c1"># Get the observation vector y</span>
+  <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
+
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">))</span> <span class="p">{</span> <span class="c1"># For each group, calculate the QDA function. </span>
+    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means[j]</span><span class="p">)</span>
+    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si[j]</span><span class="p">),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
+  <span class="p">}</span>
+
+  <span class="n">l2i.y</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i.y</span><span class="p">,</span> <span class="nf">which.max</span><span class="p">(</span><span class="n">l2i</span><span class="p">))</span> <span class="c1"># Append the group number which maximizes the function</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Print a confusion matrix of the results compared to the actual groups.</p>
+<div class="highlight"><pre><span></span><span class="nf">table</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">,</span> <span class="n">l2i.y</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group 1 2 3 4 5 6</span>
+<span class="err">##            1 8 0 0 0 0 0</span>
+<span class="err">##            2 0 7 0 1 0 0</span>
+<span class="err">##            3 1 0 6 0 1 0</span>
+<span class="err">##            4 0 0 1 7 0 0</span>
+<span class="err">##            5 0 3 0 0 4 1</span>
+<span class="err">##            6 2 0 0 0 1 5</span>
+</pre></div>
+
+
+<p>It appears QDA was rather accurate in classifying observations, particularly in groups one through four. Count the number of successful classifications divided by the total sample size to get the error rate.</p>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.2291667</span>
+</pre></div>
+
+
+<p>Out of 48 observations, the quadratic classification function correctly assigned 37 to their correct groups, giving an error rate of only 23%. This result seems quite optimistic and would likely not be as accurate in classifying new observations. We will perform cross-validation with QDA shortly in hopes of obtaining a more realistic model to use on new observations.</p>
+<p>First, verify our results using the <code>qda()</code> function from the <a href="https://cran.r-project.org/web/packages/MASS/index.html">MASS package</a>.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">MASS</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">root.qda</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">)</span>
+<span class="n">root.qda</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## Call:</span>
+<span class="err">## qda(Tree.Number ~ ., data = root)</span>
+<span class="err">## </span>
+<span class="err">## Prior probabilities of groups:</span>
+<span class="err">##         1         2         3         4         5         6 </span>
+<span class="err">## 0.1666667 0.1666667 0.1666667 0.1666667 0.1666667 0.1666667 </span>
+<span class="err">## </span>
+<span class="err">## Group means:</span>
+<span class="err">##   Trunk.Girth.4.Years Ext.Growth.4.Years Trunk.Girth.15.Years</span>
+<span class="err">## 1             1.13750           2.977125              3.73875</span>
+<span class="err">## 2             1.15750           3.109125              4.51500</span>
+<span class="err">## 3             1.10750           2.815250              4.45500</span>
+<span class="err">## 4             1.09750           2.879750              3.90625</span>
+<span class="err">## 5             1.08000           2.557250              4.31250</span>
+<span class="err">## 6             1.03625           2.214625              3.59625</span>
+<span class="err">##   Weight.Above.Ground.15.Years</span>
+<span class="err">## 1                     0.871125</span>
+<span class="err">## 2                     1.280500</span>
+<span class="err">## 3                     1.391375</span>
+<span class="err">## 4                     1.039000</span>
+<span class="err">## 5                     1.181000</span>
+<span class="err">## 6                     0.735000</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">predict</span><span class="p">(</span><span class="n">root.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##  [1] 1 1 1 1 1 1 1 1 2 4 2 2 2 2 2 2 1 3 5 3 3 3 3 3 4 4 3 4 4 4 4 4 5 2 5</span>
+<span class="err">## [36] 5 6 2 5 2 1 6 6 6 6 6 1 5</span>
+<span class="err">## Levels: 1 2 3 4 5 6</span>
+</pre></div>
+
+
+<p>Construct a confusion matrix with the results from the <code>qda()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="nf">table</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">,</span> <span class="nf">predict</span><span class="p">(</span><span class="n">root.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Predicted Group</span>
+<span class="err">## Actual Group 1 2 3 4 5 6</span>
+<span class="err">##            1 8 0 0 0 0 0</span>
+<span class="err">##            2 0 7 0 1 0 0</span>
+<span class="err">##            3 1 0 6 0 1 0</span>
+<span class="err">##            4 0 0 1 7 0 0</span>
+<span class="err">##            5 0 3 0 0 4 1</span>
+<span class="err">##            6 2 0 0 0 1 5</span>
+</pre></div>
+
+
+<p>The error rate of the <code>qda()</code> function also agrees with ours.</p>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">predict</span><span class="p">(</span><span class="n">root.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.2291667</span>
+</pre></div>
+
+
+<h2>Cross-Validation of Quadratic Discriminant Analysis of Several Groups</h2>
+<p>As we've seen previously, cross-validation of classifications often leaves a higher misclassification rate but is typically more realistic in its application to new observations. As the rootstock data contains only eight observations for each group, it is likely the cross-validated model will have a much higher error rate than what was found earlier in the post.</p>
+<p>The following code performs <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation">leave-one-out cross-validation</a> with quadratic discriminant analysis. Leave-one-out cross-validation is performed by using all but one of the sample observation vectors to determine the classification function and then using that classification function to predict the omitted observation's group membership. The procedure is repeated for each observation so that each is classified by a function of the other observations.</p>
+<div class="highlight"><pre><span></span><span class="n">l2i.y.cv</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> <span class="c1"># Vector to store classified results</span>
+
+<span class="nf">for </span><span class="p">(</span><span class="n">r</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
+
+  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">root[</span><span class="o">-</span><span class="n">r</span><span class="p">,</span><span class="n">]</span> <span class="c1"># The holdout group is all of the data except one observation</span>
+
+  <span class="c1"># Split the data and calculate the covariance matrices and mean vectors of the groups</span>
+  <span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">holdout[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">holdout</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+  <span class="n">Si</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">cov</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+  <span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">c</span><span class="p">(</span><span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">))</span>
+  <span class="p">})</span>
+
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root[r</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span> <span class="c1"># The left out observation vector is stored in the variable y</span>
+
+  <span class="c1"># Calculate the quadratic classification function using the y vector for each group to determine which maximizes the function</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means[j]</span><span class="p">)</span>
+    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si[j]</span><span class="p">),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
+  <span class="p">}</span>
+
+  <span class="c1"># The group that maximizes the classification function is stored in the initialized vector.</span>
+  <span class="n">l2i.y.cv</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i.y.cv</span><span class="p">,</span> <span class="nf">which.max</span><span class="p">(</span><span class="n">l2i</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Find the misclassification rate of the cross-validated results.</p>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y.cv</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.6875</span>
+</pre></div>
+
+
+<p>A 69% error rate is three times the rate we found with the non-cross-validated results above, which we expected due to the relatively small sample size of each group. The error rate is also higher than the 56% error rate found with the cross-validated linear discriminant analysis model. However, since quadratic discriminant analysis makes fewer assumptions regarding the groups and involves more parameters, it may be the recommended model for classifying new observations. The model is also more accurate than simply guessing group membership of observations, which would have an 83% error rate <span class="math">\((1 - \frac{1}{6})\)</span>.</p>
+<p>The <code>qda()</code> function also performs cross-validation when the <code>CV</code> argument is <code>TRUE</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">root.qda.cv</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">CV</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">root.qda.cv</span><span class="o">$</span><span class="n">class</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##  [1] 1 6 5 4 4 6 4 1 5 4 4 2 5 2 2 6 1 3 5 3 3 2 3 2 2 3 3 3 6 1 4 4 5 2 2</span>
+<span class="err">## [36] 5 6 2 3 2 1 5 6 2 1 6 1 5</span>
+<span class="err">## Levels: 1 2 3 4 5 6</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">root.qda.cv</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.6875</span>
+</pre></div>
+
+
+<h2>References</h2>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<p><a href="https://onlinecourses.science.psu.edu/stat857/node/80">https://onlinecourses.science.psu.edu/stat857/node/80</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/discriminant-analysis-several-groups.html">Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/cholesky-decomposition-r-example.html">Cholesky Decomposition with R Example</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html">Linear Discriminant Analysis for the Classification of Two Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

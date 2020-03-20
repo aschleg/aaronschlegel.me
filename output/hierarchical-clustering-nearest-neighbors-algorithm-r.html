@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Hierarchical Clustering Nearest Neighbors Algorithm in R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Hierarchical clustering is a widely used and popular tool in statistics" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Hierarchical Clustering Nearest Neighbors Algorithm in R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2017-03-09 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Hierarchical clustering is a widely used and popular tool in statistics" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/hierarchical-clustering-nearest-neighbors-algorithm-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/hierarchical-clustering-nearest-neighbors-algorithm-r.html" rel="bookmark"
+                   title="Permalink to Hierarchical Clustering Nearest Neighbors Algorithm in R">Hierarchical Clustering Nearest Neighbors Algorithm in R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2017-03-09T00:00:00-08:00">
+                Thu 09 March 2017
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>and data mining for grouping data into 'clusters' that exposes
+similarities or dissimilarities in the data. There are many approaches
+to hierarchical clustering as it is not possible to investigate all
+clustering possibilities. One set of approaches to hierarchical
+clustering is known as agglomerative, whereby in each step of the
+clustering process an observation or cluster is merged into another
+cluster.</p>
+<p>Hierarchical clustering is a widely used and popular tool in statistics
+and data mining for grouping data into 'clusters' that exposes
+similarities or dissimilarities in the data. There are many approaches
+to hierarchical clustering as it is not possible to investigate all
+clustering possibilities. One set of approaches to hierarchical
+clustering is known as agglomerative, whereby in each step of the
+clustering process an observation or cluster is merged into another
+cluster. The first approach we will explore is known as the <a href="https://en.wikipedia.org/wiki/Single-linkage_clustering">single
+linkage</a>
+method, also known as nearest neighbors.</p>
+<p>The data we will cluster is seven different measures of air pollution of
+41 cities throughout the United States (qtd. Rencher 502). The data were
+obtained from the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book
+Methods of Multivariate Analysis and contains the variables as follows:</p>
+<ul>
+<li>SO2 content of air in mg/cm</li>
+<li>Average annual temperature in F</li>
+<li>Number of manufacturing plants with 20 or more workers</li>
+<li>Population size as recorded by 1970 census in thousands</li>
+<li>Average annual wind speed in mph</li>
+<li>Average annual precipitation in inches</li>
+<li>Average number of days with precipitation per year</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">poll</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;T15_13_POLLUTION.dat&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;city&#39;</span><span class="p">,</span> <span class="s">&#39;so2&#39;</span><span class="p">,</span> <span class="s">&#39;tempf&#39;</span><span class="p">,</span> <span class="s">&#39;manufacturing&#39;</span><span class="p">,</span>
+                                                         <span class="s">&#39;pop&#39;</span><span class="p">,</span> <span class="s">&#39;wind&#39;</span><span class="p">,</span> <span class="s">&#39;precip&#39;</span><span class="p">,</span> <span class="s">&#39;days.w.precip&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<h2>Variable Scaling Consideration</h2>
+<p>Although recommended by many authors, the question of scaling in the
+context of hierarchical clustering (particularly using the Euclidean
+distance measure) is not so black and white (Rencher 2002, pp. 454). The
+variables that best separate clusters might not do so after scaling. We
+will scale the pollution data because the variables' scale of
+measurement is quite different from each other, but it should be noted
+standardization should be thoughtfully applied (or not applied) rather
+than proceeding to scale automatically.</p>
+<div class="highlight"><pre><span></span><span class="n">poll.scale</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">scale</span><span class="p">(</span><span class="n">poll[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">8</span><span class="n">]</span><span class="p">))</span>
+</pre></div>
+
+
+<h2>Measures of Similarity (or Dissimilarity) for Cluster Analysis</h2>
+<p>Before performing hierarchical clustering, we must find the similarity
+between each pair of observations, which is referred to as the distance.
+The distance measure is more of a measure of dissimilarity as it
+increases as the observations move farther away. As in agglomerative
+hierarchical clustering, there are many approaches to measuring the
+distance, the most common of which is the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean
+distance</a>. There is no
+'best' distance measure, and one must consider the data at hand and the
+assumptions of each measure to select an appropriate method. Euclidean
+distance is the straight line between two pairs of observations and is
+defined as:</p>
+<div class="math">$$ d(x,y) = \sqrt{(x - y)^\prime (x - y)} = \sqrt{\sum^p_{j=1} (x_j - y_j)^2} $$</div>
+<p>The following function implements the Euclidean distance calculations
+for each pair of observations in the dataset.</p>
+<div class="highlight"><pre><span></span><span class="n">euclidean.distance</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">dist.mat</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+  <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x[1</span><span class="p">,</span><span class="n">]</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">yj</span> <span class="o">&lt;-</span> <span class="n">x[j</span><span class="p">,</span><span class="n">]</span>
+      <span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">as.matrix</span><span class="p">(</span><span class="n">xj</span> <span class="o">-</span> <span class="n">yj</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="n">xj</span> <span class="o">-</span> <span class="n">yj</span><span class="p">)))</span>
+      <span class="n">dist.mat[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="n">d</span>
+    <span class="p">}</span>
+    <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x[1</span><span class="o">+</span><span class="n">i</span><span class="p">,</span><span class="n">]</span>
+  <span class="p">}</span>
+  <span class="nf">return</span><span class="p">(</span><span class="n">dist.mat</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">euclid.dist</span> <span class="o">&lt;-</span> <span class="nf">euclidean.distance</span><span class="p">(</span><span class="n">poll.scale</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <code>dist()</code> function in R also calculates the distance.</p>
+<div class="highlight"><pre><span></span><span class="n">poll.dist</span> <span class="o">&lt;-</span> <span class="nf">dist</span><span class="p">(</span><span class="n">poll.scale</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s">&#39;euclidean&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The output of the <code>dist()</code> function is an atomic vector. We convert it
+to a matrix here to compare our results with the function.</p>
+<div class="highlight"><pre><span></span><span class="n">poll.dist.mat</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">poll.dist</span><span class="p">)</span>
+</pre></div>
+
+
+<p>As the resulting matrices are <span class="math">\(41 \times 41\)</span>, check the first and bottom
+three rows of each to verify.</p>
+<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">poll.dist.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">poll.dist.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          1        2        3        1        2        3</span>
+<span class="err">## 1 0.000000 4.789018 3.171606 4.034076 3.264390 1.782405</span>
+<span class="err">## 2 4.789018 0.000000 3.009865 5.751432 2.007170 3.321471</span>
+<span class="err">## 3 3.171606 3.009865 0.000000 4.790368 1.171199 2.906303</span>
+<span class="err">## 4 3.871066 3.491389 1.262450 6.637764 3.208636 4.153093</span>
+<span class="err">## 5 6.230609 2.817075 3.800426 5.675892 2.526646 4.136598</span>
+<span class="err">## 6 5.305038 1.729939 2.964289 6.546541 4.008765 3.474188</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">euclid.dist[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">euclid.dist[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]     [,2]     [,3]     [,4]     [,5]     [,6]</span>
+<span class="err">## [36,] 0.000000 4.789018 3.171606 4.034076 3.264390 1.782405</span>
+<span class="err">## [37,] 4.789018 0.000000 3.009865 5.751432 2.007170 3.321471</span>
+<span class="err">## [38,] 3.171606 3.009865 0.000000 4.790368 1.171199 2.906303</span>
+<span class="err">## [39,] 3.871066 3.491389 1.262450 6.637764 3.208636 4.153093</span>
+<span class="err">## [40,] 6.230609 2.817075 3.800426 5.675892 2.526646 4.136598</span>
+<span class="err">## [41,] 5.305038 1.729939 2.964289 6.546541 4.008765 3.474188</span>
+</pre></div>
+
+
+<h2>Hierarchical Clustering with Single Linkage</h2>
+<p><a href="https://en.wikipedia.org/wiki/Johnson's_algorithm">Johnson's algorithm</a>
+describes the general process of hierarchical clustering given <span class="math">\(N\)</span>
+observations to be clustered and an <span class="math">\(N \times N\)</span> distance matrix. The
+steps of Johnson's algorithm as applied to hierarchical clustering is as
+follows:</p>
+<ol>
+<li>Begin with disjoint clustering with level <span class="math">\(L(0) = 0\)</span> and <span class="math">\(m = 0\)</span>.</li>
+<li>
+<p>In the case of single linkage, find the pair with the minimum
+    distance, with pairs denoted as <span class="math">\(r\)</span> and <span class="math">\(s\)</span>, according to:</p>
+</li>
+<li>
+<p><span class="math">\(d[(r), (s)] = min (d[(i),(j)])\)</span></p>
+</li>
+<li>
+<p>Add one to <span class="math">\(m\)</span>, <span class="math">\(m = m + 1\)</span>. Merge clusters <span class="math">\(r\)</span> and <span class="math">\(s\)</span> into one
+    cluster to form the next clustering at <span class="math">\(m\)</span>. <span class="math">\(L(m)\)</span> then becomes:
+    <span class="math">\(L(m) = d[(r), (s)]\)</span></p>
+</li>
+<li>
+<p>The distance matrix is updated by removing the rows and columns
+    corresponding to clusters <span class="math">\(r\)</span> and <span class="math">\(s\)</span> and inserting a row and column
+    for the newly formed cluster. The distance between the newly formed
+    cluster <span class="math">\((r,s)\)</span> and the old cluster <span class="math">\(k\)</span> is calculated again with the
+    minimum distance (in the case of single linkage):</p>
+</li>
+<li>
+<p><span class="math">\(d[(k), (r,s)] = min (d[(k),(r)], d[(k),(s)])\)</span></p>
+</li>
+<li>
+<p>Stop if all <span class="math">\(N\)</span> observations are in one cluster, otherwise repeat
+    starting at Step 2.</p>
+</li>
+</ol>
+<h2>Implementing the Single Linkage Hierarchical Clustering Technique</h2>
+<p>Although hierarchical clustering with a variety of different methods can
+be performed in R with the <code>hclust()</code> function, we can also replicate
+the routine to an extent to better understand how Johnson's algorithm is
+applied to hierarchical clustering and how <code>hclust()</code> works. To plot our
+clustering results, we will rely on one output of the <code>hclust()</code>
+function, the <code>order</code> value, which is purely used for plotting. To plot
+and compare our clustering results, the best method (that I know of) is
+to create an <code>hclust</code> object, which according to <code>?hclust</code>, requires
+<code>merge</code>, <code>height</code> and the aforementioned <code>order</code> components.</p>
+<p>Quoting from the <code>hclust</code> documentation of the required components:</p>
+<blockquote>
+<p>merge is an n-1 by 2 matrix. Row i of merge describes the merging of
+clusters at step i of the clustering. If an element j in the row is
+negative, then observation -j was merged at this stage. If j is &gt;
+positive then the merge was with the cluster formed at the (earlier)
+stage j of the algorithm. Thus negative entries in merge indicate
+agglomerations of singletons, and positive entries indicate
+agglomerations of non-singletons.</p>
+<p>height is a set of n-1 real values (non-decreasing for ultrametric
+trees). The clustering height: that is, the value of the criterion
+associated with the clustering method for the particular
+agglomeration.</p>
+<p>Order is a vector giving the permutation of the original observations
+suitable for plotting, in the sense &gt; that a cluster plot using
+this ordering and matrix merge will not have crossings of the
+branches.</p>
+</blockquote>
+<p>Therefore we need to build the <code>merge</code> and <code>height</code> objects. We will
+only use the <code>order</code> output of <code>hclust()</code> to plot.</p>
+<p>To start, initialize the <code>merge</code> and <code>height</code> objects and set the
+diagonal of the distance matrix to <code>Inf</code> to avoid including 0s in our
+calculations.</p>
+<div class="highlight"><pre><span></span><span class="n">Lm</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">euclid.dist</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span>
+
+<span class="n">merge</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">N</span><span class="m">-1</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">height</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">(</span><span class="n">length</span> <span class="o">=</span> <span class="n">N</span><span class="m">-1</span><span class="p">)</span>
+<span class="nf">diag</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+</pre></div>
+
+
+<p>The row and column names of the distance matrix are set to <span class="math">\(-1\)</span>
+increasing up to <span class="math">\(-N\)</span>, which allows us to note if the merged cluster at
+a particular step was an individual cluster.</p>
+<div class="highlight"><pre><span></span><span class="nf">colnames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="n">N</span><span class="p">)</span>
+<span class="nf">rownames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="o">-</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The following loop builds the <code>merge</code> and <code>height</code> objects needed for
+plotting the hierarchical clustering results. A <a href="https://home.deib.polimi.it/matteucc/Clustering/tutorial_html/hierarchical.html">visual example of how
+clustering is
+performed</a>
+shows how the rows and columns are merged with a simple dataset.</p>
+<div class="highlight"><pre><span></span><span class="nf">for </span><span class="p">(</span><span class="n">m</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="m">-1</span><span class="p">))</span> <span class="p">{</span> 
+  <span class="n">cols</span> <span class="o">&lt;-</span> <span class="nf">colnames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span>
+
+  <span class="c1"># Johnson&#39;s algorithm Step 2L Find the pair with the minimum distance</span>
+
+  <span class="c1"># The which() function returns the row and column position of the pair</span>
+  <span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">which</span><span class="p">(</span><span class="n">Lm</span> <span class="o">==</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">),</span> <span class="n">arr.ind</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="n">[1</span><span class="p">,,</span><span class="n">drop</span><span class="o">=</span><span class="kc">FALSE</span><span class="n">]</span>
+
+  <span class="n">height[m]</span> <span class="o">&lt;-</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="c1"># The height is the value of the pair with the minimum distance</span>
+
+  <span class="c1"># The row and column position of the minimum pair is stored as sequence m in the merge object</span>
+  <span class="n">merge[m</span><span class="p">,</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">cols[d]</span><span class="p">)</span>
+
+  <span class="c1"># Johnson&#39;s algorithm Step 3: The pair with the minimum distance is merged</span>
+
+  <span class="c1"># The cluster object is used to find previous clusters that the pair belong to (if they exist)</span>
+  <span class="c1"># Does this by finding any columns above 0 (since all column names are negative, a positive </span>
+  <span class="c1"># column value implies it has been clustered)</span>
+  <span class="n">cluster</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nf">which</span><span class="p">(</span><span class="n">cols</span> <span class="o">%in%</span> <span class="n">cols[d[1</span><span class="p">,</span> <span class="n">cols[d]</span> <span class="o">&gt;</span> <span class="m">0</span><span class="n">]]</span><span class="p">))</span>
+
+  <span class="nf">colnames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span><span class="n">[cluster]</span> <span class="o">&lt;-</span> <span class="n">m</span> <span class="c1"># Rename the columns indicated by cluster to the sequence number, m</span>
+
+  <span class="c1"># Merge the pairs according to Johnson&#39;s algorithm and the single linkage method</span>
+  <span class="n">sl</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">Lm[d</span><span class="p">,</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">min</span><span class="p">)</span>
+
+  <span class="c1"># Johnson&#39;s algorithm Step 4: Remove column and row corresponding to old clusters and</span>
+  <span class="c1"># insert a new column and row for newly formed cluster.</span>
+
+  <span class="c1"># The insertion of the cluster is done by setting the first sequential row and column of the</span>
+  <span class="c1"># minimum pair in the distance matrix (top to bottom, left to right) as the cluster resulting </span>
+  <span class="c1"># from the single linkage step</span>
+  <span class="n">Lm</span><span class="nf">[min</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
+  <span class="n">Lm[</span><span class="p">,</span><span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
+
+  <span class="c1"># Make sure the minimum distance pair is not used again by setting it to Inf</span>
+  <span class="n">Lm</span><span class="nf">[min</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+
+  <span class="c1"># The removal step is done by setting the second sequential row and column of the minimum pair</span>
+  <span class="c1"># (farthest right, farthest down) to Inf</span>
+  <span class="n">Lm</span><span class="nf">[max</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+  <span class="n">Lm[</span><span class="p">,</span><span class="nf">max</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2>Plotting the Hierarchical Clustering as a Dendrogram</h2>
+<p>We now have the <code>merge</code> and <code>height</code> components of an <code>hclust</code> object.
+The <code>order</code> component comes from the <code>hclust()</code> function. As noted, the
+<code>order</code> component is used just by <code>hclust</code> to plot and has no bearing on
+our understanding of cluster analysis.</p>
+<div class="highlight"><pre><span></span><span class="n">poll.clust</span> <span class="o">&lt;-</span> <span class="nf">hclust</span><span class="p">(</span><span class="n">poll.dist</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s">&#39;single&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>According to the documentation in <code>?hclust</code>, an hclust object is a list
+with class hclust of the above components. We construct the hclust class
+with the following:</p>
+<div class="highlight"><pre><span></span><span class="n">hclust.obj</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">()</span> <span class="c1"># Initialize an empty list</span>
+<span class="n">hclust.obj</span><span class="o">$</span><span class="n">merge</span> <span class="o">&lt;-</span> <span class="n">merge</span> <span class="c1"># Add the merge component obtained earlier</span>
+<span class="n">hclust.obj</span><span class="o">$</span><span class="n">order</span> <span class="o">&lt;-</span> <span class="n">poll.clust</span><span class="o">$</span><span class="n">order</span> <span class="c1"># Here the order component from hclust is added to the list</span>
+<span class="n">hclust.obj</span><span class="o">$</span><span class="n">height</span> <span class="o">&lt;-</span> <span class="n">height</span> <span class="c1"># The height component determines the lengths of the dendogram nodes</span>
+<span class="n">hclust.obj</span><span class="o">$</span><span class="n">labels</span> <span class="o">&lt;-</span> <span class="n">poll</span><span class="o">$</span><span class="n">city</span> <span class="c1"># Add the city names to the labels component</span>
+<span class="nf">class</span><span class="p">(</span><span class="n">hclust.obj</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="s">&#39;hclust&#39;</span> <span class="c1"># The list is set to class hclust</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="n">hclust.obj</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="figure/hierarchical_clustering/unnamed-chunk-13-1.png"></p>
+<p>Plot the hierarchical clustering as given by the <code>hclust()</code> function to
+verify our results.</p>
+<div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="n">poll.clust</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">poll</span><span class="o">$</span><span class="n">city</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="figure/hierarchical_clustering/unnamed-chunk-14-1.png"></p>
+<h2>Interpretation of the Cluster Plot</h2>
+<p>Moving left to the right along the x-axis, we see there Chicago,
+Phoenix, and Philadelphia are separated from other cities to a
+decreasing degree. Otherwise, there isn't too much distinction between
+clusters. At the height of slightly more than two we have a three
+cluster solution (counting the number of lines crossed going left to
+right on the x-axis), but the third cluster would contain the bulk of
+the cities and thus isn't particularly useful. Using a lower height
+increases the number of clusters significantly, for example, a height of
+about 1.9 gives a six-cluster solution. However, the final cluster still
+contains a large amount of the cities and therefore isn't very
+descriptive of how the cities group themselves. This lack of separation
+in the clusters might indicate there isn't too much variation in the
+cities' pollution levels to begin with, the method of clustering used,
+or a combination of the two. The former point is further evidenced by
+small distances in the y-axis between many of the clusters.</p>
+<p>We will see in later posts if using a different distance measure or
+clustering method improves the clustering of the cities. The
+hierarchical cluster could be 'cut' to the number of groups we are
+interested in, but since the clustering isn't that great, we will save
+this step once for when a better clustering and distance method are
+used.</p>
+<h2>Disadvantages of the Single Linkage Approach</h2>
+<p>The single linkage (nearest neighbors) approach has several
+disadvantages compared to other clustering methods and is therefore not
+recommended by many authors (Rencher, 2002, pp. 475). Single linkage is
+rather prone to chaining (also known as space-contracting), which is the
+tendency for newly formed clusters to move closer to individual
+observations, so observations end up joining other clusters rather than
+another individual observation. We can see this markedly in the
+hierarchical cluster plot above. The single linkage method is also
+sensitive to errors in distances between observations.</p>
+<p>It should be noted there is no clear 'best' clustering method and often
+a good approach is to try several different methods. If the resulting
+clusters are somewhat similar, that is evidence there may be natural
+clusters in the data. Many studies, however, conclude Ward's method and
+the average linkage method are the overall best performers (Rencher,
+2002, pp. 479).</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/2UyYnxe">Gan, Guojun, Chaoqun Ma, and Jianhong Wu, Data Clustering: Theory,
+Algorithms, and Applications, ASA-SIAM Series on Statistics and Applied
+Probability, SIAM, Philadelphia, ASA, Alexandria, VA, 2007.</a></p>
+<p>Murtagh, F. (n.d.). Multivariate Data Analysis with Fortran C and Java.
+Queenâs University Belfast.</p>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<p><a href="http://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/1999/clustering/node12.html#SECTION00033100000000000000">http://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/1999/clustering/node12.html#SECTION00033100000000000000</a></p>
+<p><a href="http://84.89.132.1/~michael/stanford/maeb7.pdf">http://84.89.132.1/~michael/stanford/maeb7.pdf</a></p>
+<p><a href="http://www.stat.berkeley.edu/~spector/s133/Clus.html">http://www.stat.berkeley.edu/~spector/s133/Clus.html</a></p>
+<p><a href="http://www.pbarrett.net/techpapers/euclid.pdf">http://www.pbarrett.net/techpapers/euclid.pdf</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html">Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-analysis-of-variance-anova.html">Calculating and Performing One-way Analysis of Variance (ANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html">Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Predicting Cat Genders with Logistic Regression</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Consider a data set of 144 observations of household cats. The data contains the cats' gender, body weight and height. Can we model and accurately predict the gender of a cat based on previously observed values using logistic regression?" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Predicting Cat Genders with Logistic Regression" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-06-01 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Consider a data set of 144 observations of household cats. The data contains the cats' gender, body weight and height. Can we model and accurately predict the gender of a cat based on previously observed values using logistic regression?" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/predicting-cat-genders-logistic-regression.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/predicting-cat-genders-logistic-regression.html" rel="bookmark"
+                   title="Permalink to Predicting Cat Genders with Logistic Regression">Predicting Cat Genders with Logistic Regression</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-06-01T00:00:00-07:00">
+                Fri 01 June 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <h2>Classification</h2>
+<p>Classification problems refer to modeling and predicting qualitative responses, <span class="math">\(Y\)</span>, often denoted as classes or categories on observed predictors <span class="math">\(x\)</span>. Categories can refer to anything that is qualitative in nature, such as relationship status, gender, eye color, demographic information and more.</p>
+<p>Classification techniques are generally known as classifiers, of which there are a variety of methods, including logistic regression, k-nearest neighbors, trees, boosting, and Linear and Quadratic Discriminant Analysis. For this exercise, we will focus on logistic regression as it is the most common and straightforward of the techniques mentioned earlier.</p>
+<h2>The Logistic Model</h2>
+<p>As one might expect, logistic regression makes ample use of the logistic function as it outputs values between 0 and 1 which we can use to model and predict responses. The log function is described as:</p>
+<div class="math">$$ \large{p(x) = \frac{e^{\beta_{0} + \beta_{1}x}}{1 + e^{\beta_{0} + \beta_{1}x_{1}}}} $$</div>
+<p>When dealing with multiple independent values, or x predictors, the function takes the form:</p>
+<div class="math">$$ \large{p(x) = \frac{e^{\beta_{0} + \beta_{1}x_{1} + \cdots + \beta_{n}x_{p}}}{1 + e^{\beta_{0} + \beta{1}x_{1} + \cdots + \beta_{n}x_{p}}}} $$</div>
+<h2>Estimating Coefficients</h2>
+<p>At this point, the coefficients <span class="math">\(\beta_0, \beta_1, \cdots, $\beta_2\)</span> of the model are unknown, so we must estimate them in order to perform predictions. The estimation is done using maximum likelihood, due to its more general nature and statistical features.</p>
+<p>To fit the model properly, we must make estimates for the coefficients that predictions are as close as possible to the originally observed value. Maximum likelihood in this case can be formalized:</p>
+<div class="math">$$ \large{l(\beta_{0}, \beta_{1}) = \prod_{i: y_{i} = 1}p(x_{i}) \prod_{i^{'}:y_{i^{'}} = 0}(1 - p(x_{i^{'}})) \cdots} $$</div>
+<p>With additional product terms added for each independent variable.</p>
+<h2>Performing Prediction</h2>
+<p>Using the original logistic function, the coefficient estimates gained from the maximum likelihood function are used with the observed data.</p>
+<h3>Example Logistic Regression Exercise</h3>
+<p>Consider a data set of 144 observations of household cats. The data contains the cats' gender, body weight and height. Can we model and accurately predict the gender of a cat based on previously observed values?</p>
+<p>The data set ships with R and is named cats.csv. Instead of loading it directly into R with the <code>load()</code> function, I wanted to test a new package <a href="https://github.com/hadley/readr">readr</a>, which improves R's vanilla data import methods.</p>
+<p>We start by loading some packages to help with the analysis, readr and <a href="http://topepo.github.io/caret/index.html">caret</a></p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">caret</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">Loading</span> <span class="n">required</span> <span class="n">package</span><span class="p">:</span> <span class="n">lattice</span>
+
+<span class="n">Loading</span> <span class="n">required</span> <span class="n">package</span><span class="p">:</span> <span class="n">ggplot2</span>
+</pre></div>
+
+
+<p>The first command loads the csv data using readr's <code>read_csv</code> function and stores it in the cats variable. we then attach the data and print a summary to give us a quick look at what the data shows.</p>
+<div class="highlight"><pre><span></span><span class="n">cats</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="s">&quot;cats.csv&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">Parsed with column specification:</span>
+<span class="err">cols(</span>
+<span class="err">  Sex = col_character(),</span>
+<span class="err">  Bwt = col_double(),</span>
+<span class="err">  Hwt = col_double()</span>
+<span class="err">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">attach</span><span class="p">(</span><span class="n">cats</span><span class="p">)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">cats</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">     Sex                 Bwt             Hwt       </span>
+<span class="err"> Length:144         Min.   :2.000   Min.   : 6.30  </span>
+<span class="err"> Class :character   1st Qu.:2.300   1st Qu.: 8.95  </span>
+<span class="err"> Mode  :character   Median :2.700   Median :10.10  </span>
+<span class="err">                    Mean   :2.724   Mean   :10.63  </span>
+<span class="err">                    3rd Qu.:3.025   3rd Qu.:12.12  </span>
+<span class="err">                    Max.   :3.900   Max.   :20.50</span>
+</pre></div>
+
+
+<p>Plotting the data, we can see there is indeed a strong relationship between the body weight and height of a cat and its gender. Interestingly, the graph appears to be linear in nature with male cats appearing mostly in the higher values of body weight and height while female cats are centered in the lower ranges. This is even further evidence body weight and height are predictors of gender as the higher the body weight and height, the more likely the cat is male.</p>
+<div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cats</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">Bwt</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">Hwt</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">Sex.f</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">&lt;-</span> <span class="n">plot</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">5</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">&lt;-</span> <span class="n">plot</span> <span class="o">+</span> <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;Height&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Body Weight&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_color_discrete</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;Gender&quot;</span><span class="p">)</span>
+<span class="n">plot</span>
+</pre></div>
+
+
+<p><img alt="" src="figure/cats_logistic/catsplot.png"></p>
+<p>To perform logistic regression, we need to code the response variables into integers. This can be done using the <code>factor()</code> function. We create a new variable to store the coded categories for male and female cats in the data frame to call later. You can check how R factorizes the categories by calling the <code>contrasts()</code> function.</p>
+<p>Looking at the output, we can see R has assigned 0 for female and 1 for male.</p>
+<div class="highlight"><pre><span></span><span class="n">cats</span><span class="o">$</span><span class="n">Sex.f</span> <span class="o">&lt;-</span> <span class="nf">factor</span><span class="p">(</span><span class="n">cats</span><span class="o">$</span><span class="n">Sex</span><span class="p">)</span>
+<span class="nf">contrasts</span><span class="p">(</span><span class="n">cats</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">  M</span>
+<span class="err">F 0</span>
+<span class="err">M 1</span>
+</pre></div>
+
+
+<p>To verify and test our model's performance, we first need to split our data into training and test sets. This is where the caret package comes in, its <code>createDataPartition()</code> function is extremely useful for splitting data into separate sets. Here, we split 60% of the data for training using our new factorized variable and the remaining 40% for testing.</p>
+<div class="highlight"><pre><span></span><span class="n">inTrain</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">cats</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="m">.60</span><span class="p">,</span> <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="n">training</span> <span class="o">&lt;-</span> <span class="n">cats[inTrain</span><span class="p">,</span><span class="n">]</span>
+<span class="n">testing</span> <span class="o">&lt;-</span> <span class="n">cats[</span><span class="o">-</span><span class="n">inTrain</span><span class="p">,</span><span class="n">]</span>
+</pre></div>
+
+
+<p>You can check how many observations are stored in the training and test sets by calling the <code>dim()</code> function, which outputs the dimensions of the desired set.</p>
+<p>Calling this for the training and test sets contain four variables each with 88 and 56 observations, respectively.</p>
+<div class="highlight"><pre><span></span><span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 88  4</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">dim</span><span class="p">(</span><span class="n">testing</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 56  4</span>
+</pre></div>
+
+
+<p>With the training and test sets ready, we can fit our logistic regression model. This is done by calling the <code>glm()</code> function, which takes for its arguments the function string, the data, and a family argument. We use the coded response variable (cat gender) as the y with Bwt (Body Weight) and Hwt (Height) as independent predictors. The data to use is set to the training set, and family is set to binomial to tell R to perform logistic regression.</p>
+<p>The second command prints a handy summary of the fitted model's statistics. The coefficients table tells us Body Weight is the most significant predictor in determining a cat's gender, evidenced by the variables comparatively high z-value and low p-value. This shows us we can reject the null hypothesis, noted as <span class="math">\(p(x) = \frac{e^{\beta_{0}}}{1 + e^{\beta_{0}}}\)</span>, that the probability of a cat's gender does not depend on body weight.</p>
+<p>Height appears to be a far less significant in determining a cat's gender, shown by a relatively low z-value and a high p-value. This makes sense as anecdotally adult cats' heights don't vary much depending on gender.</p>
+<div class="highlight"><pre><span></span><span class="n">cats.fit</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">Sex.f</span> <span class="o">~</span> <span class="n">Bwt</span> <span class="o">+</span> <span class="n">Hwt</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">training</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">binomial</span><span class="p">)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">Call</span><span class="o">:</span>
+<span class="n">glm</span><span class="o">(</span><span class="n">formula</span> <span class="o">=</span> <span class="n">Sex</span><span class="o">.</span><span class="na">f</span> <span class="o">~</span> <span class="n">Bwt</span> <span class="o">+</span> <span class="n">Hwt</span><span class="o">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">binomial</span><span class="o">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">training</span><span class="o">)</span>
+
+<span class="n">Deviance</span> <span class="n">Residuals</span><span class="o">:</span> 
+    <span class="n">Min</span>       <span class="mi">1</span><span class="n">Q</span>   <span class="n">Median</span>       <span class="mi">3</span><span class="n">Q</span>      <span class="n">Max</span>  
+<span class="o">-</span><span class="mf">2.0189</span>  <span class="o">-</span><span class="mf">0.8322</span>   <span class="mf">0.2665</span>   <span class="mf">0.8113</span>   <span class="mf">1.6155</span>
+
+<span class="n">Coefficients</span><span class="o">:</span>
+            <span class="n">Estimate</span> <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span> <span class="n">z</span> <span class="n">value</span> <span class="n">Pr</span><span class="o">(&gt;|</span><span class="n">z</span><span class="o">|)</span>    
+<span class="o">(</span><span class="n">Intercept</span><span class="o">)</span>  <span class="o">-</span><span class="mf">8.6331</span>     <span class="mf">2.2354</span>  <span class="o">-</span><span class="mf">3.862</span> <span class="mf">0.000112</span> <span class="o">***</span>
+<span class="n">Bwt</span>           <span class="mf">3.0266</span>     <span class="mf">1.0025</span>   <span class="mf">3.019</span> <span class="mf">0.002537</span> <span class="o">**</span> 
+<span class="n">Hwt</span>           <span class="mf">0.1370</span>     <span class="mf">0.2122</span>   <span class="mf">0.645</span> <span class="mf">0.518669</span>    
+<span class="o">---</span>
+<span class="n">Signif</span><span class="o">.</span> <span class="n">codes</span><span class="o">:</span>  <span class="mi">0</span> <span class="s1">&#39;***&#39;</span> <span class="mf">0.001</span> <span class="s1">&#39;**&#39;</span> <span class="mf">0.01</span> <span class="s1">&#39;*&#39;</span> <span class="mf">0.05</span> <span class="s1">&#39;.&#39;</span> <span class="mf">0.1</span> <span class="s1">&#39; &#39;</span> <span class="mi">1</span>
+
+<span class="o">(</span><span class="n">Dispersion</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">binomial</span> <span class="n">family</span> <span class="n">taken</span> <span class="n">to</span> <span class="n">be</span> <span class="mi">1</span><span class="o">)</span>
+
+    <span class="n">Null</span> <span class="n">deviance</span><span class="o">:</span> <span class="mf">111.559</span>  <span class="n">on</span> <span class="mi">87</span>  <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">Residual</span> <span class="n">deviance</span><span class="o">:</span>  <span class="mf">82.403</span>  <span class="n">on</span> <span class="mi">85</span>  <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">AIC</span><span class="o">:</span> <span class="mf">88.403</span>
+
+<span class="n">Number</span> <span class="n">of</span> <span class="n">Fisher</span> <span class="n">Scoring</span> <span class="n">iterations</span><span class="o">:</span> <span class="mi">5</span>
+</pre></div>
+
+
+<p>We now have a fitted model of the data in which to do predictions! How does our model perform against testing data though? We can check by building a confusion matrix to display the success rate of our model's predictions on the testing data we created earlier.</p>
+<p>The first command using the <code>predict()</code> function performs prediction on a cat's gender based on the body weight and height data of the testing set. The type is set to 'response' to output probabilities.</p>
+<p>The next command creates a vector of the 'F' (female category, denoted as 0 in coded set) according to the number of observations in the training data set. This is then converted into 'M' where the predicted probability is greater than 50%.</p>
+<p>The <code>table</code> function builds the confusion matrix. Going diagonally, (21, 38) represent the number of correct predictions. Conversely, the going up diagonally, (8, 21) represent the number of incorrect predictions.</p>
+<div class="highlight"><pre><span></span><span class="n">cats.prob</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
+<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span>
+<span class="n">cats.pred[cats.prob</span> <span class="o">&gt;</span> <span class="m">.5</span><span class="n">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+<span class="nf">table</span><span class="p">(</span><span class="n">cats.pred</span><span class="p">,</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">cats.pred  F  M</span>
+<span class="err">        F 22 22</span>
+<span class="err">        M  7 37</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">mean</span><span class="p">(</span><span class="n">cats.pred</span> <span class="o">==</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 0.6704545</span>
+</pre></div>
+
+
+<p>We can also call the <code>mean()</code> function to find the success rate of our predictions. The rate is 67%, representing an error rate of about 33%, and is therefore much more accurate than random guessing.</p>
+<div class="highlight"><pre><span></span><span class="nf">mean</span><span class="p">(</span><span class="n">cats.pred</span> <span class="o">==</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 0.6704545</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">cats.pred</span> <span class="o">==</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 0.3295455</span>
+</pre></div>
+
+
+<p>Now that we know the model can predict more accurately than simply guessing, we can make predictions of cats' gender on new data. Again we call the <code>predict()</code> function but this time new data is entered for both Bwt and Hwt. These are set as (x, y) pairs; for example the first cat has a body weight of 2.8 and a height of 13.</p>
+<p>Our model shows the first cat has a 92% probability of being male, while the second cat has a 19% probability of being male, or, an 81% chance of being female.</p>
+<div class="highlight"><pre><span></span><span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">Bwt</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">2.8</span><span class="p">,</span> <span class="m">1.8</span><span class="p">),</span> <span class="n">Hwt</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">13</span><span class="p">,</span> <span class="m">7</span><span class="p">)),</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">        1         2 </span>
+<span class="err">0.8350371 0.0973901</span>
+</pre></div>
+
+
+<p>Earlier we noted height was not a significant predictor of a cat's gender due to its high p-value and low z-value. Does the model results improve if we just use body weight as a predictor?</p>
+<p>We fit a new model using the coded y data with just Bwt as a predictor. The data set and family remain the same.</p>
+<div class="highlight"><pre><span></span><span class="n">cats.fit</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">Sex.f</span> <span class="o">~</span> <span class="n">Bwt</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">training</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">binomial</span><span class="p">)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">Call</span><span class="o">:</span>
+<span class="n">glm</span><span class="o">(</span><span class="n">formula</span> <span class="o">=</span> <span class="n">Sex</span><span class="o">.</span><span class="na">f</span> <span class="o">~</span> <span class="n">Bwt</span><span class="o">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">binomial</span><span class="o">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">training</span><span class="o">)</span>
+
+<span class="n">Deviance</span> <span class="n">Residuals</span><span class="o">:</span> 
+    <span class="n">Min</span>       <span class="mi">1</span><span class="n">Q</span>   <span class="n">Median</span>       <span class="mi">3</span><span class="n">Q</span>      <span class="n">Max</span>  
+<span class="o">-</span><span class="mf">2.0538</span>  <span class="o">-</span><span class="mf">0.8808</span>   <span class="mf">0.2875</span>   <span class="mf">0.8061</span>   <span class="mf">1.6601</span>
+
+<span class="n">Coefficients</span><span class="o">:</span>
+            <span class="n">Estimate</span> <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span> <span class="n">z</span> <span class="n">value</span> <span class="n">Pr</span><span class="o">(&gt;|</span><span class="n">z</span><span class="o">|)</span>    
+<span class="o">(</span><span class="n">Intercept</span><span class="o">)</span>  <span class="o">-</span><span class="mf">8.2444</span>     <span class="mf">2.0919</span>  <span class="o">-</span><span class="mf">3.941</span> <span class="mf">8.11</span><span class="n">e</span><span class="o">-</span><span class="mi">05</span> <span class="o">***</span>
+<span class="n">Bwt</span>           <span class="mf">3.4080</span>     <span class="mf">0.8207</span>   <span class="mf">4.153</span> <span class="mf">3.28</span><span class="n">e</span><span class="o">-</span><span class="mi">05</span> <span class="o">***</span>
+<span class="o">---</span>
+<span class="n">Signif</span><span class="o">.</span> <span class="n">codes</span><span class="o">:</span>  <span class="mi">0</span> <span class="s1">&#39;***&#39;</span> <span class="mf">0.001</span> <span class="s1">&#39;**&#39;</span> <span class="mf">0.01</span> <span class="s1">&#39;*&#39;</span> <span class="mf">0.05</span> <span class="s1">&#39;.&#39;</span> <span class="mf">0.1</span> <span class="s1">&#39; &#39;</span> <span class="mi">1</span>
+
+<span class="o">(</span><span class="n">Dispersion</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">binomial</span> <span class="n">family</span> <span class="n">taken</span> <span class="n">to</span> <span class="n">be</span> <span class="mi">1</span><span class="o">)</span>
+
+    <span class="n">Null</span> <span class="n">deviance</span><span class="o">:</span> <span class="mf">111.559</span>  <span class="n">on</span> <span class="mi">87</span>  <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">Residual</span> <span class="n">deviance</span><span class="o">:</span>  <span class="mf">82.828</span>  <span class="n">on</span> <span class="mi">86</span>  <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">AIC</span><span class="o">:</span> <span class="mf">86.828</span>
+
+<span class="n">Number</span> <span class="n">of</span> <span class="n">Fisher</span> <span class="n">Scoring</span> <span class="n">iterations</span><span class="o">:</span> <span class="mi">5</span>
+</pre></div>
+
+
+<p>The confusion matrix using the new model shows classifications are very similar to the original model. Also, the computed success rate of the prediction is the same.</p>
+<div class="highlight"><pre><span></span><span class="n">cats.prob</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
+<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span>
+<span class="n">cats.pred[cats.prob</span> <span class="o">&gt;</span> <span class="m">.5</span><span class="n">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+<span class="nf">table</span><span class="p">(</span><span class="n">cats.pred</span><span class="p">,</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">cats.pred  F  M</span>
+<span class="err">        F 22 22</span>
+<span class="err">        M  7 37</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">mean</span><span class="p">(</span><span class="n">cats.pred</span> <span class="o">==</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">[1] 0.6704545</span>
+</pre></div>
+
+
+<p>Using the <code>predict()</code> function on the same body weights we previously predicted, we can see the probability of the cats being male is relatively similar compared to the previous model. Therefore, we can reasonably assume that although Height does not have as much predictive 'power' as Body Weight, it does not negatively impact the results and fitting of the model.</p>
+<div class="highlight"><pre><span></span><span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">Bwt</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">2.8</span><span class="p">,</span> <span class="m">1.8</span><span class="p">)),</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">        1         2 </span>
+<span class="err">0.7855190 0.1081379</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html">Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-analysis-of-variance-anova.html">Calculating and Performing One-way Analysis of Variance (ANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html">Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

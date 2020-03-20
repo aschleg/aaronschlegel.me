@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>N-Union and Intersection Set Operations</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Set unions and intersections can be extended to any number of sets. This post introduces notation to simplify the expression of n-sets and the set union and intersection operations themselves with R." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="N-Union and Intersection Set Operations" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-01-22 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Set unions and intersections can be extended to any number of sets. This post introduces notation to simplify the expression of n-sets and the set union and intersection operations themselves with R." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/n-set-union-intersection-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/n-set-union-intersection-r.html" rel="bookmark"
+                   title="Permalink to N-Union and Intersection Set Operations">N-Union and Intersection Set Operations</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-01-22T00:00:00-08:00">
+                Mon 22 January 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>The union and intersection set operations were introduced in a previous
+post using two sets, <span class="math">\(a\)</span> and <span class="math">\(b\)</span>. These set operations can be
+generalized to accept any number of sets.</p>
+<h2>Arbitrary Set Unions Operation</h2>
+<p>Consider a set of infinitely many sets:</p>
+<div class="math">$$ A = \large{\{b_0, b_1, b_2, \cdots \} \large} $$</div>
+<p>It would be very tedious and unnecessary to repeat the union statement
+repeatedly for any non-trivial amount of sets, for example, the first
+few unions would be written as:</p>
+<div class="math">$$ \large{b_0 \cup b_1 \cup b_2 \cup b_3 \cup b_4 \cup b_5\large} $$</div>
+<p>Thus a more general operation for performing unions is needed. This
+operation is denoted by the ⋃ symbol. For example, the set <span class="math">\(A\)</span> above and
+the desired unions of the member sets can be generalized to the
+following using the new notation:</p>
+<div class="math">$$ \large{\bigcup A = \bigcup_i b_i} $$</div>
+<p>We can then state the following definition: For a set <span class="math">\(A\)</span>, the union
+⋃<span class="math">\(A\)</span> of <span class="math">\(A\)</span> is defined by:</p>
+<div class="math">$$ \large{\bigcup A = \{x \space | \space (\exists b \in A) \space x \in b \} \large} $$</div>
+<p>For example, consider the three sets:</p>
+<div class="math">$$ \large{a = \{2, 4, 6 \} \qquad b = \{3, 5, 7\} \qquad c = \{2, 3, 8 \} \large}$$</div>
+<p>
+The union of the three sets is written as:</p>
+<div class="math">$$ \large{\bigcup \Big\{\{2,4,6\}, \{3,5,7\}, \{2,3,8\} \Big\} = \{2,3,4,5,6,7,8\}} $$</div>
+<p>Recalling our union axiom from a previous post, the union axiom states
+for two sets <span class="math">\(A\)</span> and <span class="math">\(B\)</span>, there is a set whose members consist entirely
+of those belonging to sets <span class="math">\(A\)</span> or <span class="math">\(B\)</span>, or both. More formally, the union
+axiom is stated as:</p>
+<div class="math">$$ \large{\forall a \space \forall b \space \exists B \space \forall x (x \in B \Leftrightarrow x \in a \space \vee \space x \in b)} $$</div>
+<p>As we are now dealing with an arbitrary amount of sets, we need an
+updated version of the union axiom to account for the change.</p>
+<p>Restating the union axiom:</p>
+<p>For any set <span class="math">\(A\)</span>, there exists a set <span class="math">\(B\)</span> whose members are the same
+elements of the elements of <span class="math">\(A\)</span>. Stated more formally:</p>
+<div class="math">$$ \large{\forall x \bigg[ x \in B \space \Leftrightarrow \space (\exists b \in A) \space x \in b \bigg] }$$</div>
+<p>The definition of ⋃<span class="math">\(A\)</span> can be stated as:</p>
+<div class="math">$$ \large{x \in \bigcup A \Leftrightarrow (\exists b \in A) \space x \in b} $$</div>
+<p>For example, we can demonstrate the updated axiom with the union of four
+sets <span class="math">\({a, b, c, d}\)</span>:</p>
+<div class="math">$$ \large{\bigcup \{a, b, c, d \} = \big\{(\exists B \in A) \space x \in \{a, b, c, d\}\big\} \large}$$</div>
+<div class="math">$$ \large{ \bigcup \{a, b, c, d \} = a \cup b \cup c \cup d \large}$$</div>
+<p>We can implement the set operation for an arbitrary amount of sets by
+expanding upon the function we wrote previously.</p>
+<div class="highlight"><pre><span></span><span class="k">set</span><span class="p">.</span><span class="n">unions</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">u</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">a</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="err">!</span><span class="p">(</span><span class="n">b</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">%</span><span class="ow">in</span><span class="o">%</span><span class="w"> </span><span class="n">u</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">u</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">s</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">list</span><span class="p">(...)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="err">!</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">%</span><span class="ow">in</span><span class="o">%</span><span class="w"> </span><span class="n">u</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">u</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</pre></div>
+
+
+<p>Perform the set union operation of four sets:</p>
+<div class="math">$$ \large{a = \{1,2,3\} \qquad b = \{3,4,5\} \qquad c = \{1,4,6\} \qquad d =\{2,5,7\} \large}$$</div>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">6</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">7</span><span class="p">)</span>
+
+<span class="nf">set.unions</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="c1">## [1] 1 2 3 4 5 6 7</span>
+</pre></div>
+
+
+<h2>Intersections of an Arbitrary Number of Sets</h2>
+<p>The intersection set operation can also be generalized to any number of
+sets. Consider the previous set containing an infinite number of sets.</p>
+<div class="math">$$ \large{A = \{b_0, b_1, b_2, \cdots \}} $$</div>
+<p>As before, writing out all the intersections would be tedious and not
+elegant. The intersection can instead be written as:</p>
+<div class="math">$$ \large{\bigcap A = \bigcap_i b_i} $$</div>
+<p>As before in our previous example of set intersections, there is no need
+for a separate axiom for intersections, unlike unions. Instead, we can
+state the following theorem, for a nonempty set <span class="math">\(A\)</span>, a set <span class="math">\(B\)</span> exists
+that such for any element <span class="math">\(x\)</span>:</p>
+<div class="math">$$ \large{x \in B \Leftrightarrow x \in \forall A} $$</div>
+<p>Consider the following four sets:</p>
+<div class="math">$$ \large{a = \{1,2,3\} \qquad b = \{1,3,5\} \qquad c = \{1,4,5,3\} \qquad d = \{2,6,1,3\}} $$</div>
+<p>The intersection of the sets is written as:</p>
+<div class="math">$$ \large{\bigcap \big\{\{1,2,3,5\}, \{1,3,5\}, \{1,4,5,3\}, \{2,5,1,3\}\big\}} $$</div>
+<div class="math">$$ = \large{\{1,2,3,5\} \cap \{1,3,5\} \cap \{1,4,5,3\} \cap \{2,5,1,3\} = \{1,3,5\}} $$</div>
+<p>We can write another function to implement the set intersection
+operation given any number of sets.</p>
+<div class="highlight"><pre><span></span><span class="n">set.intersections</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">()</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">i</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">intersect</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">s</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="kc">...</span><span class="p">)</span>
+
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nf">if </span><span class="p">(</span><span class="n">j</span> <span class="o">%in%</span> <span class="n">intersect</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">intersect</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">unique</span><span class="p">(</span><span class="n">intersect</span><span class="p">)</span>
+
+  <span class="nf">return</span><span class="p">(</span><span class="n">intersect</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Perform set intersections of the four sets specified earlier.</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">5</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">)</span>
+
+<span class="nf">set.intersections</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="c1">## [1] 1 3 5</span>
+</pre></div>
+
+
+<h2>References</h2>
+<p><a href="https://amzn.to/2SsiA5g">Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/cartestian-product-ordered-unordered-pairs.html">Cartesian Product and Ordered and Unordered Pairs</a></li>
+                        <li><a href="https://aaronschlegel.me/set-algebra-r.html">Algebra of Sets with R</a></li>
+                        <li><a href="https://aaronschlegel.me/set-union-intersection-r.html">Set Union and Intersections with R</a></li>
+                        <li><a href="https://aaronschlegel.me/set-theory-r.html">Introduction to Sets and Set Theory with R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

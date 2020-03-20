@@ -3,9 +3,6 @@ $ cat .gitignore
 node_modules/
 package.json
 yarn.lock
-output/
-content/draft
-themes/gum/static/fonts/Univers
 __pycache__/
 .idea/
 .ipynb_checkpoints/

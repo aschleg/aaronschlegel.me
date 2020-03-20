@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>PetfindeR, R Wrapper for the Petfinder API, Introduction Part One</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The goal of the PetfindeR package is to provide a simple and straightforward interface for interacting with the Petfinder API through R. The Petfinder database contains approximately 300,000 adoptable pet records and 11,000 animal welfare organization records, which makes it a handy and valuable source of data for those in the animal welfare community. However, the outputs from the Petfinder API are in messy JSON format and thus it makes it more time-consuming and often frustrating to coerce the output data into a form that is workable with R." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="PetfindeR, R Wrapper for the Petfinder API, Introduction Part One" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-05-15 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The goal of the PetfindeR package is to provide a simple and straightforward interface for interacting with the Petfinder API through R. The Petfinder database contains approximately 300,000 adoptable pet records and 11,000 animal welfare organization records, which makes it a handy and valuable source of data for those in the animal welfare community. However, the outputs from the Petfinder API are in messy JSON format and thus it makes it more time-consuming and often frustrating to coerce the output data into a form that is workable with R." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-one.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-one.html" rel="bookmark"
+                   title="Permalink to PetfindeR, R Wrapper for the Petfinder API, Introduction Part One">PetfindeR, R Wrapper for the Petfinder API, Introduction Part One</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-05-15T00:00:00-07:00">
+                Tue 15 May 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <h2>About PetfindeR</h2>
+<p>The goal of the <code>PetfindeR</code> package is to provide a simple and
+straightforward interface for interacting with the <a href="https://www.petfinder.com/developers/api-docs">Petfinder
+API</a> through R. The
+Petfinder database contains approximately 300,000 adoptable pet records
+and 11,000 animal welfare organization records, which makes it a handy
+and valuable source of data for those in the animal welfare community.
+However, the outputs from the Petfinder API are in messy JSON format and
+thus it makes it more time-consuming and often frustrating to coerce the
+output data into a form that is workable with R. The <code>PetfindeR</code> package
+was developed to alleviate this difficulty and provide users with a
+streamlined interface for getting the data they want and using it for
+their specific purpose.</p>
+<h2>Introduction</h2>
+<p>This post introduces and walks through the methods available in
+<code>PetfindeR</code> and the Petfinder API for authenticating and extracting data
+from the database.</p>
+<h2>Obtaining an API Key from Petfinder</h2>
+<p>Before we can use the <code>PetfindeR</code> package, we need to obtain an API key
+from the Petfinder website to authenticate our requests. To acquire an
+API key, create an account on <a href="https://www.petfinder.com/developers/api-key">Petfinder's developer
+page</a>. A 'secret' key is
+also given from Petfinder for requests that require an additional layer
+of authentication; however, the current methods available do not need a
+secret key to be provided (this could potentially change in the future).</p>
+<h2>Getting Started with PetfindeR</h2>
+<p>At the time of this writing, <code>PetfindeR</code> has been submitted to CRAN but 
+and is currently in the review process. In the meantime, the package can 
+be easily installed through the <code>devtools</code> package function <code>install_github()</code>.</p>
+<div class="highlight"><pre><span></span><span class="c">devtools::install_github(&#39;aschleg/PetfindeR&#39;)</span>
+</pre></div>
+
+
+<p>After installing and loading the package, The first step in using the
+PetfindeR package is to initialize the API connection to Petfinder. To
+do this, we pass the API key received from Petfinder into the
+<code>Petfinder</code> function which calls a wrapped <a href="https://cran.r-project.org/package=R6">R6
+class</a> and creates the connection
+to the API.</p>
+<p>It is best practice to obfuscate sensitive data such as API keys to
+avoid any potential malicious activity. To this effect, I load my API
+key by using the <code>Sys.getenv()</code> function to access an environment
+variable containing the key.</p>
+<div class="highlight"><pre><span></span><span class="n">key</span> <span class="o">&lt;-</span> <span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&#39;PETFINDER_KEY&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The API key is securely loaded so that we can initialize the PetfindeR
+API!</p>
+<div class="highlight"><pre><span></span><span class="n">pf</span> <span class="o">&lt;-</span> <span class="nf">Petfinder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</pre></div>
+
+
+<p>That's all there is to it! The <a href="https://www.petfinder.com/developers/api-docs#methods">Petfinder API
+methods</a> are now
+accessible through R.</p>
+<h2>Examples</h2>
+<p>The following section introduces the <code>PetfindeR</code> package and how to
+interact with the Petfinder API with some simple examples of extracting
+data from the database. The examples are split into pet and shelter
+methods, not due to any significant demarcation, but rather for
+organization.</p>
+<h3>Pet Methods</h3>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="15%" />
+<col width="68%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Petfinder API Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>breed.list()</td>
+<td>breed.list</td>
+<td>Returns the available breeds for the selected animal.</td>
+</tr>
+<tr class="even">
+<td>pet.find()</td>
+<td>pet.find</td>
+<td>Returns a collection of pet records matching input parameters.</td>
+</tr>
+<tr class="odd">
+<td>pet.get()</td>
+<td>pet.get</td>
+<td>Returns a single record for a pet.</td>
+</tr>
+<tr class="even">
+<td>pet.getRandom()</td>
+<td>pet.getRandom</td>
+<td>Returns a randomly selected pet record. The possible result can be filtered with input parameters.</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Finding the available breeds of an animal</h3>
+<p>The <code>breed.list()</code> method allows the user to pull a list of breeds
+associated with a particular type of animal. The currently available
+animals to search for are <code>'barnyard'</code>, <code>'bird'</code>, <code>'cat'</code>, <code>'dog'</code>,
+<code>'horse'</code>, <code>'reptile'</code> and <code>'smallfurry'</code>. Let's say we are interested
+in finding the breeds of cats in the Petfinder database.</p>
+<div class="highlight"><pre><span></span><span class="n">cats</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">breed.list</span><span class="p">(</span><span class="s">&#39;cat&#39;</span><span class="p">)</span>
+<span class="n">cats</span>
+
+<span class="c1">## $`@encoding`</span>
+<span class="c1">## [1] &quot;iso-8859-1&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $`@version`</span>
+<span class="c1">## [1] &quot;1.0&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder</span>
+<span class="c1">## $petfinder$`@xmlns:xsi`</span>
+<span class="c1">## [1] &quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$breeds</span>
+<span class="c1">## $petfinder$breeds$breed</span>
+<span class="c1">##                                       $t</span>
+<span class="c1">## 1                             Abyssinian</span>
+<span class="c1">## 2                          American Curl</span>
+<span class="c1">## 3                     American Shorthair</span>
+<span class="c1">## 4                      American Wirehair</span>
+<span class="c1">## 5                      Applehead Siamese</span>
+<span class="c1">## 6                               Balinese</span>
+<span class="c1">## 7                                 Bengal</span>
+<span class="c1">## 8                                 Birman</span>
+<span class="c1">## 9                                Bobtail</span>
+<span class="c1">## 10                                Bombay</span>
+<span class="c1">## 11                     British Shorthair</span>
+<span class="c1">## 12                               Burmese</span>
+<span class="c1">## 13                              Burmilla</span>
+<span class="c1">## 14                                Calico</span>
+<span class="c1">## 15                     Canadian Hairless</span>
+<span class="c1">## 16                             Chartreux</span>
+<span class="c1">## 17                               Chausie</span>
+<span class="c1">## 18                            Chinchilla</span>
+<span class="c1">## 19                           Cornish Rex</span>
+<span class="c1">## 20                                Cymric</span>
+<span class="c1">## 21                             Devon Rex</span>
+<span class="c1">## 22                         Dilute Calico</span>
+<span class="c1">## 23                  Dilute Tortoiseshell</span>
+<span class="c1">## 24                    Domestic Long Hair</span>
+<span class="c1">## 25                  Domestic Medium Hair</span>
+<span class="c1">## 26                   Domestic Short Hair</span>
+<span class="c1">## 27                          Egyptian Mau</span>
+<span class="c1">## 28                      Exotic Shorthair</span>
+<span class="c1">## 29 Extra-Toes Cat / Hemingway Polydactyl</span>
+<span class="c1">## 30                                Havana</span>
+<span class="c1">## 31                             Himalayan</span>
+<span class="c1">## 32                      Japanese Bobtail</span>
+<span class="c1">## 33                              Javanese</span>
+<span class="c1">## 34                                 Korat</span>
+<span class="c1">## 35                                LaPerm</span>
+<span class="c1">## 36                            Maine Coon</span>
+<span class="c1">## 37                                  Manx</span>
+<span class="c1">## 38                              Munchkin</span>
+<span class="c1">## 39                              Nebelung</span>
+<span class="c1">## 40                  Norwegian Forest Cat</span>
+<span class="c1">## 41                                Ocicat</span>
+<span class="c1">## 42                    Oriental Long Hair</span>
+<span class="c1">## 43                   Oriental Short Hair</span>
+<span class="c1">## 44                        Oriental Tabby</span>
+<span class="c1">## 45                               Persian</span>
+<span class="c1">## 46                             Pixie-Bob</span>
+<span class="c1">## 47                            Ragamuffin</span>
+<span class="c1">## 48                               Ragdoll</span>
+<span class="c1">## 49                          Russian Blue</span>
+<span class="c1">## 50                         Scottish Fold</span>
+<span class="c1">## 51                           Selkirk Rex</span>
+<span class="c1">## 52                               Siamese</span>
+<span class="c1">## 53                              Siberian</span>
+<span class="c1">## 54                                Silver</span>
+<span class="c1">## 55                             Singapura</span>
+<span class="c1">## 56                              Snowshoe</span>
+<span class="c1">## 57                                Somali</span>
+<span class="c1">## 58                 Sphynx / Hairless Cat</span>
+<span class="c1">## 59                                 Tabby</span>
+<span class="c1">## 60                                 Tiger</span>
+<span class="c1">## 61                             Tonkinese</span>
+<span class="c1">## 62                                Torbie</span>
+<span class="c1">## 63                         Tortoiseshell</span>
+<span class="c1">## 64                        Turkish Angora</span>
+<span class="c1">## 65                           Turkish Van</span>
+<span class="c1">## 66                                Tuxedo</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$breeds$`@animal`</span>
+<span class="c1">## [1] &quot;cat&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header</span>
+<span class="c1">## $petfinder$header$timestamp</span>
+<span class="c1">## $petfinder$header$timestamp$`$t`</span>
+<span class="c1">## [1] &quot;2018-05-13T21:53:18Z&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$status</span>
+<span class="c1">## $petfinder$header$status$message</span>
+<span class="c1">## named list()</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$status$code</span>
+<span class="c1">## $petfinder$header$status$code$`$t`</span>
+<span class="c1">## [1] &quot;100&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$version</span>
+<span class="c1">## $petfinder$header$version$`$t`</span>
+<span class="c1">## [1] &quot;0.1&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$`@xsi:noNamespaceSchemaLocation`</span>
+<span class="c1">## [1] &quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&quot;</span>
+</pre></div>
+
+
+<p><code>breed.list()</code> can also be set to return a <code>data.frame</code> object by
+setting the <code>return_df</code> parameter to <code>TRUE</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">cats</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">breed.list</span><span class="p">(</span><span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">cats</span><span class="p">)</span>
+
+<span class="c1">##           cat.breeds</span>
+<span class="c1">## 1         Abyssinian</span>
+<span class="c1">## 2      American Curl</span>
+<span class="c1">## 3 American Shorthair</span>
+<span class="c1">## 4  American Wirehair</span>
+<span class="c1">## 5  Applehead Siamese</span>
+<span class="c1">## 6           Balinese</span>
+</pre></div>
+
+
+<h3>Finding pet records matching criteria</h3>
+<p>The <code>pet.find()</code> method enables one to return a <code>data.frame</code> of pet
+records that match the input parameters. The available parameters can be
+found using <code>?pet.find()</code> or checking out the <a href="https://www.petfinder.com/developers/api-docs#methods">Petfinder API
+documentation</a>
+directly.</p>
+<p>Let's say we want to find female cats in Washington. The default amount
+of records is 25 (assuming there are 25 to return), which can be
+overridden with the <code>count</code> parameter.</p>
+<div class="highlight"><pre><span></span><span class="n">wa_cats</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The returned data can also be automatically parsed into a <code>data.frame</code>
+by setting the method parameter <code>return_df</code> to TRUE. Here, we make the
+same call to the Petfinder API but with <code>return_df = TRUE</code> and print the
+first six rows of the first ten columns to demonstrate the returned
+<code>data.frame</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">wa_cats</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">wa_cats[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span><span class="p">)</span>
+
+<span class="c1">##   status  contact.phone contact.state                   contact.email</span>
+<span class="c1">## 1      A   206-296-7387            WA        adoptapet@kingcounty.gov</span>
+<span class="c1">## 2      A   206-296-7387            WA        adoptapet@kingcounty.gov</span>
+<span class="c1">## 3      A   425-576-5548            WA           info@thewhole-cat.com</span>
+<span class="c1">## 4      A   425-576-5548            WA           info@thewhole-cat.com</span>
+<span class="c1">## 5      A           &lt;NA&gt;            WA       rescuinganimals@gmail.com</span>
+<span class="c1">## 6      A (253) 856-1771            WA anotherchancecats2007@gmail.com</span>
+<span class="c1">##   contact.city contact.zip  contact.address1    age size       id</span>
+<span class="c1">## 1         Kent       98032  21615 64th Ave S Senior    M 39921493</span>
+<span class="c1">## 2         Kent       98032  21615 64th Ave S  Adult    L 37949653</span>
+<span class="c1">## 3      Redmond       98052 8103 161st Ave NE Senior    L 40688475</span>
+<span class="c1">## 4      Redmond       98052 8103 161st Ave NE Senior    M 41470264</span>
+<span class="c1">## 5  Federal Way       98023              &lt;NA&gt;  Adult    M 41589923</span>
+<span class="c1">## 6   Des Moines       98198      PO Box 13244  Young    M 39650811</span>
+</pre></div>
+
+
+<h3>Returning random pet records</h3>
+<p>The <code>pet.getRandom()</code> method returns a random pet ID by default, but can
+return a full pet record with a description by setting
+<code>output = 'full'</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">pf</span><span class="err">$</span><span class="n">pet</span><span class="p">.</span><span class="n">getRandom</span><span class="p">(</span><span class="k">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;full&#39;</span><span class="p">)</span><span class="w"></span>
+
+<span class="err">##</span><span class="w"> </span><span class="err">$`</span><span class="nv">@encoding</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;iso-8859-1&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$`</span><span class="nv">@version</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;1.0&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">options</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">options</span><span class="err">$</span><span class="k">option</span><span class="w"></span>
+<span class="err">##</span><span class="w">             </span><span class="err">$</span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">1</span><span class="w">      </span><span class="n">altered</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">2</span><span class="w">     </span><span class="n">hasShots</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="n">housetrained</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">4</span><span class="w">       </span><span class="n">noDogs</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">5</span><span class="w">       </span><span class="n">noCats</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">6</span><span class="w">       </span><span class="n">noKids</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">status</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">status</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;A&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">phone</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">phone</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;717-831-5010&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="k">state</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="k">state</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;PA&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">address2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="n">named</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">email</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">email</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;info@castawaycritters.org&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">city</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">city</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;Harrisburg&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">zip</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">zip</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;17105&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">fax</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="n">named</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">address1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">contact</span><span class="err">$</span><span class="n">address1</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;P.O. Box 1421&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">age</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">age</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;Adult&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="k">size</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="k">size</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;M&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">media</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">media</span><span class="err">$</span><span class="n">photos</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">media</span><span class="err">$</span><span class="n">photos</span><span class="err">$</span><span class="n">photo</span><span class="w"></span>
+<span class="err">##</span><span class="w">    </span><span class="nv">@size</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">1</span><span class="w">    </span><span class="n">pnt</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">2</span><span class="w">    </span><span class="n">fpm</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">3</span><span class="w">      </span><span class="n">x</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">4</span><span class="w">     </span><span class="n">pn</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">5</span><span class="w">      </span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">6</span><span class="w">    </span><span class="n">pnt</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">7</span><span class="w">    </span><span class="n">fpm</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">8</span><span class="w">      </span><span class="n">x</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">9</span><span class="w">     </span><span class="n">pn</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">10</span><span class="w">     </span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">11</span><span class="w">   </span><span class="n">pnt</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">12</span><span class="w">   </span><span class="n">fpm</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">13</span><span class="w">     </span><span class="n">x</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">14</span><span class="w">    </span><span class="n">pn</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">15</span><span class="w">     </span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w">                                                                                       </span><span class="err">$</span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">60</span><span class="o">&amp;-</span><span class="n">pnt</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">2</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">95</span><span class="o">&amp;-</span><span class="n">fpm</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">3</span><span class="w">   </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="o">&amp;-</span><span class="n">x</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">4</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="o">&amp;-</span><span class="n">pn</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">5</span><span class="w">    </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="o">&amp;-</span><span class="n">t</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">6</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">60</span><span class="o">&amp;-</span><span class="n">pnt</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">7</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">95</span><span class="o">&amp;-</span><span class="n">fpm</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">8</span><span class="w">   </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="o">&amp;-</span><span class="n">x</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">9</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="o">&amp;-</span><span class="n">pn</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">10</span><span class="w">   </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1488734507</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="o">&amp;-</span><span class="n">t</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1477877892</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">60</span><span class="o">&amp;-</span><span class="n">pnt</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1477877892</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">95</span><span class="o">&amp;-</span><span class="n">fpm</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">13</span><span class="w">  </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1477877892</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="o">&amp;-</span><span class="n">x</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1477877892</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="o">&amp;-</span><span class="n">pn</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">15</span><span class="w">   </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">photos</span><span class="p">.</span><span class="n">petfinder</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">pets</span><span class="o">/</span><span class="mi">35679386</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="vm">?</span><span class="n">bust</span><span class="o">=</span><span class="mi">1477877892</span><span class="o">&amp;</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="o">&amp;-</span><span class="n">t</span><span class="p">.</span><span class="n">jpg</span><span class="w"></span>
+<span class="err">##</span><span class="w">    </span><span class="nv">@id</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">1</span><span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">2</span><span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">3</span><span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">4</span><span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">5</span><span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">6</span><span class="w">    </span><span class="mi">2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">7</span><span class="w">    </span><span class="mi">2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">8</span><span class="w">    </span><span class="mi">2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">9</span><span class="w">    </span><span class="mi">2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">10</span><span class="w">   </span><span class="mi">2</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">11</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">12</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">13</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">14</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">15</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">id</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">id</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;35679386&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">shelterPetId</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">shelterPetId</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;1732589-CC-11179&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">breeds</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">breeds</span><span class="err">$</span><span class="n">breed</span><span class="w"></span>
+<span class="err">##</span><span class="w">                     </span><span class="err">$</span><span class="n">t</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">1</span><span class="w">               </span><span class="n">Beagle</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">Jack</span><span class="w"> </span><span class="n">Russell</span><span class="w"> </span><span class="n">Terrier</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">name</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">name</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;Duke- *ADOPTION SPECIAL*&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">sex</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">sex</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;M&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">description</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">description</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;You can fill out an adoption application online on our official website.Please contact Jamie (ccjamieballa@gmail.com) for more information about this pet.Hello my name is Duke! I really would love a forever home. I love to run and play so a fenced yard would be so fun! I do well on walks and don&#39;t pull on my leash.I really love being the center of attention so I prefer to live without other animals. We are still trying out how well I do with children.I am potty trained, well mannered, crate trained. A super loving pup who is quiet, timid with loud noises and knows sit and stay. I travel great in the car.I would make a great running companion or might even do pretty well in Agility training. I would love to be a part of my very own family. Could that be you??Duke is in foster care so please complete an application before meeting him. Completing an application does not obligate you to adopt; however, it is required. Applications are processed in the order received in an effort to find the best match possible for both the dog and the adopter.*Duke has an adoption special right now. His adoption fee is only $150. If you feel you are the right home for Duke please fill out an app! 5/12/18 5:11 PM&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">mix</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">mix</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;yes&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">shelterId</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">shelterId</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;PA224&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">lastUpdate</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">lastUpdate</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;2016-07-15T21:28:15Z&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">animal</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">pet</span><span class="err">$</span><span class="n">animal</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;Dog&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$`</span><span class="nv">@xmlns</span><span class="err">:</span><span class="n">xsi</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="nc">timestamp</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="nc">timestamp</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;2018-05-13T21:53:20Z&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">status</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">status</span><span class="err">$</span><span class="n">message</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="n">named</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">status</span><span class="err">$</span><span class="n">code</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">status</span><span class="err">$</span><span class="n">code</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;100&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">version</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$</span><span class="n">header</span><span class="err">$</span><span class="n">version</span><span class="err">$`$</span><span class="n">t</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;0.1&quot;</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span>
+<span class="err">##</span><span class="w"> </span><span class="err">$</span><span class="n">petfinder</span><span class="err">$`</span><span class="nv">@xsi</span><span class="err">:</span><span class="n">noNamespaceSchemaLocation</span><span class="err">`</span><span class="w"></span>
+<span class="err">##</span><span class="w"> </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="ss">&quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&quot;</span><span class="w"></span>
+</pre></div>
+
+
+<p>We can also get a set of random results by setting the <code>records</code>
+parameter to the number of desired results to return. Note that each
+record counts as one call to the Petfinder API.</p>
+<div class="highlight"><pre><span></span><span class="n">random_records</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.getRandom</span><span class="p">(</span><span class="n">records</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;full&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Similar to other methods available in the PetfindeR package, the
+<code>pet.getRandom</code> method can also be set to return a <code>data.frame</code> by
+setting the parameter <code>return_df = TRUE</code>. As an example, we get three
+random pet records again and output the result as a <code>data.frame</code> (note
+the returned records will likely not be the same as the earlier returned
+records due to the random nature of the output).</p>
+<div class="highlight"><pre><span></span><span class="n">random_records_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.getRandom</span><span class="p">(</span><span class="n">records</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;full&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">random_records_df[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+
+<span class="c1">##   status.1 status.2     status.3 status address1.state</span>
+<span class="c1">## 1  altered hasShots housetrained      A             MA</span>
+<span class="c1">## 2     &lt;NA&gt;     &lt;NA&gt;         &lt;NA&gt;      A             TX</span>
+<span class="c1">## 3  altered hasShots housetrained      A             MI</span>
+<span class="c1">##                           address1.email address1.city address1.zip   age</span>
+<span class="c1">## 1                   Info@AhimsaHaven.org     Templeton        01468 Adult</span>
+<span class="c1">## 2 animal.customerservice@austintexas.gov        Austin        78702 Adult</span>
+<span class="c1">## 3                     kelcruiser@aol.com        Macomb        48042 Adult</span>
+<span class="c1">##   size</span>
+<span class="c1">## 1    L</span>
+<span class="c1">## 2   XL</span>
+<span class="c1">## 3    M</span>
+</pre></div>
+
+
+<h3>Getting pet records associated with a petId</h3>
+<p>Given a petId, an ID associated with information on a pet in the
+Petfinder database, the <code>pet.get()</code> method will return the pet record as
+a JSON object represented as an R list. The method also accepts a vector
+or list of IDs for returning multiple records. For example, we can take
+the petIds given in our previous call to <code>pet.getRandom()</code> and pass
+those to <code>pet.get()</code>. Note since we are using the same petIds from
+before, the returned records will be the same. We also set the
+<code>return_df</code> parameter to <code>TRUE</code> to demonstrate the functionality to
+convert the returned JSON result into a <code>data.frame</code> as in other methods
+seen previously.</p>
+<div class="highlight"><pre><span></span><span class="n">pet_get_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.get</span><span class="p">(</span><span class="n">petId</span> <span class="o">=</span> <span class="n">random_records_df</span><span class="o">$</span><span class="n">id</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">pet_get_df[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+
+<span class="c1">##   status.1 status.2     status.3 status address1.state</span>
+<span class="c1">## 1  altered hasShots housetrained      A             MA</span>
+<span class="c1">## 2     &lt;NA&gt;     &lt;NA&gt;         &lt;NA&gt;      A             TX</span>
+<span class="c1">## 3  altered hasShots housetrained      A             MI</span>
+<span class="c1">##                           address1.email address1.city address1.zip   age</span>
+<span class="c1">## 1                   Info@AhimsaHaven.org     Templeton        01468 Adult</span>
+<span class="c1">## 2 animal.customerservice@austintexas.gov        Austin        78702 Adult</span>
+<span class="c1">## 3                     kelcruiser@aol.com        Macomb        48042 Adult</span>
+<span class="c1">##   size</span>
+<span class="c1">## 1    L</span>
+<span class="c1">## 2   XL</span>
+<span class="c1">## 3    M</span>
+</pre></div>
+
+
+<h2>Shelter Methods</h2>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="15%" />
+<col width="68%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Petfinder API Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>shelter.find()</td>
+<td>shelter.find</td>
+<td>Returns a collection of shelter records matching input parameters.</td>
+</tr>
+<tr class="even">
+<td>shelter.get()</td>
+<td>shelter.get</td>
+<td>Returns a single shelter record.</td>
+</tr>
+<tr class="odd">
+<td>shelter.getPets()</td>
+<td>shelter.getPets</td>
+<td>Returns a collection of pet records for an individual shelter.</td>
+</tr>
+<tr class="even">
+<td>shelter.listByBreed()</td>
+<td>shelter.listByBreed</td>
+<td>Returns a list of shelter IDs listing animals matching the input animal breed.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Shelter methods are somewhat similar to the Pet methods we explored
+previously, but return information on animal shelters and other animal
+welfare organizations.</p>
+<h3>Finding animal welfare organizations in an area</h3>
+<p>Using the <code>shelter.find()</code> method, one can locate shelters and their
+available attributes matching the input parameters. For example, say we
+wanted to find shelters in a ZIP code in Seattle (my old zip code).</p>
+<div class="highlight"><pre><span></span><span class="n">wa_shelters</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.find</span><span class="p">(</span><span class="s">&#39;98115&#39;</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">wa_shelters</span><span class="o">$</span><span class="n">petfinder</span><span class="o">$</span><span class="n">shelters</span><span class="o">$</span><span class="n">shelter</span><span class="p">)</span>
+
+<span class="c1">##   country.$t longitude.$t                                    name.$t</span>
+<span class="c1">## 1         US    -122.2939                      Forgotten Dogs Rescue</span>
+<span class="c1">## 2         US    -122.2939 Fox Terrier Fanciers of Puget Sound Rescue</span>
+<span class="c1">## 3         US    -122.2939                    Little Blessings Rescue</span>
+<span class="c1">## 4         US    -122.3004                           Dog Gone Seattle</span>
+<span class="c1">## 5         US    -122.3005          Friends of the Animals Foundation</span>
+<span class="c1">## 6         US    -122.3005            Pacific Northwest KUVASZ Rescue</span>
+<span class="c1">##           phone.$t state.$t                                  email.$t</span>
+<span class="c1">## 1             &lt;NA&gt;       WA           forgotten.dogs.rescue@gmail.com</span>
+<span class="c1">## 2  360-733-5735          WA                   kmartin44@earthlink.net</span>
+<span class="c1">## 3    206473-1111         WA adoptions@littleblessingsrescue.vpweb.com</span>
+<span class="c1">## 4             &lt;NA&gt;       WA                  adopt@doggoneseattle.org</span>
+<span class="c1">## 5 (206) 719-4864         WA                       info@fafseattle.org</span>
+<span class="c1">## 6             &lt;NA&gt;       WA                    vicki@AnimalsReign.com</span>
+<span class="c1">##   city.$t zip.$t latitude.$t id.$t    address1.$t</span>
+<span class="c1">## 1 Seattle  98115     47.6831 WA368           &lt;NA&gt;</span>
+<span class="c1">## 2 Seattle  98115     47.6831  WA58           &lt;NA&gt;</span>
+<span class="c1">## 3 Seattle  98115     47.6831 WA620           &lt;NA&gt;</span>
+<span class="c1">## 4 Seattle  98165     47.7161 WA650           &lt;NA&gt;</span>
+<span class="c1">## 5 Seattle  98125     47.7165  WA77 P.O. Box 16308</span>
+<span class="c1">## 6 Seattle  98125     47.7165  WA90           &lt;NA&gt;</span>
+</pre></div>
+
+
+<p>As with other methods in <code>PetfindeR</code>, the <code>shelter.find</code> method also has
+a <code>return_df</code> parameter that coerces and outputs the returned JSON into
+a workable <code>data.frame</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">wa_shelters_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.find</span><span class="p">(</span><span class="s">&#39;98115&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">wa_shelters_df</span><span class="p">)</span>
+
+<span class="c1">##   country longitude                                       name</span>
+<span class="c1">## 1      US -122.2939                      Forgotten Dogs Rescue</span>
+<span class="c1">## 2      US -122.2939 Fox Terrier Fanciers of Puget Sound Rescue</span>
+<span class="c1">## 3      US -122.2939                    Little Blessings Rescue</span>
+<span class="c1">## 4      US -122.3004                           Dog Gone Seattle</span>
+<span class="c1">## 5      US -122.3005          Friends of the Animals Foundation</span>
+<span class="c1">## 6      US -122.3005            Pacific Northwest KUVASZ Rescue</span>
+<span class="c1">##              phone shelterate                                     email</span>
+<span class="c1">## 1             &lt;NA&gt;         WA           forgotten.dogs.rescue@gmail.com</span>
+<span class="c1">## 2  360-733-5735            WA                   kmartin44@earthlink.net</span>
+<span class="c1">## 3    206473-1111           WA adoptions@littleblessingsrescue.vpweb.com</span>
+<span class="c1">## 4             &lt;NA&gt;         WA                  adopt@doggoneseattle.org</span>
+<span class="c1">## 5 (206) 719-4864           WA                       info@fafseattle.org</span>
+<span class="c1">## 6             &lt;NA&gt;         WA                    vicki@AnimalsReign.com</span>
+<span class="c1">##      city   zip latitude    id       address1</span>
+<span class="c1">## 1 Seattle 98115  47.6831 WA368           &lt;NA&gt;</span>
+<span class="c1">## 2 Seattle 98115  47.6831  WA58           &lt;NA&gt;</span>
+<span class="c1">## 3 Seattle 98115  47.6831 WA620           &lt;NA&gt;</span>
+<span class="c1">## 4 Seattle 98165  47.7161 WA650           &lt;NA&gt;</span>
+<span class="c1">## 5 Seattle 98125  47.7165  WA77 P.O. Box 16308</span>
+<span class="c1">## 6 Seattle 98125  47.7165  WA90           &lt;NA&gt;</span>
+</pre></div>
+
+
+<h3>Returning information on specific animal welfare organizations</h3>
+<p>Similar to <code>pet.get()</code>, the <code>shelter.get()</code> method takes a shelterId and
+returns the available information on the shelter from the Petfinder
+database.</p>
+<p>One shelter that's very dear to me is <a href="http://www.seattleareafelinerescue.org/">Seattle Area Feline
+Rescue</a>, the shelterId of which
+is 'WA40'. Let's return the information available on the rescue.</p>
+<div class="highlight"><pre><span></span><span class="n">safr</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.get</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">)</span>
+<span class="n">safr</span>
+
+<span class="c1">## $`@encoding`</span>
+<span class="c1">## [1] &quot;iso-8859-1&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $`@version`</span>
+<span class="c1">## [1] &quot;1.0&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder</span>
+<span class="c1">## $petfinder$`@xmlns:xsi`</span>
+<span class="c1">## [1] &quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter</span>
+<span class="c1">## $petfinder$shelter$country</span>
+<span class="c1">## $petfinder$shelter$country$`$t`</span>
+<span class="c1">## [1] &quot;US&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$longitude</span>
+<span class="c1">## $petfinder$shelter$longitude$`$t`</span>
+<span class="c1">## [1] &quot;-122.3428&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$name</span>
+<span class="c1">## $petfinder$shelter$name$`$t`</span>
+<span class="c1">## [1] &quot;Seattle Area Feline Rescue&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$phone</span>
+<span class="c1">## $petfinder$shelter$phone$`$t`</span>
+<span class="c1">## [1] &quot;206-659-6220 &quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$state</span>
+<span class="c1">## $petfinder$shelter$state$`$t`</span>
+<span class="c1">## [1] &quot;WA&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$address2</span>
+<span class="c1">## named list()</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$email</span>
+<span class="c1">## $petfinder$shelter$email$`$t`</span>
+<span class="c1">## [1] &quot;adoptions@seattleareafelinerescue.org&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$city</span>
+<span class="c1">## $petfinder$shelter$city$`$t`</span>
+<span class="c1">## [1] &quot;Shoreline&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$zip</span>
+<span class="c1">## $petfinder$shelter$zip$`$t`</span>
+<span class="c1">## [1] &quot;98133&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$fax</span>
+<span class="c1">## named list()</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$latitude</span>
+<span class="c1">## $petfinder$shelter$latitude$`$t`</span>
+<span class="c1">## [1] &quot;47.7382&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$id</span>
+<span class="c1">## $petfinder$shelter$id$`$t`</span>
+<span class="c1">## [1] &quot;WA40&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$shelter$address1</span>
+<span class="c1">## $petfinder$shelter$address1$`$t`</span>
+<span class="c1">## [1] &quot;14717 Aurora Ave N&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header</span>
+<span class="c1">## $petfinder$header$timestamp</span>
+<span class="c1">## $petfinder$header$timestamp$`$t`</span>
+<span class="c1">## [1] &quot;2018-05-13T21:53:24Z&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$status</span>
+<span class="c1">## $petfinder$header$status$message</span>
+<span class="c1">## named list()</span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$status$code</span>
+<span class="c1">## $petfinder$header$status$code$`$t`</span>
+<span class="c1">## [1] &quot;100&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$header$version</span>
+<span class="c1">## $petfinder$header$version$`$t`</span>
+<span class="c1">## [1] &quot;0.1&quot;</span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## </span>
+<span class="c1">## $petfinder$`@xsi:noNamespaceSchemaLocation`</span>
+<span class="c1">## [1] &quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&quot;</span>
+</pre></div>
+
+
+<p>This data can also be transformed into a one-row <code>data.frame</code> by setting
+<code>return_df = TRUE</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">safr_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.get</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">safr_df</span>
+
+<span class="c1">##   country longitude                       name         phone state</span>
+<span class="c1">## 1      US -122.3428 Seattle Area Feline Rescue 206-659-6220     WA</span>
+<span class="c1">##   address2                                 email      city   zip fax</span>
+<span class="c1">## 1       NA adoptions@seattleareafelinerescue.org Shoreline 98133  NA</span>
+<span class="c1">##   latitude   id           address1</span>
+<span class="c1">## 1  47.7382 WA40 14717 Aurora Ave N</span>
+</pre></div>
+
+
+<h3>Getting pet records from a shelter</h3>
+<p>Let's say we are interested in finding the available pets at a
+particular shelter; we could use the <code>shelter.getPets()</code> method to
+quickly find this information. Here, we return the pets currently
+available at the Seattle Area Feline Rescue and print the first ten
+columns of the returned data.</p>
+<div class="highlight"><pre><span></span><span class="n">safr.pets</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.getPets</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets</span><span class="o">$</span><span class="n">petfinder</span><span class="o">$</span><span class="n">pets</span><span class="o">$</span><span class="n">pet</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+
+<span class="c1">##                          options.option status.$t contact.phone.$t</span>
+<span class="c1">## 1       altered, hasShots, housetrained         A    206-659-6220 </span>
+<span class="c1">## 2                                  NULL         A    206-659-6220 </span>
+<span class="c1">## 3                 altered, housetrained         A    206-659-6220 </span>
+<span class="c1">## 4         altered, housetrained, noKids         A    206-659-6220 </span>
+<span class="c1">## 5 altered, housetrained, noCats, noKids         A    206-659-6220 </span>
+<span class="c1">## 6         altered, housetrained, noKids         A    206-659-6220 </span>
+<span class="c1">##   contact.state.$t                      contact.email.$t contact.city.$t</span>
+<span class="c1">## 1               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">## 2               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">## 3               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">## 4               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">## 5               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">## 6               WA adoptions@seattleareafelinerescue.org       Shoreline</span>
+<span class="c1">##   contact.zip.$t contact.address1.$t age.$t size.$t</span>
+<span class="c1">## 1          98133  14717 Aurora Ave N  Adult       L</span>
+<span class="c1">## 2          98133  14717 Aurora Ave N   Baby       M</span>
+<span class="c1">## 3          98133  14717 Aurora Ave N Senior       L</span>
+<span class="c1">## 4          98133  14717 Aurora Ave N Senior       L</span>
+<span class="c1">## 5          98133  14717 Aurora Ave N  Adult       M</span>
+<span class="c1">## 6          98133  14717 Aurora Ave N  Adult       M</span>
+</pre></div>
+
+
+<p>The <code>shelter.getPets()</code> method also has a <code>return_df</code> parameter that can
+be set to TRUE to return a clean, workable <code>data.frame</code> for analysis.</p>
+<div class="highlight"><pre><span></span><span class="n">safr.pets_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.getPets</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets_df</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+
+<span class="c1">##   status contact.phone contact.state                         contact.email</span>
+<span class="c1">## 1      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">## 2      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">## 3      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">## 4      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">## 5      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">## 6      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
+<span class="c1">##   contact.city contact.zip   contact.address1    age size       id</span>
+<span class="c1">## 1    Shoreline       98133 14717 Aurora Ave N  Adult    L  6481751</span>
+<span class="c1">## 2    Shoreline       98133 14717 Aurora Ave N   Baby    M  6497950</span>
+<span class="c1">## 3    Shoreline       98133 14717 Aurora Ave N Senior    L 38016564</span>
+<span class="c1">## 4    Shoreline       98133 14717 Aurora Ave N Senior    L 40493265</span>
+<span class="c1">## 5    Shoreline       98133 14717 Aurora Ave N  Adult    M 40674254</span>
+<span class="c1">## 6    Shoreline       98133 14717 Aurora Ave N  Adult    M 40977444</span>
+</pre></div>
+
+
+<h3>Finding shelters that have a particular animal breed</h3>
+<p>The <code>shelter.listByBreed()</code> method allows one to find shelters that have
+a particular breed of animal, which may be useful for users interested
+in finding rarer breeds of animal. The <code>breed</code> argument must match a
+breed listed in the Petfinder database, which can be easily extracted by
+using the <code>breed.list()</code> method. We already pulled the available cat
+breeds earlier in the vignette, so we can use that to select a breed of
+cat to search.</p>
+<p>The Abyssinian is a beautiful and wonderfully friendly breed of cat, so
+let's search for some shelters that have Abyssinians listed on
+Petfinder.</p>
+<div class="highlight"><pre><span></span><span class="n">aby_shelters</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.listByBreed</span><span class="p">(</span><span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="s">&#39;Abyssinian&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Note: There currently seems to be an issue (as of 5/9/2018) with the
+Petfinder API and the <code>shelter.listByBreed</code> method. The API will return
+an object successfully, but the data is empty. Hopefully, Petfinder will
+be able to fix this issue soon, but in the meantime, I leave this note
+here just in case.</p>
+<h2>Conclusion</h2>
+<p>In this vignette, we introduced the core functionality of the
+<code>PetfindeR</code> library for interacting and extracting data from the
+Petfinder API. In future vignettes, we will further explore working with
+the <code>PetfindeR</code> library as well some potential uses of the package for
+data extraction and analysis.</p>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-two.html">PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two</a></li>
+                        <li><a href="https://aaronschlegel.me/introduction-rpoet.html">Introduction to Rpoet</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

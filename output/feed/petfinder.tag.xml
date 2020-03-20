@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - PetfindeR</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/petfinder.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2018-05-17T00:00:00-07:00</updated><entry><title>PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two</title><link href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-two.html" rel="alternate"></link><published>2018-05-17T00:00:00-07:00</published><updated>2018-05-17T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2018-05-17:/petfinder-r-wrapper-petfinder-api-introduction-part-two.html</id><summary type="html">&lt;p&gt;The first post introduced and explored the basic usage of the PetfindeR library. In this post, we take a quick look at some of the additional uses of the library and its methods to extract data from the Petfinder database.&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Getting Started&lt;/h2&gt;
+&lt;p&gt;The &lt;a href="petfinder-r-wrapper-petfinder-api-introduction-part-one.html"&gt;first post introduced and explored the basic usage of the
+&lt;code&gt;PetfindeR&lt;/code&gt; library&lt;/a&gt;. 
+In this post, we take a quick look at some of the additional uses of the library 
+and its methods to extract data from the Petfinder database. Before getting started, 
+it is worthwhile to recall the limits imposed by Petfinder when interacting with its API.
+The following restrictions are copied from &lt;a href="https://www.petfinder.com/developers/api-docs#restrictions"&gt;Petfinder's API
+documentation&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total requests per day: 10,000&lt;/li&gt;
+&lt;li&gt;Records per request: 1,000&lt;/li&gt;
+&lt;li&gt;Maximum records per search: 2,000&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Therefore, a single call cannot exceed 2,000 records, and there is a
+maximum of 1,000 records per request. Knowing this information, we can
+construct our calls to the API to extract the maximum amount of
+information without exceeding the limitations imposed by Petfinder.&lt;/p&gt;
+&lt;p&gt;After &lt;code&gt;PetfindeR&lt;/code&gt; is installed, it can be loaded using the &lt;code&gt;library()&lt;/code&gt;
+function. We initialize the &lt;code&gt;Petfinder&lt;/code&gt; R6 class object using a key
+received from Petfinder. You can easily obtain a key by creating an
+account on Petfinder on the &lt;a href="https://www.petfinder.com/developers/api-key"&gt;site's developers
+page&lt;/a&gt;. Once the key is
+obtained, we use that as an argument when initializing the class. We can
+now begin to extract data from the Petfinder API!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PetfindeR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;key&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;Sys.getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PETFINDER_KEY&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pf&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;Petfinder&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Paging Results&lt;/h2&gt;
+&lt;p&gt;The Petfinder API pages results to reduce the stress on the API when
+extracting a large number of records. Paging is the only way to exceed
+the API's limitation of 1,000 records per request. For example, to get
+2,000 animal records located in Washington State (and beyond), we could
+set the &lt;code&gt;count&lt;/code&gt; parameter in the &lt;code&gt;pet.find&lt;/code&gt; method to 500 and the
+&lt;code&gt;pages&lt;/code&gt; parameter to 4. We could also change the &lt;code&gt;count&lt;/code&gt; and &lt;code&gt;pages&lt;/code&gt;
+parameters to 1, 000 and 2, respectively, which would achieve the same
+result.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;paged&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;500&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;paged2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Returns the same as above&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;PetfindeR&lt;/code&gt; library will check to make sure the &lt;code&gt;count&lt;/code&gt; parameter
+doesn't exceed 1,000 to avoid wasting an API call.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;count.too.high&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1001&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Error in check_inputs(animal = animal, size = size, sex = sex, age = age, : a single request cannot exceed 1,000 records&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The library will also check to make sure that the input &lt;code&gt;pages&lt;/code&gt;
+parameter and &lt;code&gt;count&lt;/code&gt; will not exceed 2,000.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;max.record.exceeded&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;500&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Error in check_inputs(animal = animal, size = size, sex = sex, age = age, : searches cannot exceed 2,000 records.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Offsetting Results&lt;/h2&gt;
+&lt;p&gt;Four of the available methods (&lt;code&gt;pet.find&lt;/code&gt;, &lt;code&gt;shelter.find&lt;/code&gt;,
+&lt;code&gt;shelter.getPets&lt;/code&gt;, and &lt;code&gt;shelter.listByBreed&lt;/code&gt;) in the Petfinder API offer
+an &lt;code&gt;offset&lt;/code&gt; parameter which can be used to skip the first &lt;em&gt;n&lt;/em&gt; results
+from the API. Behind the scenes, the &lt;code&gt;offset&lt;/code&gt; parameter is used to page
+results if the &lt;code&gt;pages&lt;/code&gt; parameter is specified, but it can also be used
+to avoid returning the same data when iterating calls. For example, the
+below two calls using the &lt;code&gt;pet.find&lt;/code&gt; method would, in essence, return
+the first 100 results should the two results be appended.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;no.offset&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Get the first 50 results&lt;/span&gt;
+&lt;span class="n"&gt;offsetted&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Skip the first 25 results and get the next 50&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The above two calls could also be written as the below.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;paged&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;raw_count&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;This short vignette explored some of the additional functionality of
+several of the methods available in the Petfinder API and &lt;code&gt;PetfindeR&lt;/code&gt;
+library for further customizing the number of records and their location
+in the database using the &lt;code&gt;offset&lt;/code&gt; parameter. Future vignettes will also
+explore some possible use cases of extracting and analyzing the data
+available in the Petfinder database.&lt;/p&gt;</content><category term="R"></category><category term="PetfindeR"></category><category term="APIs"></category></entry><entry><title>PetfindeR, R Wrapper for the Petfinder API, Introduction Part One</title><link href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-one.html" rel="alternate"></link><published>2018-05-15T00:00:00-07:00</published><updated>2018-05-15T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2018-05-15:/petfinder-r-wrapper-petfinder-api-introduction-part-one.html</id><summary type="html">&lt;p&gt;The goal of the PetfindeR package is to provide a simple and straightforward interface for interacting with the Petfinder API through R. The Petfinder database contains approximately 300,000 adoptable pet records and 11,000 animal welfare organization records, which makes it a handy and valuable source of data for those in the animal welfare community. However, the outputs from the Petfinder API are in messy JSON format and thus it makes it more time-consuming and often frustrating to coerce the output data into a form that is workable with R.&lt;/p&gt;</summary><content type="html">&lt;h2&gt;About PetfindeR&lt;/h2&gt;
+&lt;p&gt;The goal of the &lt;code&gt;PetfindeR&lt;/code&gt; package is to provide a simple and
+straightforward interface for interacting with the &lt;a href="https://www.petfinder.com/developers/api-docs"&gt;Petfinder
+API&lt;/a&gt; through R. The
+Petfinder database contains approximately 300,000 adoptable pet records
+and 11,000 animal welfare organization records, which makes it a handy
+and valuable source of data for those in the animal welfare community.
+However, the outputs from the Petfinder API are in messy JSON format and
+thus it makes it more time-consuming and often frustrating to coerce the
+output data into a form that is workable with R. The &lt;code&gt;PetfindeR&lt;/code&gt; package
+was developed to alleviate this difficulty and provide users with a
+streamlined interface for getting the data they want and using it for
+their specific purpose.&lt;/p&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This post introduces and walks through the methods available in
+&lt;code&gt;PetfindeR&lt;/code&gt; and the Petfinder API for authenticating and extracting data
+from the database.&lt;/p&gt;
+&lt;h2&gt;Obtaining an API Key from Petfinder&lt;/h2&gt;
+&lt;p&gt;Before we can use the &lt;code&gt;PetfindeR&lt;/code&gt; package, we need to obtain an API key
+from the Petfinder website to authenticate our requests. To acquire an
+API key, create an account on &lt;a href="https://www.petfinder.com/developers/api-key"&gt;Petfinder's developer
+page&lt;/a&gt;. A 'secret' key is
+also given from Petfinder for requests that require an additional layer
+of authentication; however, the current methods available do not need a
+secret key to be provided (this could potentially change in the future).&lt;/p&gt;
+&lt;h2&gt;Getting Started with PetfindeR&lt;/h2&gt;
+&lt;p&gt;At the time of this writing, &lt;code&gt;PetfindeR&lt;/code&gt; has been submitted to CRAN but 
+and is currently in the review process. In the meantime, the package can 
+be easily installed through the &lt;code&gt;devtools&lt;/code&gt; package function &lt;code&gt;install_github()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c"&gt;devtools::install_github(&amp;#39;aschleg/PetfindeR&amp;#39;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After installing and loading the package, The first step in using the
+PetfindeR package is to initialize the API connection to Petfinder. To
+do this, we pass the API key received from Petfinder into the
+&lt;code&gt;Petfinder&lt;/code&gt; function which calls a wrapped &lt;a href="https://cran.r-project.org/package=R6"&gt;R6
+class&lt;/a&gt; and creates the connection
+to the API.&lt;/p&gt;
+&lt;p&gt;It is best practice to obfuscate sensitive data such as API keys to
+avoid any potential malicious activity. To this effect, I load my API
+key by using the &lt;code&gt;Sys.getenv()&lt;/code&gt; function to access an environment
+variable containing the key.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;key&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;Sys.getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PETFINDER_KEY&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The API key is securely loaded so that we can initialize the PetfindeR
+API!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pf&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;Petfinder&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's all there is to it! The &lt;a href="https://www.petfinder.com/developers/api-docs#methods"&gt;Petfinder API
+methods&lt;/a&gt; are now
+accessible through R.&lt;/p&gt;
+&lt;h2&gt;Examples&lt;/h2&gt;
+&lt;p&gt;The following section introduces the &lt;code&gt;PetfindeR&lt;/code&gt; package and how to
+interact with the Petfinder API with some simple examples of extracting
+data from the database. The examples are split into pet and shelter
+methods, not due to any significant demarcation, but rather for
+organization.&lt;/p&gt;
+&lt;h3&gt;Pet Methods&lt;/h3&gt;
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col width="16%" /&gt;
+&lt;col width="15%" /&gt;
+&lt;col width="68%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class="header"&gt;
+&lt;th&gt;Method&lt;/th&gt;
+&lt;th&gt;Petfinder API Method&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class="odd"&gt;
+&lt;td&gt;breed.list()&lt;/td&gt;
+&lt;td&gt;breed.list&lt;/td&gt;
+&lt;td&gt;Returns the available breeds for the selected animal.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="even"&gt;
+&lt;td&gt;pet.find()&lt;/td&gt;
+&lt;td&gt;pet.find&lt;/td&gt;
+&lt;td&gt;Returns a collection of pet records matching input parameters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="odd"&gt;
+&lt;td&gt;pet.get()&lt;/td&gt;
+&lt;td&gt;pet.get&lt;/td&gt;
+&lt;td&gt;Returns a single record for a pet.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="even"&gt;
+&lt;td&gt;pet.getRandom()&lt;/td&gt;
+&lt;td&gt;pet.getRandom&lt;/td&gt;
+&lt;td&gt;Returns a randomly selected pet record. The possible result can be filtered with input parameters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3&gt;Finding the available breeds of an animal&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;breed.list()&lt;/code&gt; method allows the user to pull a list of breeds
+associated with a particular type of animal. The currently available
+animals to search for are &lt;code&gt;'barnyard'&lt;/code&gt;, &lt;code&gt;'bird'&lt;/code&gt;, &lt;code&gt;'cat'&lt;/code&gt;, &lt;code&gt;'dog'&lt;/code&gt;,
+&lt;code&gt;'horse'&lt;/code&gt;, &lt;code&gt;'reptile'&lt;/code&gt; and &lt;code&gt;'smallfurry'&lt;/code&gt;. Let's say we are interested
+in finding the breeds of cats in the Petfinder database.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;cats&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;breed.list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cats&lt;/span&gt;
+
+&lt;span class="c1"&gt;## $`@encoding`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;iso-8859-1&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $`@version`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;1.0&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$`@xmlns:xsi`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$breeds&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$breeds$breed&lt;/span&gt;
+&lt;span class="c1"&gt;##                                       $t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1                             Abyssinian&lt;/span&gt;
+&lt;span class="c1"&gt;## 2                          American Curl&lt;/span&gt;
+&lt;span class="c1"&gt;## 3                     American Shorthair&lt;/span&gt;
+&lt;span class="c1"&gt;## 4                      American Wirehair&lt;/span&gt;
+&lt;span class="c1"&gt;## 5                      Applehead Siamese&lt;/span&gt;
+&lt;span class="c1"&gt;## 6                               Balinese&lt;/span&gt;
+&lt;span class="c1"&gt;## 7                                 Bengal&lt;/span&gt;
+&lt;span class="c1"&gt;## 8                                 Birman&lt;/span&gt;
+&lt;span class="c1"&gt;## 9                                Bobtail&lt;/span&gt;
+&lt;span class="c1"&gt;## 10                                Bombay&lt;/span&gt;
+&lt;span class="c1"&gt;## 11                     British Shorthair&lt;/span&gt;
+&lt;span class="c1"&gt;## 12                               Burmese&lt;/span&gt;
+&lt;span class="c1"&gt;## 13                              Burmilla&lt;/span&gt;
+&lt;span class="c1"&gt;## 14                                Calico&lt;/span&gt;
+&lt;span class="c1"&gt;## 15                     Canadian Hairless&lt;/span&gt;
+&lt;span class="c1"&gt;## 16                             Chartreux&lt;/span&gt;
+&lt;span class="c1"&gt;## 17                               Chausie&lt;/span&gt;
+&lt;span class="c1"&gt;## 18                            Chinchilla&lt;/span&gt;
+&lt;span class="c1"&gt;## 19                           Cornish Rex&lt;/span&gt;
+&lt;span class="c1"&gt;## 20                                Cymric&lt;/span&gt;
+&lt;span class="c1"&gt;## 21                             Devon Rex&lt;/span&gt;
+&lt;span class="c1"&gt;## 22                         Dilute Calico&lt;/span&gt;
+&lt;span class="c1"&gt;## 23                  Dilute Tortoiseshell&lt;/span&gt;
+&lt;span class="c1"&gt;## 24                    Domestic Long Hair&lt;/span&gt;
+&lt;span class="c1"&gt;## 25                  Domestic Medium Hair&lt;/span&gt;
+&lt;span class="c1"&gt;## 26                   Domestic Short Hair&lt;/span&gt;
+&lt;span class="c1"&gt;## 27                          Egyptian Mau&lt;/span&gt;
+&lt;span class="c1"&gt;## 28                      Exotic Shorthair&lt;/span&gt;
+&lt;span class="c1"&gt;## 29 Extra-Toes Cat / Hemingway Polydactyl&lt;/span&gt;
+&lt;span class="c1"&gt;## 30                                Havana&lt;/span&gt;
+&lt;span class="c1"&gt;## 31                             Himalayan&lt;/span&gt;
+&lt;span class="c1"&gt;## 32                      Japanese Bobtail&lt;/span&gt;
+&lt;span class="c1"&gt;## 33                              Javanese&lt;/span&gt;
+&lt;span class="c1"&gt;## 34                                 Korat&lt;/span&gt;
+&lt;span class="c1"&gt;## 35                                LaPerm&lt;/span&gt;
+&lt;span class="c1"&gt;## 36                            Maine Coon&lt;/span&gt;
+&lt;span class="c1"&gt;## 37                                  Manx&lt;/span&gt;
+&lt;span class="c1"&gt;## 38                              Munchkin&lt;/span&gt;
+&lt;span class="c1"&gt;## 39                              Nebelung&lt;/span&gt;
+&lt;span class="c1"&gt;## 40                  Norwegian Forest Cat&lt;/span&gt;
+&lt;span class="c1"&gt;## 41                                Ocicat&lt;/span&gt;
+&lt;span class="c1"&gt;## 42                    Oriental Long Hair&lt;/span&gt;
+&lt;span class="c1"&gt;## 43                   Oriental Short Hair&lt;/span&gt;
+&lt;span class="c1"&gt;## 44                        Oriental Tabby&lt;/span&gt;
+&lt;span class="c1"&gt;## 45                               Persian&lt;/span&gt;
+&lt;span class="c1"&gt;## 46                             Pixie-Bob&lt;/span&gt;
+&lt;span class="c1"&gt;## 47                            Ragamuffin&lt;/span&gt;
+&lt;span class="c1"&gt;## 48                               Ragdoll&lt;/span&gt;
+&lt;span class="c1"&gt;## 49                          Russian Blue&lt;/span&gt;
+&lt;span class="c1"&gt;## 50                         Scottish Fold&lt;/span&gt;
+&lt;span class="c1"&gt;## 51                           Selkirk Rex&lt;/span&gt;
+&lt;span class="c1"&gt;## 52                               Siamese&lt;/span&gt;
+&lt;span class="c1"&gt;## 53                              Siberian&lt;/span&gt;
+&lt;span class="c1"&gt;## 54                                Silver&lt;/span&gt;
+&lt;span class="c1"&gt;## 55                             Singapura&lt;/span&gt;
+&lt;span class="c1"&gt;## 56                              Snowshoe&lt;/span&gt;
+&lt;span class="c1"&gt;## 57                                Somali&lt;/span&gt;
+&lt;span class="c1"&gt;## 58                 Sphynx / Hairless Cat&lt;/span&gt;
+&lt;span class="c1"&gt;## 59                                 Tabby&lt;/span&gt;
+&lt;span class="c1"&gt;## 60                                 Tiger&lt;/span&gt;
+&lt;span class="c1"&gt;## 61                             Tonkinese&lt;/span&gt;
+&lt;span class="c1"&gt;## 62                                Torbie&lt;/span&gt;
+&lt;span class="c1"&gt;## 63                         Tortoiseshell&lt;/span&gt;
+&lt;span class="c1"&gt;## 64                        Turkish Angora&lt;/span&gt;
+&lt;span class="c1"&gt;## 65                           Turkish Van&lt;/span&gt;
+&lt;span class="c1"&gt;## 66                                Tuxedo&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$breeds$`@animal`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;cat&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$timestamp&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$timestamp$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;2018-05-13T21:53:18Z&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$message&lt;/span&gt;
+&lt;span class="c1"&gt;## named list()&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$code&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$code$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;100&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$version&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$version$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;0.1&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$`@xsi:noNamespaceSchemaLocation`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;breed.list()&lt;/code&gt; can also be set to return a &lt;code&gt;data.frame&lt;/code&gt; object by
+setting the &lt;code&gt;return_df&lt;/code&gt; parameter to &lt;code&gt;TRUE&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;cats&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;breed.list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cats&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;##           cat.breeds&lt;/span&gt;
+&lt;span class="c1"&gt;## 1         Abyssinian&lt;/span&gt;
+&lt;span class="c1"&gt;## 2      American Curl&lt;/span&gt;
+&lt;span class="c1"&gt;## 3 American Shorthair&lt;/span&gt;
+&lt;span class="c1"&gt;## 4  American Wirehair&lt;/span&gt;
+&lt;span class="c1"&gt;## 5  Applehead Siamese&lt;/span&gt;
+&lt;span class="c1"&gt;## 6           Balinese&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Finding pet records matching criteria&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;pet.find()&lt;/code&gt; method enables one to return a &lt;code&gt;data.frame&lt;/code&gt; of pet
+records that match the input parameters. The available parameters can be
+found using &lt;code&gt;?pet.find()&lt;/code&gt; or checking out the &lt;a href="https://www.petfinder.com/developers/api-docs#methods"&gt;Petfinder API
+documentation&lt;/a&gt;
+directly.&lt;/p&gt;
+&lt;p&gt;Let's say we want to find female cats in Washington. The default amount
+of records is 25 (assuming there are 25 to return), which can be
+overridden with the &lt;code&gt;count&lt;/code&gt; parameter.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;wa_cats&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;cat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sex&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;F&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The returned data can also be automatically parsed into a &lt;code&gt;data.frame&lt;/code&gt;
+by setting the method parameter &lt;code&gt;return_df&lt;/code&gt; to TRUE. Here, we make the
+same call to the Petfinder API but with &lt;code&gt;return_df = TRUE&lt;/code&gt; and print the
+first six rows of the first ten columns to demonstrate the returned
+&lt;code&gt;data.frame&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;wa_cats&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;cat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sex&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;F&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wa_cats[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   status  contact.phone contact.state                   contact.email&lt;/span&gt;
+&lt;span class="c1"&gt;## 1      A   206-296-7387            WA        adoptapet@kingcounty.gov&lt;/span&gt;
+&lt;span class="c1"&gt;## 2      A   206-296-7387            WA        adoptapet@kingcounty.gov&lt;/span&gt;
+&lt;span class="c1"&gt;## 3      A   425-576-5548            WA           info@thewhole-cat.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 4      A   425-576-5548            WA           info@thewhole-cat.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 5      A           &amp;lt;NA&amp;gt;            WA       rescuinganimals@gmail.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 6      A (253) 856-1771            WA anotherchancecats2007@gmail.com&lt;/span&gt;
+&lt;span class="c1"&gt;##   contact.city contact.zip  contact.address1    age size       id&lt;/span&gt;
+&lt;span class="c1"&gt;## 1         Kent       98032  21615 64th Ave S Senior    M 39921493&lt;/span&gt;
+&lt;span class="c1"&gt;## 2         Kent       98032  21615 64th Ave S  Adult    L 37949653&lt;/span&gt;
+&lt;span class="c1"&gt;## 3      Redmond       98052 8103 161st Ave NE Senior    L 40688475&lt;/span&gt;
+&lt;span class="c1"&gt;## 4      Redmond       98052 8103 161st Ave NE Senior    M 41470264&lt;/span&gt;
+&lt;span class="c1"&gt;## 5  Federal Way       98023              &amp;lt;NA&amp;gt;  Adult    M 41589923&lt;/span&gt;
+&lt;span class="c1"&gt;## 6   Des Moines       98198      PO Box 13244  Young    M 39650811&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Returning random pet records&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;pet.getRandom()&lt;/code&gt; method returns a random pet ID by default, but can
+return a full pet record with a description by setting
+&lt;code&gt;output = 'full'&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getRandom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;output&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;full&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$`&lt;/span&gt;&lt;span class="nv"&gt;@encoding&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;iso-8859-1&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$`&lt;/span&gt;&lt;span class="nv"&gt;@version&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;option&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;altered&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;hasShots&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;housetrained&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="n"&gt;noDogs&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="n"&gt;noCats&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="n"&gt;noKids&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;A&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;phone&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;phone&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;717-831-5010&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;state&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;PA&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;address2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;named&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;email&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;email&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;info@castawaycritters.org&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Harrisburg&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;zip&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;zip&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;17105&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;fax&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;named&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;address1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;contact&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;address1&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;P.O. Box 1421&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Adult&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;size&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;size&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;M&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;media&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;media&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;media&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;photo&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;@size&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;13&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt;                                                                                       &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;95&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;500&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;300&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;95&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;500&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;300&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1488734507&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1477877892&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pnt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1477877892&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;95&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;fpm&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;13&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1477877892&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;500&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1477877892&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;300&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;pn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;photos&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;35679386&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="vm"&gt;?&lt;/span&gt;&lt;span class="n"&gt;bust&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1477877892&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;-&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jpg&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;@id&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;13&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;35679386&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelterPetId&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelterPetId&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;1732589-CC-11179&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;breeds&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;breeds&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;breed&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt;                     &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="n"&gt;Beagle&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Jack&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Russell&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Terrier&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Duke- *ADOPTION SPECIAL*&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;sex&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;sex&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;M&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;description&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;description&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;You can fill out an adoption application online on our official website.Please contact Jamie (ccjamieballa@gmail.com) for more information about this pet.Hello my name is Duke! I really would love a forever home. I love to run and play so a fenced yard would be so fun! I do well on walks and don&amp;#39;t pull on my leash.I really love being the center of attention so I prefer to live without other animals. We are still trying out how well I do with children.I am potty trained, well mannered, crate trained. A super loving pup who is quiet, timid with loud noises and knows sit and stay. I travel great in the car.I would make a great running companion or might even do pretty well in Agility training. I would love to be a part of my very own family. Could that be you??Duke is in foster care so please complete an application before meeting him. Completing an application does not obligate you to adopt; however, it is required. Applications are processed in the order received in an effort to find the best match possible for both the dog and the adopter.*Duke has an adoption special right now. His adoption fee is only $150. If you feel you are the right home for Duke please fill out an app! 5/12/18 5:11 PM&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;mix&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;mix&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;yes&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelterId&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelterId&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;PA224&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;lastUpdate&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;lastUpdate&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;2016-07-15T21:28:15Z&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;animal&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;animal&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Dog&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$`&lt;/span&gt;&lt;span class="nv"&gt;@xmlns&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="n"&gt;xsi&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nc"&gt;timestamp&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nc"&gt;timestamp&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;2018-05-13T21:53:20Z&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;message&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;named&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;100&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="err"&gt;$`$&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;0.1&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="err"&gt;$`&lt;/span&gt;&lt;span class="nv"&gt;@xsi&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="n"&gt;noNamespaceSchemaLocation&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;##&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can also get a set of random results by setting the &lt;code&gt;records&lt;/code&gt;
+parameter to the number of desired results to return. Note that each
+record counts as one call to the Petfinder API.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;random_records&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.getRandom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;records&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;output&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;full&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Similar to other methods available in the PetfindeR package, the
+&lt;code&gt;pet.getRandom&lt;/code&gt; method can also be set to return a &lt;code&gt;data.frame&lt;/code&gt; by
+setting the parameter &lt;code&gt;return_df = TRUE&lt;/code&gt;. As an example, we get three
+random pet records again and output the result as a &lt;code&gt;data.frame&lt;/code&gt; (note
+the returned records will likely not be the same as the earlier returned
+records due to the random nature of the output).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;random_records_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.getRandom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;records&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;output&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;full&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;random_records_df[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   status.1 status.2     status.3 status address1.state&lt;/span&gt;
+&lt;span class="c1"&gt;## 1  altered hasShots housetrained      A             MA&lt;/span&gt;
+&lt;span class="c1"&gt;## 2     &amp;lt;NA&amp;gt;     &amp;lt;NA&amp;gt;         &amp;lt;NA&amp;gt;      A             TX&lt;/span&gt;
+&lt;span class="c1"&gt;## 3  altered hasShots housetrained      A             MI&lt;/span&gt;
+&lt;span class="c1"&gt;##                           address1.email address1.city address1.zip   age&lt;/span&gt;
+&lt;span class="c1"&gt;## 1                   Info@AhimsaHaven.org     Templeton        01468 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;## 2 animal.customerservice@austintexas.gov        Austin        78702 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;## 3                     kelcruiser@aol.com        Macomb        48042 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;##   size&lt;/span&gt;
+&lt;span class="c1"&gt;## 1    L&lt;/span&gt;
+&lt;span class="c1"&gt;## 2   XL&lt;/span&gt;
+&lt;span class="c1"&gt;## 3    M&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Getting pet records associated with a petId&lt;/h3&gt;
+&lt;p&gt;Given a petId, an ID associated with information on a pet in the
+Petfinder database, the &lt;code&gt;pet.get()&lt;/code&gt; method will return the pet record as
+a JSON object represented as an R list. The method also accepts a vector
+or list of IDs for returning multiple records. For example, we can take
+the petIds given in our previous call to &lt;code&gt;pet.getRandom()&lt;/code&gt; and pass
+those to &lt;code&gt;pet.get()&lt;/code&gt;. Note since we are using the same petIds from
+before, the returned records will be the same. We also set the
+&lt;code&gt;return_df&lt;/code&gt; parameter to &lt;code&gt;TRUE&lt;/code&gt; to demonstrate the functionality to
+convert the returned JSON result into a &lt;code&gt;data.frame&lt;/code&gt; as in other methods
+seen previously.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pet_get_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;pet.get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;petId&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;random_records_df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pet_get_df[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   status.1 status.2     status.3 status address1.state&lt;/span&gt;
+&lt;span class="c1"&gt;## 1  altered hasShots housetrained      A             MA&lt;/span&gt;
+&lt;span class="c1"&gt;## 2     &amp;lt;NA&amp;gt;     &amp;lt;NA&amp;gt;         &amp;lt;NA&amp;gt;      A             TX&lt;/span&gt;
+&lt;span class="c1"&gt;## 3  altered hasShots housetrained      A             MI&lt;/span&gt;
+&lt;span class="c1"&gt;##                           address1.email address1.city address1.zip   age&lt;/span&gt;
+&lt;span class="c1"&gt;## 1                   Info@AhimsaHaven.org     Templeton        01468 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;## 2 animal.customerservice@austintexas.gov        Austin        78702 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;## 3                     kelcruiser@aol.com        Macomb        48042 Adult&lt;/span&gt;
+&lt;span class="c1"&gt;##   size&lt;/span&gt;
+&lt;span class="c1"&gt;## 1    L&lt;/span&gt;
+&lt;span class="c1"&gt;## 2   XL&lt;/span&gt;
+&lt;span class="c1"&gt;## 3    M&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Shelter Methods&lt;/h2&gt;
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col width="16%" /&gt;
+&lt;col width="15%" /&gt;
+&lt;col width="68%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class="header"&gt;
+&lt;th&gt;Method&lt;/th&gt;
+&lt;th&gt;Petfinder API Method&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class="odd"&gt;
+&lt;td&gt;shelter.find()&lt;/td&gt;
+&lt;td&gt;shelter.find&lt;/td&gt;
+&lt;td&gt;Returns a collection of shelter records matching input parameters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="even"&gt;
+&lt;td&gt;shelter.get()&lt;/td&gt;
+&lt;td&gt;shelter.get&lt;/td&gt;
+&lt;td&gt;Returns a single shelter record.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="odd"&gt;
+&lt;td&gt;shelter.getPets()&lt;/td&gt;
+&lt;td&gt;shelter.getPets&lt;/td&gt;
+&lt;td&gt;Returns a collection of pet records for an individual shelter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="even"&gt;
+&lt;td&gt;shelter.listByBreed()&lt;/td&gt;
+&lt;td&gt;shelter.listByBreed&lt;/td&gt;
+&lt;td&gt;Returns a list of shelter IDs listing animals matching the input animal breed.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Shelter methods are somewhat similar to the Pet methods we explored
+previously, but return information on animal shelters and other animal
+welfare organizations.&lt;/p&gt;
+&lt;h3&gt;Finding animal welfare organizations in an area&lt;/h3&gt;
+&lt;p&gt;Using the &lt;code&gt;shelter.find()&lt;/code&gt; method, one can locate shelters and their
+available attributes matching the input parameters. For example, say we
+wanted to find shelters in a ZIP code in Seattle (my old zip code).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;wa_shelters&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;98115&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wa_shelters&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelters&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;shelter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   country.$t longitude.$t                                    name.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1         US    -122.2939                      Forgotten Dogs Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 2         US    -122.2939 Fox Terrier Fanciers of Puget Sound Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 3         US    -122.2939                    Little Blessings Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 4         US    -122.3004                           Dog Gone Seattle&lt;/span&gt;
+&lt;span class="c1"&gt;## 5         US    -122.3005          Friends of the Animals Foundation&lt;/span&gt;
+&lt;span class="c1"&gt;## 6         US    -122.3005            Pacific Northwest KUVASZ Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;##           phone.$t state.$t                                  email.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1             &amp;lt;NA&amp;gt;       WA           forgotten.dogs.rescue@gmail.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 2  360-733-5735          WA                   kmartin44@earthlink.net&lt;/span&gt;
+&lt;span class="c1"&gt;## 3    206473-1111         WA adoptions@littleblessingsrescue.vpweb.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 4             &amp;lt;NA&amp;gt;       WA                  adopt@doggoneseattle.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 5 (206) 719-4864         WA                       info@fafseattle.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 6             &amp;lt;NA&amp;gt;       WA                    vicki@AnimalsReign.com&lt;/span&gt;
+&lt;span class="c1"&gt;##   city.$t zip.$t latitude.$t id.$t    address1.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1 Seattle  98115     47.6831 WA368           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 2 Seattle  98115     47.6831  WA58           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 3 Seattle  98115     47.6831 WA620           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 4 Seattle  98165     47.7161 WA650           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 5 Seattle  98125     47.7165  WA77 P.O. Box 16308&lt;/span&gt;
+&lt;span class="c1"&gt;## 6 Seattle  98125     47.7165  WA90           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As with other methods in &lt;code&gt;PetfindeR&lt;/code&gt;, the &lt;code&gt;shelter.find&lt;/code&gt; method also has
+a &lt;code&gt;return_df&lt;/code&gt; parameter that coerces and outputs the returned JSON into
+a workable &lt;code&gt;data.frame&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;wa_shelters_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;98115&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wa_shelters_df&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   country longitude                                       name&lt;/span&gt;
+&lt;span class="c1"&gt;## 1      US -122.2939                      Forgotten Dogs Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 2      US -122.2939 Fox Terrier Fanciers of Puget Sound Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 3      US -122.2939                    Little Blessings Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;## 4      US -122.3004                           Dog Gone Seattle&lt;/span&gt;
+&lt;span class="c1"&gt;## 5      US -122.3005          Friends of the Animals Foundation&lt;/span&gt;
+&lt;span class="c1"&gt;## 6      US -122.3005            Pacific Northwest KUVASZ Rescue&lt;/span&gt;
+&lt;span class="c1"&gt;##              phone shelterate                                     email&lt;/span&gt;
+&lt;span class="c1"&gt;## 1             &amp;lt;NA&amp;gt;         WA           forgotten.dogs.rescue@gmail.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 2  360-733-5735            WA                   kmartin44@earthlink.net&lt;/span&gt;
+&lt;span class="c1"&gt;## 3    206473-1111           WA adoptions@littleblessingsrescue.vpweb.com&lt;/span&gt;
+&lt;span class="c1"&gt;## 4             &amp;lt;NA&amp;gt;         WA                  adopt@doggoneseattle.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 5 (206) 719-4864           WA                       info@fafseattle.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 6             &amp;lt;NA&amp;gt;         WA                    vicki@AnimalsReign.com&lt;/span&gt;
+&lt;span class="c1"&gt;##      city   zip latitude    id       address1&lt;/span&gt;
+&lt;span class="c1"&gt;## 1 Seattle 98115  47.6831 WA368           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 2 Seattle 98115  47.6831  WA58           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 3 Seattle 98115  47.6831 WA620           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 4 Seattle 98165  47.7161 WA650           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;## 5 Seattle 98125  47.7165  WA77 P.O. Box 16308&lt;/span&gt;
+&lt;span class="c1"&gt;## 6 Seattle 98125  47.7165  WA90           &amp;lt;NA&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Returning information on specific animal welfare organizations&lt;/h3&gt;
+&lt;p&gt;Similar to &lt;code&gt;pet.get()&lt;/code&gt;, the &lt;code&gt;shelter.get()&lt;/code&gt; method takes a shelterId and
+returns the available information on the shelter from the Petfinder
+database.&lt;/p&gt;
+&lt;p&gt;One shelter that's very dear to me is &lt;a href="http://www.seattleareafelinerescue.org/"&gt;Seattle Area Feline
+Rescue&lt;/a&gt;, the shelterId of which
+is 'WA40'. Let's return the information available on the rescue.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;safr&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA40&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;safr&lt;/span&gt;
+
+&lt;span class="c1"&gt;## $`@encoding`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;iso-8859-1&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $`@version`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;1.0&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$`@xmlns:xsi`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$country&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$country$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;US&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$longitude&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$longitude$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;-122.3428&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$name&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$name$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;Seattle Area Feline Rescue&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$phone&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$phone$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;206-659-6220 &amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$state&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$state$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;WA&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$address2&lt;/span&gt;
+&lt;span class="c1"&gt;## named list()&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$email&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$email$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;adoptions@seattleareafelinerescue.org&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$city&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$city$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;Shoreline&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$zip&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$zip$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;98133&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$fax&lt;/span&gt;
+&lt;span class="c1"&gt;## named list()&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$latitude&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$latitude$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;47.7382&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$id&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$id$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;WA40&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$address1&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$shelter$address1$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;14717 Aurora Ave N&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$timestamp&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$timestamp$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;2018-05-13T21:53:24Z&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$message&lt;/span&gt;
+&lt;span class="c1"&gt;## named list()&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$code&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$status$code$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;100&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$version&lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$header$version$`$t`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;0.1&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;span class="c1"&gt;## $petfinder$`@xsi:noNamespaceSchemaLocation`&lt;/span&gt;
+&lt;span class="c1"&gt;## [1] &amp;quot;http://api.petfinder.com/schemas/0.9/petfinder.xsd&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This data can also be transformed into a one-row &lt;code&gt;data.frame&lt;/code&gt; by setting
+&lt;code&gt;return_df = TRUE&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;safr_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA40&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;safr_df&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   country longitude                       name         phone state&lt;/span&gt;
+&lt;span class="c1"&gt;## 1      US -122.3428 Seattle Area Feline Rescue 206-659-6220     WA&lt;/span&gt;
+&lt;span class="c1"&gt;##   address2                                 email      city   zip fax&lt;/span&gt;
+&lt;span class="c1"&gt;## 1       NA adoptions@seattleareafelinerescue.org Shoreline 98133  NA&lt;/span&gt;
+&lt;span class="c1"&gt;##   latitude   id           address1&lt;/span&gt;
+&lt;span class="c1"&gt;## 1  47.7382 WA40 14717 Aurora Ave N&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Getting pet records from a shelter&lt;/h3&gt;
+&lt;p&gt;Let's say we are interested in finding the available pets at a
+particular shelter; we could use the &lt;code&gt;shelter.getPets()&lt;/code&gt; method to
+quickly find this information. Here, we return the pets currently
+available at the Seattle Area Feline Rescue and print the first ten
+columns of the returned data.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;safr.pets&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.getPets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA40&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;safr.pets&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;petfinder&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pets&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;pet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+
+&lt;span class="c1"&gt;##                          options.option status.$t contact.phone.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1       altered, hasShots, housetrained         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;## 2                                  NULL         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;## 3                 altered, housetrained         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;## 4         altered, housetrained, noKids         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;## 5 altered, housetrained, noCats, noKids         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;## 6         altered, housetrained, noKids         A    206-659-6220 &lt;/span&gt;
+&lt;span class="c1"&gt;##   contact.state.$t                      contact.email.$t contact.city.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;## 2               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;## 3               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;## 4               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;## 5               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;## 6               WA adoptions@seattleareafelinerescue.org       Shoreline&lt;/span&gt;
+&lt;span class="c1"&gt;##   contact.zip.$t contact.address1.$t age.$t size.$t&lt;/span&gt;
+&lt;span class="c1"&gt;## 1          98133  14717 Aurora Ave N  Adult       L&lt;/span&gt;
+&lt;span class="c1"&gt;## 2          98133  14717 Aurora Ave N   Baby       M&lt;/span&gt;
+&lt;span class="c1"&gt;## 3          98133  14717 Aurora Ave N Senior       L&lt;/span&gt;
+&lt;span class="c1"&gt;## 4          98133  14717 Aurora Ave N Senior       L&lt;/span&gt;
+&lt;span class="c1"&gt;## 5          98133  14717 Aurora Ave N  Adult       M&lt;/span&gt;
+&lt;span class="c1"&gt;## 6          98133  14717 Aurora Ave N  Adult       M&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;shelter.getPets()&lt;/code&gt; method also has a &lt;code&gt;return_df&lt;/code&gt; parameter that can
+be set to TRUE to return a clean, workable &lt;code&gt;data.frame&lt;/code&gt; for analysis.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;safr.pets_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.getPets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;WA40&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;return_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;safr.pets_df&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+
+&lt;span class="c1"&gt;##   status contact.phone contact.state                         contact.email&lt;/span&gt;
+&lt;span class="c1"&gt;## 1      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 2      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 3      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 4      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 5      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;## 6      A 206-659-6220             WA adoptions@seattleareafelinerescue.org&lt;/span&gt;
+&lt;span class="c1"&gt;##   contact.city contact.zip   contact.address1    age size       id&lt;/span&gt;
+&lt;span class="c1"&gt;## 1    Shoreline       98133 14717 Aurora Ave N  Adult    L  6481751&lt;/span&gt;
+&lt;span class="c1"&gt;## 2    Shoreline       98133 14717 Aurora Ave N   Baby    M  6497950&lt;/span&gt;
+&lt;span class="c1"&gt;## 3    Shoreline       98133 14717 Aurora Ave N Senior    L 38016564&lt;/span&gt;
+&lt;span class="c1"&gt;## 4    Shoreline       98133 14717 Aurora Ave N Senior    L 40493265&lt;/span&gt;
+&lt;span class="c1"&gt;## 5    Shoreline       98133 14717 Aurora Ave N  Adult    M 40674254&lt;/span&gt;
+&lt;span class="c1"&gt;## 6    Shoreline       98133 14717 Aurora Ave N  Adult    M 40977444&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Finding shelters that have a particular animal breed&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;shelter.listByBreed()&lt;/code&gt; method allows one to find shelters that have
+a particular breed of animal, which may be useful for users interested
+in finding rarer breeds of animal. The &lt;code&gt;breed&lt;/code&gt; argument must match a
+breed listed in the Petfinder database, which can be easily extracted by
+using the &lt;code&gt;breed.list()&lt;/code&gt; method. We already pulled the available cat
+breeds earlier in the vignette, so we can use that to select a breed of
+cat to search.&lt;/p&gt;
+&lt;p&gt;The Abyssinian is a beautiful and wonderfully friendly breed of cat, so
+let's search for some shelters that have Abyssinians listed on
+Petfinder.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;aby_shelters&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pf&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="nf"&gt;shelter.listByBreed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Abyssinian&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note: There currently seems to be an issue (as of 5/9/2018) with the
+Petfinder API and the &lt;code&gt;shelter.listByBreed&lt;/code&gt; method. The API will return
+an object successfully, but the data is empty. Hopefully, Petfinder will
+be able to fix this issue soon, but in the meantime, I leave this note
+here just in case.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In this vignette, we introduced the core functionality of the
+&lt;code&gt;PetfindeR&lt;/code&gt; library for interacting and extracting data from the
+Petfinder API. In future vignettes, we will further explore working with
+the &lt;code&gt;PetfindeR&lt;/code&gt; library as well some potential uses of the package for
+data extraction and analysis.&lt;/p&gt;</content><category term="R"></category><category term="PetfindeR"></category><category term="APIs"></category></entry></feed>

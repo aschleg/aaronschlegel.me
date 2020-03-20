@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Extraction and Feature Engineering of Animal Austin Center's Shelter Outcomes Dataset using Requests and Pandas</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/python.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The Austin Animal Center, the largest no-kill municipal animal shelter in the United States, makes available its shelter animal outcomes dataset as patrt of the City of Austin's Open Data program. This post demonstrates how to extract the data from the City of Austin's Open Data portal using the requests library and convert the resulting JSON to a tabular pandas DataFrame. We will then enrich the data by applying feature engineering to the data to add more information, which should help improve the outcome prediction model." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Extraction and Feature Engineering of Animal Austin Center's Shelter Outcomes Dataset using Requests and Pandas" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-02-05 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The Austin Animal Center, the largest no-kill municipal animal shelter in the United States, makes available its shelter animal outcomes dataset as patrt of the City of Austin's Open Data program. This post demonstrates how to extract the data from the City of Austin's Open Data portal using the requests library and convert the resulting JSON to a tabular pandas DataFrame. We will then enrich the data by applying feature engineering to the data to add more information, which should help improve the outcome prediction model." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/extraction-feature-engineering-aac-data-requests-pandas.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/extraction-feature-engineering-aac-data-requests-pandas.html" rel="bookmark"
+                   title="Permalink to Extraction and Feature Engineering of Animal Austin Center's Shelter Outcomes Dataset using Requests and Pandas">Extraction and Feature Engineering of Animal Austin Center's Shelter Outcomes Dataset using Requests and Pandas</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-02-05T00:00:00-08:00">
+                Mon 05 February 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <a href="http://www.austintexas.gov/department/aac">Austin Animal Center</a> is the largest no-kill animal shelter and shelters and protects over 18,000 animals each year. As part of the <a href="https://data.austintexas.gov/">City of Austin's Open Data Initiative</a>, the Center makes available their data detailing shelter pet intake and outcomes. According to the data portal, over 90% of animal outcomes are adoptions, transfers to other shelter partners or returning lost pets to owners.</p>
+<p>Given the data made available by the AAC, is there a predictable pattern or visible trend to shelter pet outcomes? By performing <a href="https://en.wikipedia.org/wiki/Exploratory_data_analysis">exploratory data analysis</a> we can unveil potential patterns and trends to help inform what features and terms are included in our final prediction model.</p>
+<p>This notebook will walkthrough extracting the AAC's shelter pet outcome dataset using the <a href="http://docs.python-requests.org/en/master/">requests</a> library. Once the data is extracted, we will clean the data and enrich the data by leveraging <a href="https://en.wikipedia.org/wiki/Feature_engineering">feature engineering</a> to create new and potentially more useful indicators of shelter animal outcomes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The libraries used to perform the exploratory data analysis will be primarily the ubiquitous <a href="https://pandas.pydata.org/">pandas</a> for loading and manipulating the extracted data, and <a href="https://seaborn.pydata.org/">seaborn</a> for visualizing the data. The packages are imported below; we also call the <a href="http://ipython.readthedocs.io/en/stable/interactive/plotting.html"><code>%matplotlib inline</code></a> function for printing the visualizations.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Obtain-Shelter-Pet-Data-from-the-Austin-Open-Data-Portal">Obtain Shelter Pet Data from the Austin Open Data Portal<a class="anchor-link" href="#Obtain-Shelter-Pet-Data-from-the-Austin-Open-Data-Portal">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The first step in analyzing the data is obtaining the data! The shelter outcome data can be extracted in a variety of ways, including going to the <a href="https://data.austintexas.gov/Health-and-Community-Services/Austin-Animal-Center-Outcomes/9t4d-g238">Austin Animal Center Outcomes webpage</a> and downloading the data directly to standard formats, but that's not as fun as extracting the data programmatically with Python =p.</p>
+<p>Clicking the API button in the top-right corner of the <a href="https://data.austintexas.gov/Health-and-Community-Services/Austin-Animal-Center-Outcomes/9t4d-g238">AAC webpage</a> reveals the API endpoint that will be called to get the data. There are several export options, including CSV and JSON.</p>
+<p>The API is powered by <a href="https://socrata.com/">Socrata</a>, which has a call limit of 1,000. Therefore, we need to page through the results and get the results 1,000 at a time, as noted by the <a href="https://dev.socrata.com/docs/paging.html">Socrata API paging documentation</a> until the total amount of records is reached. The dataset information states there are 77.9k total rows in the dataset.</p>
+<p>We set the endpoint, the number of records to return on each call, and the number of pages we want to page through. Although the data states there are just over only 78k rows in the data, the <code>pages</code> variable is set to 100 anyway, and we break the call loop once there are no results to return.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">endpoint</span> <span class="o">=</span> <span class="s1">&#39;https://data.austintexas.gov/resource/9t4d-g238.json&#39;</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">pages</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We extract the data using the <code>requests</code> library and append the results to a list. Once the call returns a <code>404</code> error, the loop stops and the results are returned.</p>
+<p>Note: This approach is not optimal, a likely better approach would be to use a <code>while</code> statement and check the HTTP status code on each loop until it returns a <code>404</code>; however, this quick and dirty loop works fine for our purposes. Once the extraction of the data is complete, the length of the list is returned.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;$limit&#39;</span><span class="p">:</span> <span class="n">count</span><span class="p">,</span> <span class="s1">&#39;$offset&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pages</span><span class="p">):</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;$offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1000</span>
+        
+    <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="s1">&#39;404&#39;</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+<span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[4]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>100</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We convert the list of JSON results into a pandas DataFrame by using the very convenient <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.io.json.json_normalize.html"><code>json_normalize</code></a> function. Iterate through the list of results and convert the returned JSON into a DataFrame and append to our initialized, empty DataFrame <code>outcome_df</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">outcome_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="n">outcome_df</span> <span class="o">=</span> <span class="n">outcome_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">json_normalize</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="nb">len</span><span class="p">(</span><span class="n">outcome_df</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[5]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>78256</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The DataFrame contains x rows of data, just as the data webpage stated.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As we are only interested in the outcomes of cats for this particular task, filter the <code>animal_type</code> column and reset the index.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span> <span class="o">=</span> <span class="n">outcome_df</span><span class="p">[</span><span class="n">outcome_df</span><span class="p">[</span><span class="s1">&#39;animal_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Cat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="k">del</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Print the number of cat shelter outcomes as well as the first 5 rows of the filtered dataset.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cats_df</span><span class="p">))</span>
+<span class="n">cats_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>29422
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[7]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age_upon_outcome</th>
+      <th>animal_id</th>
+      <th>animal_type</th>
+      <th>breed</th>
+      <th>color</th>
+      <th>date_of_birth</th>
+      <th>datetime</th>
+      <th>monthyear</th>
+      <th>name</th>
+      <th>outcome_subtype</th>
+      <th>outcome_type</th>
+      <th>sex_upon_outcome</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2 weeks</td>
+      <td>A684346</td>
+      <td>Cat</td>
+      <td>Domestic Shorthair Mix</td>
+      <td>Orange Tabby</td>
+      <td>2014-07-07T00:00:00</td>
+      <td>2014-07-22T16:04:00</td>
+      <td>2014-07-22T16:04:00</td>
+      <td>NaN</td>
+      <td>Partner</td>
+      <td>Transfer</td>
+      <td>Intact Male</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1 month</td>
+      <td>A685067</td>
+      <td>Cat</td>
+      <td>Domestic Shorthair Mix</td>
+      <td>Blue Tabby/White</td>
+      <td>2014-06-16T00:00:00</td>
+      <td>2014-08-14T18:45:00</td>
+      <td>2014-08-14T18:45:00</td>
+      <td>Lucy</td>
+      <td>NaN</td>
+      <td>Adoption</td>
+      <td>Intact Female</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3 months</td>
+      <td>A678580</td>
+      <td>Cat</td>
+      <td>Domestic Shorthair Mix</td>
+      <td>White/Black</td>
+      <td>2014-03-26T00:00:00</td>
+      <td>2014-06-29T17:45:00</td>
+      <td>2014-06-29T17:45:00</td>
+      <td>*Frida</td>
+      <td>Offsite</td>
+      <td>Adoption</td>
+      <td>Spayed Female</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1 year</td>
+      <td>A675405</td>
+      <td>Cat</td>
+      <td>Domestic Medium Hair Mix</td>
+      <td>Black/White</td>
+      <td>2013-03-27T00:00:00</td>
+      <td>2014-03-28T14:55:00</td>
+      <td>2014-03-28T14:55:00</td>
+      <td>Stella Luna</td>
+      <td>NaN</td>
+      <td>Return to Owner</td>
+      <td>Spayed Female</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3 weeks</td>
+      <td>A670420</td>
+      <td>Cat</td>
+      <td>Domestic Shorthair Mix</td>
+      <td>Black/White</td>
+      <td>2013-12-16T00:00:00</td>
+      <td>2014-01-09T19:29:00</td>
+      <td>2014-01-09T19:29:00</td>
+      <td>NaN</td>
+      <td>Partner</td>
+      <td>Transfer</td>
+      <td>Intact Male</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We successfully extracted the Austin Animal Center's shelter outcome dataset and have already started manipulating the data to our needs! We now turn our attention to the process of feature engineering, an often manual but extremely valuable step in creating models. Before beginning; however, it can be worthwhile to save the data we extracted to a file in case we need to return to it. There are many options for saving a pandas DataFrame, as noted by the <a href="https://pandas.pydata.org/pandas-docs/stable/api.html#id12">pandas documentation</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">outcome_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../../data/aac_outcomes_working.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="n">cats_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../../data/cats_working.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-Engineering">Feature Engineering<a class="anchor-link" href="#Feature-Engineering">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Feature engineering, although often laborious and potentially time-consuming, can yield significantly better results in the modeling phase as the data is richer with information machine learning algorithms can leverage. The step of feature engineering is another phase where a data scientist or analyst's domain knowledge about the particular data being analyzed can enhance and play a vital role in the success of the analysis and model of the problem.</p>
+<p>In the end, and possibly for the foreseeable future, machine learning is at the core pattern recognition and statistics with computers, and cannot replace the specialized knowledge of a skilled analyst.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Each row represents one outcome. Therefore we can start by adding a simple <code>count</code> column to denote the number of observations in each group.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>sex_upon_outcome</code> column denotes the cat's gender and if it was spayed or neutered upon the shelter outcome. This variable can be split into two new features, <code>sex</code> and <code>Spay/Neuter</code>. These features can be added with the <code>np.where()</code> function, which is essentially an <code>if</code> statement that works with pandas Series.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;sex_upon_outcome&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;Male&#39;</span><span class="p">),</span> <span class="s1">&#39;Male&#39;</span><span class="p">,</span> <span class="s1">&#39;Female&#39;</span><span class="p">)</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Spay/Neuter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;sex_upon_outcome&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;Intact&#39;</span><span class="p">),</span> <span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The cat's age upon outcome is given in not a very data analysis-friendly format. Let's inspect the first 5 rows of the <code>age_upon_outcome</code> column to see what we're dealing with:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_upon_outcome&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[11]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0     2 weeks
+1     1 month
+2    3 months
+3      1 year
+4     3 weeks
+Name: age_upon_outcome, dtype: object</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The cat's age is approximated with a numeric value and a date interval such as 'weeks', 'months', and 'years', therefore we will only be able to get an approximation of the cat's age, which is typically the best achievable regarding of accuracy in the shelter environment.</p>
+<p>We will transform the column into a day value that can be converted into months and years as needed. Start by splitting the <code>age_upon_outcome</code> column using the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.str.split.html"><code>.str.split</code></a> method. Note we could also use the <code>expand=True</code> parameter to return a DataFrame of the split columns.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_upon_outcome&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;NULL&#39;</span><span class="p">]</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Periods&#39;</span><span class="p">],</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_upon_outcome&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_upon_outcome&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[13]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([&#39;weeks&#39;, &#39;month&#39;, &#39;months&#39;, &#39;year&#39;, &#39;years&#39;, &#39;days&#39;, &#39;week&#39;, &#39;day&#39;], dtype=object)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Taking advantage of the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.unique.html"><code>.unique()</code></a> Series method, we can find the date intervals we need to account for during the conversion.</p>
+<p>With the period lengths, we can approximate the age of the cat upon the outcome in days by multiplying the number of periods by the appropriate number of days. This is done using the <code>np.where()</code> function. Once the approximate age in days is obtained, we also determine the age in years by dividing the days by 365.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;day&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> 
+                                   <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;week&#39;</span><span class="p">),</span> <span class="mi">7</span><span class="p">,</span> 
+                                            <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">),</span> <span class="mi">30</span><span class="p">,</span> 
+                                                     <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">),</span> <span class="mi">365</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_age_(days)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Period Range&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Periods&#39;</span><span class="p">]</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_age_(years)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_age_(days)&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">365</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the shelter environment, kittens, defined as cats of approximately six months of age or less, are often adopted much more quickly than adult cats. Kittens can also be transferred to other area organizations for treatments and to get spayed or neutered if the shelter does not have the appropriate facilities or staff on hand to perform the procedure. Therefore, it makes sense to create a few more features that designate whether a cat was of adult or kitten age upon outcome.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Cat/Kitten (outcome)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_age_(days)&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">180</span><span class="p">,</span> <span class="s1">&#39;Cat&#39;</span><span class="p">,</span> <span class="s1">&#39;Kitten&#39;</span><span class="p">)</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;sex_age_outcome&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;sex_upon_outcome&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;Cat/Kitten (outcome)&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_age_(years)&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;age_group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[16]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(-0.022, 2.2]    25107
+(2.2, 4.4]        1554
+(4.4, 6.6]         901
+(6.6, 8.8]         724
+(8.8, 11.0]        599
+(11.0, 13.2]       297
+(13.2, 15.4]       151
+(15.4, 17.6]        58
+(17.6, 19.8]        16
+(19.8, 22.0]        14
+Name: age_group, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we want to convert the date columns into formats that are workable with <code>pandas</code> and for future data analysis. Thus, we apply the handy <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.to_datetime.html"><code>pd.to_datetime()</code></a> function. The month and year the cat was born and the time of outcome is then extracted and stored in new columns.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">])</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;dob_year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;dob_month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;dob_monthyear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;monthyear&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_weekday&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">weekday_name</span>
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;outcome_hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are far fewer recognized cat breeds than dog breeds, as dogs have been selected for desired traits for millennia, while the cat has more or less stayed the same as its role in human society during the same time was essentially constant (keeping vermin out of food and grain stores). Only in the last century or so has there been more breeding for desired traits such as coat pattern and behavior. Also, unlike numerous dogs breeds, cat breeds are extremely difficult to determine without genetic testing and aren't officially recognized by the CFA (Cat Fancier's Association) without the proper paperwork. As a result, the vast majority of cats who arrive in shelters are of the Domestic breed, generally classified into three different hair lengths, 'short', 'medium', and 'long', which are defined as cats of mixed breed.</p>
+<p>We can see the counts of cat breeds using the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.value_counts.html"><code>.value_counts()</code></a> method.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[18]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Domestic Shorthair Mix                     23334
+Domestic Medium Hair Mix                    2323
+Domestic Longhair Mix                       1228
+Siamese Mix                                  998
+Domestic Shorthair                           386
+American Shorthair Mix                       211
+Snowshoe Mix                                 148
+Domestic Medium Hair                         131
+Maine Coon Mix                               106
+Manx Mix                                      79
+Russian Blue Mix                              65
+Siamese                                       60
+Domestic Longhair                             45
+Himalayan Mix                                 32
+Ragdoll Mix                                   22
+Persian Mix                                   20
+Siamese/Domestic Shorthair                    13
+Bengal Mix                                    12
+Angora Mix                                    12
+American Curl Shorthair Mix                   11
+Balinese Mix                                  10
+Japanese Bobtail Mix                          10
+Maine Coon                                    10
+Persian                                        9
+Tonkinese Mix                                  8
+Snowshoe                                       8
+Bombay Mix                                     7
+British Shorthair Mix                          6
+Himalayan                                      6
+Cymric Mix                                     6
+                                           ...  
+Chartreux Mix                                  2
+Domestic Shorthair/Siamese                     2
+British Shorthair                              2
+Domestic Longhair/Rex                          2
+Devon Rex                                      2
+Munchkin Longhair Mix                          2
+Turkish Van Mix                                2
+Bengal                                         2
+Munchkin Shorthair Mix                         2
+Bengal/Domestic Shorthair                      2
+Domestic Medium Hair/Maine Coon                2
+Manx/Domestic Longhair                         2
+Snowshoe/Ragdoll                               2
+Domestic Shorthair/Manx                        1
+Manx/Siamese                                   1
+Angora/Persian                                 1
+Domestic Shorthair/Maine Coon                  1
+Domestic Longhair/Russian Blue                 1
+American Wirehair Mix                          1
+Domestic Medium Hair/Manx                      1
+Manx                                           1
+Domestic Shorthair/Abyssinian                  1
+Domestic Shorthair/British Shorthair           1
+Snowshoe/Domestic Shorthair                    1
+Havana Brown Mix                               1
+Domestic Shorthair/Domestic Medium Hair        1
+Ocicat Mix                                     1
+Siamese/Angora                                 1
+Domestic Longhair/Domestic Longhair            1
+Domestic Shorthair/Domestic Shorthair          1
+Name: breed, Length: 79, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As suspected, the Domestic breed is the most common by far. Let's clean up the breed names by removing 'mix' (we will assume the term 'mix' isn't relevant to the type of breed, which is certainly true for Domestic breeds) and trimming the values to remove any whitespace.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;mix&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;medium hair&#39;</span><span class="p">,</span> <span class="s1">&#39;mediumhair&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <a href="http://cfa.org/Breeds.aspx">Cat Fancier's Association</a> currently recognizes 42 cat breeds. Let's create two new features that distinguish the cat as a breed recognized by the CFA or a domestic breed. As we saw, most of the cats will be classified into the domestic category, but we will be able to analyze if a cats breed (or breed type) has any impact on its outcome.</p>
+<p>We create a list of all the CFA breeds and then convert the list to lowercase and join all the elements with a bar.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cfa_breeds</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Abyssinian&#39;</span><span class="p">,</span> <span class="s1">&#39;American Bobtail&#39;</span><span class="p">,</span> <span class="s1">&#39;American Curl&#39;</span><span class="p">,</span> <span class="s1">&#39;American Shorthair&#39;</span><span class="p">,</span> <span class="s1">&#39;American Wirehair&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Balinese&#39;</span><span class="p">,</span> <span class="s1">&#39;Bengal&#39;</span><span class="p">,</span> <span class="s1">&#39;Birman&#39;</span><span class="p">,</span> <span class="s1">&#39;Bombay&#39;</span><span class="p">,</span> <span class="s1">&#39;British Shorthair&#39;</span><span class="p">,</span> <span class="s1">&#39;Burmese&#39;</span><span class="p">,</span> <span class="s1">&#39;Burmilla&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Chartreux&#39;</span><span class="p">,</span> <span class="s1">&#39;Colorpoint Shorthair&#39;</span><span class="p">,</span> <span class="s1">&#39;Cornish Rex&#39;</span><span class="p">,</span> <span class="s1">&#39;Devon Rex&#39;</span><span class="p">,</span> <span class="s1">&#39;Egyptian Mau&#39;</span><span class="p">,</span> <span class="s1">&#39;European Burmese&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Exotic&#39;</span><span class="p">,</span> <span class="s1">&#39;Havana Brown&#39;</span><span class="p">,</span> <span class="s1">&#39;Japanese Bobtail&#39;</span><span class="p">,</span> <span class="s1">&#39;Korat&#39;</span><span class="p">,</span> <span class="s1">&#39;LaPerm&#39;</span><span class="p">,</span> <span class="s1">&#39;Maine Coon&#39;</span><span class="p">,</span> <span class="s1">&#39;Manx&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Norwegian Forest Cat&#39;</span><span class="p">,</span> <span class="s1">&#39;Ocicat&#39;</span><span class="p">,</span> <span class="s1">&#39;Oriental&#39;</span><span class="p">,</span> <span class="s1">&#39;Persian&#39;</span><span class="p">,</span> <span class="s1">&#39;Ragamuffin&#39;</span><span class="p">,</span> <span class="s1">&#39;Ragdoll&#39;</span><span class="p">,</span> <span class="s1">&#39;Russian Blue&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Scottish Fold&#39;</span><span class="p">,</span> <span class="s1">&#39;Selkirk Rex&#39;</span><span class="p">,</span> <span class="s1">&#39;Siamese&#39;</span><span class="p">,</span> <span class="s1">&#39;Siberian&#39;</span><span class="p">,</span> <span class="s1">&#39;Singapura&#39;</span><span class="p">,</span> <span class="s1">&#39;Somali&#39;</span><span class="p">,</span> <span class="s1">&#39;Tonkinese&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Turkish Angora&#39;</span><span class="p">,</span> <span class="s1">&#39;Turkish Van&#39;</span><span class="p">]</span>
+
+<span class="n">cfa_breeds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cfa_breeds</span><span class="p">]</span>
+<span class="n">cfa_breeds</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfa_breeds</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Some of the records contain two breeds, which we need to split to correctly categorize the cats as a domestic or pedigree breed. This is done using the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.str.split.html"><code>.str.split()</code></a> method with <code>expand = True</code> in combination with the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.concat.html"><code>pd.concat()</code></a> function to join the resulting <code>DataFrame</code> and our original dataset.</p>
+<p>The cat record is then categorized based on the resulting two breed columns. We categorize the cat as a CFA recognized breed if one of the breed columns contains a breed in the list above (we assume that records with a Domestic/CFA Breed or vice-versa is a CFA breed).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">cats_df</span><span class="p">,</span> 
+                     <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;breed1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;breed2&#39;</span><span class="p">})],</span> 
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;cfa_breed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">cfa_breeds</span><span class="p">))</span> <span class="o">|</span> 
+                                <span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">cfa_breeds</span><span class="p">)),</span> 
+                                <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;domestic_breed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">cfa_breeds</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span> <span class="o">|</span> 
+                                     <span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;breed2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">cfa_breeds</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">),</span> 
+                                     <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The last given feature that may be of interest in our analysis is the color of the cat. As before, we can find the counts of each color using the <code>value_counts()</code> function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[22]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Brown Tabby                  4445
+Black                        3847
+Black/White                  2804
+Brown Tabby/White            2338
+Orange Tabby                 2180
+Tortie                       1335
+Calico                       1318
+Blue Tabby                   1130
+Orange Tabby/White           1095
+Blue                         1058
+Torbie                        845
+Blue/White                    792
+Blue Tabby/White              545
+White/Black                   508
+Cream Tabby                   498
+Lynx Point                    438
+White                         334
+Seal Point                    321
+White/Brown Tabby             287
+Cream Tabby/White             236
+Flame Point                   200
+White/Blue                    196
+Black Tabby                   177
+Torbie/White                  175
+Gray Tabby                    132
+Black Smoke                   105
+White/Orange Tabby            101
+Lilac Point                    77
+Tortie Point                   75
+Gray                           74
+                             ... 
+Torbie/Calico                   1
+Blue/Calico                     1
+Brown/Buff                      1
+Tortie/Black Smoke              1
+Lilac Point/Cream               1
+Agouti/Brown Tabby              1
+Blue/Blue                       1
+Blue/Brown                      1
+Agouti/White                    1
+Brown Brindle                   1
+Orange Tiger                    1
+Fawn                            1
+Lynx Point/Blue                 1
+Tricolor/Calico                 1
+Blue Smoke/Gray                 1
+Yellow                          1
+Brown Tabby/Black Brindle       1
+Brown Tiger/White               1
+Calico/Orange                   1
+Blue Point/Cream                1
+Brown Merle/Brown Tabby         1
+Lynx Point/Tan                  1
+Brown Tabby/Gray Tabby          1
+Blue/Cream                      1
+Orange Tabby/Black              1
+Tortie/Tortie                   1
+White/Calico Point              1
+Brown Merle                     1
+Tortie Point/Blue               1
+White/Lilac Point               1
+Name: color, Length: 231, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We see there is quite a variety of different colors and similar to the listed breeds, there are at times two given colors. If we want to use this information in our visualizations and model, we need to clean up the data with some more feature engineering!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since we are dealing with not just coat colors but coat patterns, such as calico, tabby, colorpoint, and others, it would make sense to break up the data into more useful information based on the given color and if a coat pattern is given. Luckily, there aren't too many coat patterns to deal with, and we can list them as with the breeds. An excellent resource to see what each coat pattern looks like can be found at the <a href="http://sheltermedicine.vetmed.ufl.edu/files/2011/11/identification-and-coat-colors-patterns.pdf">University of Florida's Shelter Medicine</a> website.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">coat_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tabby&#39;</span><span class="p">,</span> <span class="s1">&#39;tortie&#39;</span><span class="p">,</span> <span class="s1">&#39;tortoiseshell&#39;</span><span class="p">,</span> <span class="s1">&#39;calico&#39;</span><span class="p">,</span> <span class="s1">&#39;smoke&#39;</span><span class="p">,</span> <span class="s1">&#39;torbie&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;colorpoint&#39;</span><span class="p">,</span> <span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;brindle&#39;</span><span class="p">,</span> <span class="s1">&#39;agouti&#39;</span><span class="p">,</span> <span class="s1">&#39;bicolor&#39;</span><span class="p">,</span> <span class="s1">&#39;tricolor&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We want to extract the given coat pattern and color information, one way of which is using a regex string in conjunction with pandas' <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.str.extract.html"><code>str.extract</code></a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create the regex string by joining the coat patterns with | and encapsulating them in parantheses</span>
+<span class="n">coat_reg</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">coat_patterns</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>color</code> column is converted to lower case, and if a coat pattern is given that matches one of the values in our list, it is extracted into a new column, <code>coat pattern</code>. We also remove the coat pattern from the <code>color</code> column, so we don't create duplicate values.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;coat_pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">coat_reg</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">coat_reg</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The transformed color column is then split into a two column DataFrame using the <code>.str.split()</code> method with the parameter <code>expand</code> set to <code>True</code>. This operation will create some empty values in the first color column, <code>color1</code>, as we removed some information from the original column earlier. These blank values would then be present only when a breed specific color, such as tabby, torbie or tortoiseshell, was given; therefore, we search for any rows in the <code>color1</code> column that are blank and change them to 'Breed Specific'. The extracted coat colors and patterns are then combined into a new column, <code>coat</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">cats_df</span><span class="p">,</span> 
+                     <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;color1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;color2&#39;</span><span class="p">})],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color1&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;Breed Specific&#39;</span><span class="p">,</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color1&#39;</span><span class="p">])</span>
+
+<span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;coat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color1&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Breed Specific&#39;</span><span class="p">,</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;coat_pattern&#39;</span><span class="p">],</span> <span class="n">cats_df</span><span class="p">[</span><span class="s1">&#39;color1&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That wraps up the feature engineering portion of our data analysis task! Although add more features to the data can be somewhat tedious, it can result in a much-improved model for prediction of outcomes. The process of feature engineering also allows the individual analyst or data scientist working with the data to apply their domain knowledge to the data to enrich its information.</p>
+<p>As a final step, we save the new data with the added features into a <code>csv</code> that we will use in the following steps of analyzing the shelter outcome data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cats_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../../data/cats_df_clean.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The next step in the analysis is to visualize the data and hopefully generate any hypotheses and features that appear to have a significant impact on the outcome of the cat.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">References<a class="anchor-link" href="#References">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="http://sheltermedicine.vetmed.ufl.edu/files/2011/11/identification-and-coat-colors-patterns.pdf">http://sheltermedicine.vetmed.ufl.edu/files/2011/11/identification-and-coat-colors-patterns.pdf</a></p>
+<p><a href="http://cfa.org/Breeds.aspx">http://cfa.org/Breeds.aspx</a></p>
+
+</div>
+</div>
+</div>
+ 
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/exploratory-data-analysis-shelter-cat-outcomes-pandas-seaborn.html">Exploratory Data Analysis of Shelter Cat Outcomes with Pandas and Seaborn</a></li>
+                        <li><a href="https://aaronschlegel.me/intake-outcome-austin-animal-center-analysis.html">From Intake to Outcome: Analyzing the Austin Animal Center's Intake and Outcomes Datasets</a></li>
+                        <li><a href="https://aaronschlegel.me/austin-animal-center-intakes-exploratory-data-analysis-python-pandas-seaborn.html">Austin Animal Center Intakes Exploratory Data Analysis with Python, Pandas and Seaborn</a></li>
+                        <li><a href="https://aaronschlegel.me/extract-analyze-seattle-pet-licenses-dataset.html">Extract and Analyze the Seattle Pet Licenses Dataset</a></li>
+                        <li><a href="https://aaronschlegel.me/predict-shelter-cat-outcomes-scikit-learn-machine-learning.html">Predicting Shelter Cat Adoptions and Transfers with Scikit-learn and Machine Learning</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

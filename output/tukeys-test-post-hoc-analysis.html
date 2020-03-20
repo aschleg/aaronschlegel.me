@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Tukey's Test for Post-Hoc Analysis</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="After a multivariate test, it is often desired to know more about the specific groups to find out if they are significantly different or similar. This step after analysis is referred to as 'post-hoc analysis' and is a major step in hypothesis testing. One common and popular method of post-hoc analysis is Tukey's Test. The test is known by several different names. Tukey's test compares the means of all treatments to the mean of every other treatment and is considered the best available method in cases when confidence intervals are desired or if sample sizes are unequal." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Tukey's Test for Post-Hoc Analysis" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-09-07 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="After a multivariate test, it is often desired to know more about the specific groups to find out if they are significantly different or similar. This step after analysis is referred to as 'post-hoc analysis' and is a major step in hypothesis testing. One common and popular method of post-hoc analysis is Tukey's Test. The test is known by several different names. Tukey's test compares the means of all treatments to the mean of every other treatment and is considered the best available method in cases when confidence intervals are desired or if sample sizes are unequal." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html" rel="bookmark"
+                   title="Permalink to Tukey's Test for Post-Hoc Analysis">Tukey's Test for Post-Hoc Analysis</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-09-07T00:00:00-07:00">
+                Fri 07 September 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>In a <a href="https://rpubs.com/aaronsc32/anova-compare-more-than-two-groups">previous example</a>, ANOVA (Analysis of Variance) was performed to test a hypothesis concerning more than two groups. Although ANOVA is a powerful and useful parametric approach to analyzing approximately normally distributed data with more than two groups (referred to as 'treatments'), it does not provide any deeper insights into patterns or comparisons between specific groups.</p>
+<p>After a multivariate test, it is often desired to know more about the specific groups to find out if they are significantly different or similar. This step after analysis is referred to as 'post-hoc analysis' and is a major step in hypothesis testing.</p>
+<p>One common and popular method of post-hoc analysis is Tukey's Test. The test is known by several different names. Tukey's test compares the means of all treatments to the mean of every other treatment and is considered the best available method in cases when confidence intervals are desired or if sample sizes are unequal (<a href="https://en.wikipedia.org/wiki/Tukey%27s_range_test#Advantages_and_disadvantages">Wikipedia</a>).</p>
+<p>The test statistic used in Tukey's test is denoted <span class="math">\(q\)</span> and is essentially a modified t-statistic that corrects for multiple comparisons. <span class="math">\(q\)</span> can be found similarly to the t-statistic:</p>
+<div class="math">$$ q_{\alpha, k, N - k} $$</div>
+<p>The studentized range distribution of <span class="math">\(q\)</span> is defined as:</p>
+<div class="math">$$ q_s = \frac{Y_{max} - Y_{min}}{SE} $$</div>
+<p>Where <span class="math">\(Y_{max}\)</span> and <span class="math">\(Y_{min}\)</span> are the larger and smaller means of the two groups being compared. <span class="math">\(SE\)</span> is defined as the standard error of the entire design.</p>
+<p>In this example, Tukey's Test will be performed on the <code>PlantGrowth</code> dataset that was analyzed previously with ANOVA. The outputs from two different (but similar) implementations of Tukey's Test will be examined along with how to manually calculate the test. Other methods of post-hoc analysis will be explored in future posts.</p>
+<h2>Getting Started</h2>
+<p>Begin by loading the packages that will be needed and the <code>PlantGrowth</code> dataset.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">agricolae</span><span class="p">)</span>
+<span class="nf">data</span><span class="p">(</span><span class="s">&quot;PlantGrowth&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Tukey's Test</h2>
+<p>Since Tukey's test is a post-hoc test, we must first fit a linear regression model and perform ANOVA on the data. ANOVA in this example is done using the <code>aov()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">plant.lm</span> <span class="o">&lt;-</span> <span class="nf">lm</span><span class="p">(</span><span class="n">weight</span> <span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">PlantGrowth</span><span class="p">)</span>
+<span class="n">plant.av</span> <span class="o">&lt;-</span> <span class="nf">aov</span><span class="p">(</span><span class="n">plant.lm</span><span class="p">)</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">plant.av</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##             Df Sum Sq Mean Sq F value Pr(&gt;F)  </span>
+<span class="err">## group        2  3.766  1.8832   4.846 0.0159 *</span>
+<span class="err">## Residuals   27 10.492  0.3886                 </span>
+<span class="err">## ---</span>
+<span class="err">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+</pre></div>
+
+
+<p>The summary of the <code>aov()</code> output is the same as the output of the <code>anova()</code> function that was used in the previous example. As before, ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the groups. To investigate more into the differences between all groups, Tukey's Test is performed.</p>
+<p>The <code>TukeyHSD()</code> function is available in base R and takes a fitted <code>aov</code> object.</p>
+<div class="highlight"><pre><span></span><span class="n">tukey.test</span> <span class="o">&lt;-</span> <span class="nf">TukeyHSD</span><span class="p">(</span><span class="n">plant.av</span><span class="p">)</span>
+<span class="n">tukey.test</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##   Tukey multiple comparisons of means</span>
+<span class="err">##     95% family-wise confidence level</span>
+<span class="err">## </span>
+<span class="err">## Fit: aov(formula = plant.lm)</span>
+<span class="err">## </span>
+<span class="err">## $group</span>
+<span class="err">##             diff        lwr       upr     p adj</span>
+<span class="err">## trt1-ctrl -0.371 -1.0622161 0.3202161 0.3908711</span>
+<span class="err">## trt2-ctrl  0.494 -0.1972161 1.1852161 0.1979960</span>
+<span class="err">## trt2-trt1  0.865  0.1737839 1.5562161 0.0120064</span>
+</pre></div>
+
+
+<p>The output gives the difference in means, confidence levels and the adjusted p-values for all possible pairs. The confidence levels and p-values show the only significant between-group difference is for treatments 1 and 2. Note the other two pairs contain 0 in the confidence intervals and thus, have no significant difference. The results can also be plotted.</p>
+<div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="n">tukey.test</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="tukey_test_files/figure-markdown_github/tukey_plot-1.png"></p>
+<p>Another way of performing Tukey's Test is provided by the <a href="https://cran.r-project.org/web/packages/agricolae/index.html">agricolae</a> package. The <code>HSD.test()</code> function in the <code>agricolae</code> package performs Tukey's Test and outputs several additional statistics.</p>
+<div class="highlight"><pre><span></span><span class="n">tukey.test2</span> <span class="o">&lt;-</span> <span class="nf">HSD.test</span><span class="p">(</span><span class="n">plant.av</span><span class="p">,</span> <span class="n">trt</span> <span class="o">=</span> <span class="s">&#39;group&#39;</span><span class="p">)</span>
+<span class="n">tukey.test2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## $statistics</span>
+<span class="err">##     MSerror Df  Mean       CV       MSD</span>
+<span class="err">##   0.3885959 27 5.073 12.28809 0.6912161</span>
+<span class="err">## </span>
+<span class="err">## $parameters</span>
+<span class="err">##    test name.t ntr StudentizedRange alpha</span>
+<span class="err">##   Tukey  group   3         3.506426  0.05</span>
+<span class="err">## </span>
+<span class="err">## $means</span>
+<span class="err">##      weight       std  r  Min  Max    Q25   Q50    Q75</span>
+<span class="err">## ctrl  5.032 0.5830914 10 4.17 6.11 4.5500 5.155 5.2925</span>
+<span class="err">## trt1  4.661 0.7936757 10 3.59 6.03 4.2075 4.550 4.8700</span>
+<span class="err">## trt2  5.526 0.4425733 10 4.92 6.31 5.2675 5.435 5.7350</span>
+<span class="err">## </span>
+<span class="err">## $comparison</span>
+<span class="err">## NULL</span>
+<span class="err">## </span>
+<span class="err">## $groups</span>
+<span class="err">##      weight groups</span>
+<span class="err">## trt2  5.526      a</span>
+<span class="err">## ctrl  5.032     ab</span>
+<span class="err">## trt1  4.661      b</span>
+<span class="err">## </span>
+<span class="err">## attr(,&quot;class&quot;)</span>
+<span class="err">## [1] &quot;group&quot;</span>
+</pre></div>
+
+
+<p>The <code>HSD.test()</code> implementation provides the Honestly Significant Difference, another statistic that can be used to determine if a comparison is significant, the calculated <span class="math">\(q\)</span> value, and the mean square error, which was found in the previous example on ANOVA. The test shows in the <code>$groups</code> output the control is similar to both treatments but treatment 1 and two are significantly different from each other, just as the previous test showed.</p>
+<h2>Manually Calculating Tukey's Test</h2>
+<p>The results from both tests can be verified manually. We'll start with the latter test (<code>HSD.test</code>) with the MSE and also define some common variables to make it all easier to keep straight. The MSE calculation is the same as the previous example.</p>
+<div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">)</span> <span class="c1"># total sample size</span>
+<span class="n">k</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">group</span><span class="p">))</span> <span class="c1"># number of treatments</span>
+<span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span> <span class="c1"># number of samples per group (since sizes are equal)</span>
+
+<span class="c1"># Mean Square</span>
+<span class="n">plants</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="p">,</span> <span class="n">PlantGrowth</span><span class="o">$</span><span class="n">group</span><span class="p">)</span>
+
+<span class="n">sse</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">Reduce</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">plants</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">x[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">sd</span><span class="p">(</span><span class="n">x[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span><span class="n">^2</span>
+<span class="p">})))</span>
+
+<span class="n">mse</span> <span class="o">&lt;-</span> <span class="n">sse</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+<span class="n">mse</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.3885959</span>
+</pre></div>
+
+
+<p>Next, find the q-value. Computing the q-value is done with the <code>qtukey()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="c1"># q-value</span>
+<span class="n">q.value</span> <span class="o">&lt;-</span> <span class="nf">qtukey</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">nmeans</span> <span class="o">=</span> <span class="n">k</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+<span class="n">q.value</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 3.506426</span>
+</pre></div>
+
+
+<p>With the q-value found, the Honestly Significant Difference can be determined. The Honestly Significant Difference is defined as the q-value multiplied by the square root of the MSE divided by the sample size.</p>
+<div class="math">$$ HSD = q_{\alpha,k,N-k} \sqrt{\frac{MSE}{n}} $$</div>
+<div class="highlight"><pre><span></span><span class="c1"># Tukey Honestly Signficant Difference</span>
+<span class="n">tukey.hsd</span> <span class="o">&lt;-</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">tukey.hsd</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 0.6912161</span>
+</pre></div>
+
+
+<p>As mentioned earlier, the Honestly Significant Difference is a statistic that can be used to determine significant differences between groups. If the absolute value of the difference of the two groups' means is greater than or equal to the HSD, the difference is significant.</p>
+<div class="math">$$|Y_1 − Y_2| \geq HSD $$</div>
+<p>The means of each group can be found using the <code>tapply()</code> function. Since there's only three groups, I went ahead and just calculated the differences manually. With the differences obtained, compare the absolute value of the difference to the HSD. I used a quick and dirty <code>for()</code> loop to do this.</p>
+<div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">&lt;-</span> <span class="nf">tapply</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">,</span> <span class="n">PlantGrowth</span><span class="o">$</span><span class="n">group</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+<span class="n">trt1.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means[2]</span> <span class="o">-</span> <span class="n">means[1]</span>
+<span class="n">trt2.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means[3]</span> <span class="o">-</span> <span class="n">means[1]</span>
+<span class="n">trt2.trt1.diff</span> <span class="o">&lt;-</span> <span class="n">means[3]</span> <span class="o">-</span> <span class="n">means[2]</span>
+
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">list</span><span class="p">(</span><span class="n">trt1.ctrl.diff</span><span class="p">,</span> <span class="n">trt2.ctrl.diff</span><span class="p">,</span> <span class="n">trt2.trt1.diff</span><span class="p">))</span> <span class="p">{</span>
+  <span class="nf">print</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tukey.hsd</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##  trt1 </span>
+<span class="err">## FALSE </span>
+<span class="err">##  trt2 </span>
+<span class="err">## FALSE </span>
+<span class="err">## trt2 </span>
+<span class="err">## TRUE</span>
+</pre></div>
+
+
+<p>The output of the for loop shows the only significant difference higher than the HSD is between treatment 1 and 2.</p>
+<h2>Calculating Tukey's Test Confidence Intervals</h2>
+<p>Intervals for Tukey's Test can also be estimated, as seen in the output of the <code>TukeyHSD()</code> function. Since the test uses the studentized range, estimation is similar to the t-test setting. Intervals with <span class="math">\(1 − \alpha\)</span> confidence can be found using the Tukey-Kramer method. The Tukey-Kramer method allows for unequal sample sizes between the treatments and is, therefore, more often applicable (though it doesn't matter in this case since the sample sizes are equal). The Tukey-Kramer method is defined as:</p>
+<div class="math">$$ y_i - y_j \pm q_{\alpha,k,N-k} \sqrt{\left(\frac{MSE}{2}\right) \left(\frac{1}{n_i} + \frac{1}{n_j}\right)} $$</div>
+<p>Entering the values that were found earlier into the equation yields the same intervals as was found from the <code>TukeyHSD()</code> output.</p>
+<div class="highlight"><pre><span></span><span class="n">trt1.ctrl.diff.upper</span> <span class="o">&lt;-</span> <span class="n">trt1.ctrl.diff</span> <span class="o">+</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">trt1.ctrl.diff.lower</span> <span class="o">&lt;-</span> <span class="n">trt1.ctrl.diff</span> <span class="o">-</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] ( -1.0622161 0.3202161 )</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">trt2.ctrl.diff.upper</span> <span class="o">&lt;-</span> <span class="n">trt2.ctrl.diff</span> <span class="o">+</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">trt2.ctrl.diff.lower</span> <span class="o">&lt;-</span> <span class="n">trt2.ctrl.diff</span> <span class="o">-</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] ( -0.1972161 1.1852161 )</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">trt2.trt1.diff.upper</span> <span class="o">&lt;-</span> <span class="n">trt2.trt1.diff</span> <span class="o">+</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">trt2.trt1.diff.lower</span> <span class="o">&lt;-</span> <span class="n">trt2.trt1.diff</span> <span class="o">-</span> <span class="n">q.value</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">mse</span> <span class="o">/</span> <span class="m">2</span> <span class="o">*</span> <span class="p">(</span><span class="m">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] ( 0.1737839 1.5562161 )</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">tukey.test</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##   Tukey multiple comparisons of means</span>
+<span class="err">##     95% family-wise confidence level</span>
+<span class="err">## </span>
+<span class="err">## Fit: aov(formula = plant.lm)</span>
+<span class="err">## </span>
+<span class="err">## $group</span>
+<span class="err">##             diff        lwr       upr     p adj</span>
+<span class="err">## trt1-ctrl -0.371 -1.0622161 0.3202161 0.3908711</span>
+<span class="err">## trt2-ctrl  0.494 -0.1972161 1.1852161 0.1979960</span>
+<span class="err">## trt2-trt1  0.865  0.1737839 1.5562161 0.0120064</span>
+</pre></div>
+
+
+<p>The table from the <code>TukeyHSD()</code> output is reconstructed below. Adjusted p-values are left out intentionally.</p>
+<table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>diff</th>
+<th>lwr</th>
+<th>upr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>trt1-ctrl</td>
+<td>-0.371</td>
+<td>-1.0622161</td>
+<td>0.3202161</td>
+</tr>
+<tr>
+<td>trt2-ctrl</td>
+<td>0.494</td>
+<td>-0.1972161</td>
+<td>1.1852161</td>
+</tr>
+<tr>
+<td>trt2-trt1</td>
+<td>0.865</td>
+<td>0.1737839</td>
+<td>1.5562161</td>
+</tr>
+</tbody>
+</table>
+<h2>Conclusion</h2>
+<p>In this example, hypothesis testing was taken a step further into the realm of post-hoc analysis. Post-hoc analysis often provides much greater insight into the differences or similarities between specific groups and is, therefore, an important step in data analysis. Tukey's Test is just one of many methods available in post-hoc analysis and as mentioned, is considered to be the best method in a wide variety of cases.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html">Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-analysis-of-variance-anova.html">Calculating and Performing One-way Analysis of Variance (ANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html">Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</a></li>
+                        <li><a href="https://aaronschlegel.me/predicting-cat-genders-logistic-regression.html">Predicting Cat Genders with Logistic Regression</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

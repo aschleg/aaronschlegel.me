@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Linear Congruential Generator for Pseudo-random Number Generation with R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Linear congruential generators (LCGs) are a class of pseudorandom number generator (PRNG) algorithms used for generating sequences of random-like numbers. The generation of random numbers plays a large role in many applications ranging from cryptography to Monte Carlo methods. Linear congruential generators are one of the oldest and most well-known methods for generating random numbers primarily due to their comparative ease of implementation and speed and their need for little memory." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Linear Congruential Generator for Pseudo-random Number Generation with R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-01-05 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Linear congruential generators (LCGs) are a class of pseudorandom number generator (PRNG) algorithms used for generating sequences of random-like numbers. The generation of random numbers plays a large role in many applications ranging from cryptography to Monte Carlo methods. Linear congruential generators are one of the oldest and most well-known methods for generating random numbers primarily due to their comparative ease of implementation and speed and their need for little memory." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/linear-congruential-generator-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/linear-congruential-generator-r.html" rel="bookmark"
+                   title="Permalink to Linear Congruential Generator for Pseudo-random Number Generation with R">Linear Congruential Generator for Pseudo-random Number Generation with R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-01-05T00:00:00-08:00">
+                Fri 05 January 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>Linear congruential generators (LCGs) are a class of pseudorandom number
+generator (PRNG) algorithms used for generating sequences of random-like
+numbers. The generation of random numbers plays a large role in many
+applications ranging from cryptography to Monte Carlo methods. Linear
+congruential generators are one of the oldest and most well-known
+methods for generating random numbers primarily due to their comparative
+ease of implementation and speed and their need for little memory. Other
+methods such as the Mersenne Twister are much more common in practical
+use today.</p>
+<p>Linear congruential generators are defined by a recurrence relation:</p>
+<div class="math">$$ \large{X_{i+1} = (aX_i + c) \space \text{mod} \space m} $$</div>
+<p>There are many choices for the parameters <span class="math">\(m\)</span>, the modulus, <span class="math">\(a\)</span>, the
+multiplier, and <span class="math">\(c\)</span> the increment. Wikipedia has a seemingly
+<a href="https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use">comprehensive list of the
+parameters</a>
+currently in use in common programs.</p>
+<h2>Aside: 'Pseudorandom' and Selecting a Seed Number</h2>
+<p>Random number generators such as LCGs are known as 'pseudorandom' as
+they require a seed number to generate the random sequence. Due to this
+requirement, random number generators today are not truly 'random.' The
+theory and optimal selection of a seed number are beyond the scope of
+this post; however, a common choice suitable for our application is to
+take the current system time in microseconds.</p>
+<h2>A Linear Congruential Generator Implementation in R</h2>
+<p>The parameters we will use for our implementation of the linear
+congruential generator are the same as the ANSI C implementation
+(Saucier, 2000.).</p>
+<div class="math">$$ \large{m = 2^{32} \qquad a = 1103515245 \qquad c = 12345} $$</div>
+<p>The following function is an implementation of a linear congruential
+generator with the given parameters above.</p>
+<div class="highlight"><pre><span></span><span class="n">lcg</span><span class="p">.</span><span class="nf">rand</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">rng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">m</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">32</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">1103515245</span><span class="w"></span>
+<span class="w">  </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">12345</span><span class="w"></span>
+
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="k">Set</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="k">using</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">current</span><span class="w"> </span><span class="k">system</span><span class="w"> </span><span class="nc">time</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">microseconds</span><span class="w"></span>
+<span class="w">  </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">as</span><span class="p">.</span><span class="nc">numeric</span><span class="p">(</span><span class="n">Sys</span><span class="p">.</span><span class="nc">time</span><span class="p">())</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">%%</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">    </span><span class="n">rng</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</pre></div>
+
+
+<p>We can use the function to generate random numbers <span class="math">\(U(0, 1)\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">Print</span> <span class="mi">10</span> <span class="n">random</span> <span class="n">numbers</span> <span class="k">on</span> <span class="n">the</span> <span class="n">half</span><span class="o">-</span><span class="k">open</span> <span class="nb">interval</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">lcg</span><span class="p">.</span><span class="n">rand</span><span class="p">()</span>
+
+<span class="o">##</span>  <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="mi">0</span><span class="p">.</span><span class="mi">37640381</span> <span class="mi">0</span><span class="p">.</span><span class="mi">05926800</span> <span class="mi">0</span><span class="p">.</span><span class="mi">04859354</span> <span class="mi">0</span><span class="p">.</span><span class="mi">80578491</span> <span class="mi">0</span><span class="p">.</span><span class="mi">38819063</span> <span class="mi">0</span><span class="p">.</span><span class="mi">96884811</span>
+<span class="o">##</span>  <span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="mi">0</span><span class="p">.</span><span class="mi">64161718</span> <span class="mi">0</span><span class="p">.</span><span class="mi">38872898</span> <span class="mi">0</span><span class="p">.</span><span class="mi">46478403</span> <span class="mi">0</span><span class="p">.</span><span class="mi">48452079</span>
+</pre></div>
+
+
+<p>We can also demonstrate how apparently 'random' the LCG is by plotting a
+sample generation in 3 dimensions. To do this, we generate three random
+vectors <span class="math">\(x\)</span>, <span class="math">\(y\)</span>, <span class="math">\(z\)</span> using our LCG above and plot. The <a href="https://cran.r-project.org/web/packages/plot3D/index.html">plot3d
+package</a> is
+used to create the scatterplot, and the <a href="https://cran.r-project.org/web/packages/animation/">animation
+package</a> is used to
+animate each scatterplot as the length of the random vectors, <span class="math">\(n\)</span>,
+increases.</p>
+<div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plot3D</span><span class="p">)</span><span class="w"></span>
+<span class="n">library</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">c</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span><span class="w"> </span><span class="mi">20000</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">saveGIF</span><span class="p">(</span><span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">length</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="nf">rand</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="nf">rand</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">z</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="nf">rand</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">scatter3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">colvar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">pch</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">cex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">theta</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="s1">&#39;n = &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="err">}</span><span class="p">,</span><span class="w"> </span><span class="n">movie</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lcg.gif&#39;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+
+
+<p>As <span class="math">\(n\)</span> increases, the LCG appears to be 'random' enough as demonstrated
+by the cloud of points.</p>
+<p><img alt="" src="figure/lcg/lcg.gif"></p>
+<h2>Linear Congruential Generators with Poor Parameters</h2>
+<p>The values chosen for the parameters <span class="math">\(m\)</span>, <span class="math">\(a\)</span> and <span class="math">\(c\)</span> are very important
+in driving how 'random' the generated values from the linear
+congruential estimator; hence that is why there are so many different
+parameters in use today as there has not yet been a clear consensus on
+the 'best' parameters to use.</p>
+<p>We can demonstrate how choosing poor parameters for our LCG leads to not
+so random generated values by creating a new LCG function.</p>
+<div class="highlight"><pre><span></span><span class="n">lcg</span><span class="p">.</span><span class="n">poor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">rng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="k">Parameters</span><span class="w"> </span><span class="n">taken</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="nl">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="p">.</span><span class="n">mimuw</span><span class="p">.</span><span class="n">edu</span><span class="p">.</span><span class="n">pl</span><span class="o">/~</span><span class="n">apalczew</span><span class="o">/</span><span class="n">CFP_lecture3</span><span class="p">.</span><span class="n">pdf</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">2048</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">1229</span><span class="w"></span>
+<span class="w">  </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">as</span><span class="p">.</span><span class="nc">numeric</span><span class="p">(</span><span class="n">Sys</span><span class="p">.</span><span class="nc">time</span><span class="p">())</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">%%</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">    </span><span class="n">rng</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</pre></div>
+
+
+<p>Generating successively longer vectors using the 'poor' LCG and plotting
+as we did previously, we see the generated points are very sequentially
+correlated, and there doesn't appear to be any 'randomness' at all as
+<span class="math">\(n\)</span> increases.</p>
+<div class="highlight"><pre><span></span><span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">c</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span><span class="w"> </span><span class="mi">20000</span><span class="p">)</span><span class="w"></span>
+<span class="n">saveGIF</span><span class="p">(</span><span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">length</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="n">poor</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="n">poor</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">z</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lcg</span><span class="p">.</span><span class="n">poor</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">scatter3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">colvar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">pch</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">cex</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">theta</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="s1">&#39;n = &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="err">}</span><span class="p">,</span><span class="w"> </span><span class="n">movie</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lcg_poor.gif&#39;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+
+
+<p><img alt="" src="figure/lcg/lcg_poor.gif"></p>
+<h2>References</h2>
+<p>Saucier, R. (2000). Computer Generation of Statistical Distributions
+(1st ed.). Aberdeen, MD. Army Research Lab.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/combined-linear-congruential-generator-prng-r.html">Combined Linear Congruential Generator for Pseudo-random Number Generation</a></li>
+                        <li><a href="https://aaronschlegel.me/multiplicative-congruential-generator-rng-r.html">Multiplicative Congruential Random Number Generators with R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

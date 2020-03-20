@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Singular Value Decomposition and R Example</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="SVD underpins many statistical and real-world" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Singular Value Decomposition and R Example" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2016-11-03 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="SVD underpins many statistical and real-world" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/singular-value-decomposition-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/singular-value-decomposition-r.html" rel="bookmark"
+                   title="Permalink to Singular Value Decomposition and R Example">Singular Value Decomposition and R Example</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2016-11-03T00:00:00-07:00">
+                Thu 03 November 2016
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \$1 million recommendation system improvement contest.</p>
+<p>Following from a previous post on the <a href="http://www.aaronschlegel.com/cholesky-decomposition-r-example.html">Cholesky
+decomposition</a> of
+a matrix, I wanted to explore another often used decomposition method
+known as <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">Singular Value
+Decomposition</a>,
+also called SVD. SVD underpins many statistical and real-world
+applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \<span class="math">\(1 million recommendation system improvement contest. The
+method of SVD works by reducing a matrix $A\)</span> of rank <span class="math">\(R\)</span> to a matrix of
+rank <span class="math">\(k\)</span> and is applicable for both square and rectangular matrices.</p>
+<p>Singular value decomposition can be thought of as a method that
+transforms correlated variables into a set of uncorrelated variables,
+enabling one to better analyze the relationships of the original data
+(Baker, 2005). Similar to Cholesky decomposition, SVD factors a matrix
+<span class="math">\(A\)</span> into a product of three matrices:</p>
+<div class="math">$$ A = U\Sigma V^T $$</div>
+<p>Where the columns of matrices <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthonormal (orthogonal
+unit vectors) and <span class="math">\(\Sigma\)</span> is a diagonal matrix. The columns of <span class="math">\(U\)</span> and
+<span class="math">\(V\)</span> are the eigenvectors of <span class="math">\(AA^T\)</span> and <span class="math">\(A^T A\)</span>, respectively. The
+entries in the diagonal matrix <span class="math">\(\Sigma\)</span> are the singular values <span class="math">\(r\)</span>,
+which are the square roots of the non-zero eigenvalues of <span class="math">\(AA^T\)</span> and
+<span class="math">\(A^T A\)</span>.</p>
+<h2>Singular Value Decomposition in R</h2>
+<p>Base R provides the function <code>svd()</code> for performing SVD. The following
+matrix was taken from Problem 2.23 in the book Methods of Multivariate
+Analysis by Alvin Rencher.</p>
+<div class="math">$$A = 
+\begin{bmatrix}
+  4 &amp; -5 &amp; -1 \\
+  7 &amp; -2 &amp; 3 \\
+  -1 &amp; 4 &amp; -3 \\
+  8 &amp; 2 &amp; 6 \\
+\end{bmatrix}$$</div>
+<div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">7</span><span class="p">,</span><span class="m">-1</span><span class="p">,</span><span class="m">8</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="m">-5</span><span class="p">,</span><span class="m">-2</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">2</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">-3</span><span class="p">,</span><span class="m">6</span><span class="p">)))</span>
+<span class="n">A</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.</span>
+<span class="err">## [1,]              4              -5              -1</span>
+<span class="err">## [2,]              7              -2               3</span>
+<span class="err">## [3,]             -1               4              -3</span>
+<span class="err">## [4,]              8               2               6</span>
+</pre></div>
+
+
+<p>The singular value decomposition of the matrix is computed using the
+<code>svd()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">A.svd</span> <span class="o">&lt;-</span> <span class="nf">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">A.svd</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## $d</span>
+<span class="err">## [1] 13.161210  6.999892  3.432793</span>
+<span class="err">## </span>
+<span class="err">## $u</span>
+<span class="err">##            [,1]       [,2]        [,3]</span>
+<span class="err">## [1,] -0.2816569  0.7303849 -0.42412326</span>
+<span class="err">## [2,] -0.5912537  0.1463017 -0.18371213</span>
+<span class="err">## [3,]  0.2247823 -0.4040717 -0.88586638</span>
+<span class="err">## [4,] -0.7214994 -0.5309048  0.04012567</span>
+<span class="err">## </span>
+<span class="err">## $v</span>
+<span class="err">##            [,1]        [,2]       [,3]</span>
+<span class="err">## [1,] -0.8557101  0.01464091 -0.5172483</span>
+<span class="err">## [2,]  0.1555269 -0.94610374 -0.2840759</span>
+<span class="err">## [3,] -0.4935297 -0.32353262  0.8073135</span>
+</pre></div>
+
+
+<p>Thus the above matrix <span class="math">\(A\)</span> can be factorized as the following:</p>
+<div class="math">$$\begin{bmatrix}
+ 0.281657 &amp; -0.730385 &amp; -0.424123 &amp; 0.455332 \\
+ 0.591254 &amp; -0.146302 &amp; -0.183712 &amp; -0.771534 \\
+ -0.224782 &amp; 0.404072 &amp; -0.885866 &amp; -0.0379443 \\
+ 0.721499 &amp; 0.530905 &amp; 0.0401257 &amp; 0.442683 \\
+\end{bmatrix}\begin{bmatrix}
+ 13.1612 &amp; 0 &amp; 0 \\
+ 0 &amp; 6.99989 &amp; 0 \\
+ 0 &amp; 0 &amp; 3.43279 \\
+ 0 &amp; 0 &amp; 0 \\
+\end{bmatrix}\begin{bmatrix}
+ 0.85571 &amp; -0.0146409 &amp; -0.517248 \\
+ -0.155527 &amp; 0.946104 &amp; -0.284076 \\
+ 0.49353 &amp; 0.323533 &amp; 0.807314 \\
+\end{bmatrix}$$</div>
+<h2>Singular Value Decomposition Step-by-Step</h2>
+<p>SVD can be performed step-by-step with R by calculating <span class="math">\(A^TA\)</span> and
+<span class="math">\(AA^T\)</span> then finding the eigenvalues and eigenvectors of the matrices.
+However, it should be noted this is only for demonstration and not
+recommended in practice as the results can be slightly different than
+the output of the <code>svd()</code>. This is due to somewhat random changes in
+signs of the eigenvectors from the <code>eigen()</code> function as the
+eigenvectors can be scaled by <span class="math">\(-1\)</span>. <a href="http://stackoverflow.com/questions/17998228/sign-of-eigenvectors-change-depending-on-specification-of-the-symmetric-argument">This question on
+Stackoverflow</a>
+contains more information for those curious.</p>
+<p>First, find <span class="math">\(A^TA\)</span> and <span class="math">\(AA^T\)</span>.</p>
+<div class="math">$$A^TA = 
+\begin{bmatrix}
+  4 &amp; 7 &amp; -1 &amp; 8 \\
+  -5 &amp; -2 &amp; 4 &amp; 2 \\
+  -1 &amp; 3 &amp; -3 &amp; 6
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp; -5 &amp; -1 \\
+  7 &amp; -2 &amp; 3 \\
+  -1 &amp; 4 &amp; -3 \\
+  8 &amp; 2 &amp; 6 
+\end{bmatrix} = 
+\begin{bmatrix}
+  130 &amp; -22 &amp; 68 \\
+  -22 &amp; 49 &amp; -1 \\
+  68 &amp; -1 &amp; 55
+\end{bmatrix}$$</div>
+<div class="highlight"><pre><span></span><span class="n">ATA</span> <span class="o">&lt;-</span> <span class="nf">t</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">A</span>
+<span class="n">ATA</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                 c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.</span>
+<span class="err">## c.4..7...1..8.             130             -22              68</span>
+<span class="err">## c..5...2..4..2.            -22              49              -1</span>
+<span class="err">## c..1..3...3..6.             68              -1              55</span>
+</pre></div>
+
+
+<p>The <span class="math">\(V\)</span> component of the singular value decomposition is then found by
+calculating the eigenvectors of the resultant <span class="math">\(A^TA\)</span> matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">ATA.e</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="n">ATA</span><span class="p">)</span>
+<span class="n">v.mat</span> <span class="o">&lt;-</span> <span class="n">ATA.e</span><span class="o">$</span><span class="n">vectors</span>
+<span class="n">v.mat</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]        [,2]       [,3]</span>
+<span class="err">## [1,]  0.8557101 -0.01464091 -0.5172483</span>
+<span class="err">## [2,] -0.1555269  0.94610374 -0.2840759</span>
+<span class="err">## [3,]  0.4935297  0.32353262  0.8073135</span>
+</pre></div>
+
+
+<p>Here we see the <span class="math">\(V\)</span> matrix is the same as the output of the <code>svd()</code> but
+with some sign changes. These sign changes can happen, as mentioned
+earlier, as the eigenvector scaled by <span class="math">\(-1\)</span> is still the same
+eigenvector, just scaled. We will alter the signs of our calculated <span class="math">\(V\)</span>
+to match the output of the <code>svd()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">v.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">v.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">*</span> <span class="m">-1</span>
+<span class="n">v.mat</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]        [,2]       [,3]</span>
+<span class="err">## [1,] -0.8557101  0.01464091 -0.5172483</span>
+<span class="err">## [2,]  0.1555269 -0.94610374 -0.2840759</span>
+<span class="err">## [3,] -0.4935297 -0.32353262  0.8073135</span>
+</pre></div>
+
+
+<p>The same routine is done for the <span class="math">\(AA^T\)</span> matrix.</p>
+<div class="math">$$AA^T = 
+\begin{bmatrix}
+  4 &amp; -5 &amp; -1 \\
+  7 &amp; -2 &amp; 3 \\
+  -1 &amp; 4 &amp; -3 \\
+  8 &amp; 2 &amp; 6 
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp; 7 &amp; -1 &amp; 8 \\
+  -5 &amp; -2 &amp; 4 &amp; 2 \\
+  -1 &amp; 3 &amp; -3 &amp; 6
+\end{bmatrix} = 
+\begin{bmatrix}
+  42 &amp; 35 &amp; -21 &amp; 16 \\
+  35 &amp; 62 &amp; -24 &amp; 70 \\
+  -21 &amp; -24 &amp; 26 &amp; -18 \\
+  16 &amp; 70 &amp; -17 &amp; 104
+\end{bmatrix}$$</div>
+<div class="highlight"><pre><span></span><span class="n">AAT</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">AAT</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3] [,4]</span>
+<span class="err">## [1,]   42   35  -21   16</span>
+<span class="err">## [2,]   35   62  -24   70</span>
+<span class="err">## [3,]  -21  -24   26  -18</span>
+<span class="err">## [4,]   16   70  -18  104</span>
+</pre></div>
+
+
+<p>The eigenvectors are again found for the computed <span class="math">\(AA^T\)</span> matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">AAT.e</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="n">AAT</span><span class="p">)</span>
+<span class="n">u.mat</span> <span class="o">&lt;-</span> <span class="n">AAT.e</span><span class="o">$</span><span class="n">vectors</span>
+<span class="n">u.mat</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]       [,2]        [,3]       [,4]</span>
+<span class="err">## [1,] -0.2816569  0.7303849 -0.42412326 -0.4553316</span>
+<span class="err">## [2,] -0.5912537  0.1463017 -0.18371213  0.7715340</span>
+<span class="err">## [3,]  0.2247823 -0.4040717 -0.88586638  0.0379443</span>
+<span class="err">## [4,] -0.7214994 -0.5309048  0.04012567 -0.4426835</span>
+</pre></div>
+
+
+<p>There are four eigenvectors in the resulting matrix; however, we are
+only interested in the non-zero eigenvalues and their respective
+eigenvectors. Therefore, we can remove the last eigenvector from the
+matrix which gives us the <span class="math">\(U\)</span> matrix. Note the eigenvalues of <span class="math">\(AA^T\)</span> and
+<span class="math">\(A^TA\)</span> are the same except the <span class="math">\(0\)</span> eigenvalue in the <span class="math">\(AA^T\)</span> matrix.</p>
+<div class="highlight"><pre><span></span><span class="n">u.mat</span> <span class="o">&lt;-</span> <span class="n">u.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span>
+</pre></div>
+
+
+<p>As mentioned earlier, the singular values <span class="math">\(r\)</span> are the square roots of
+the non-zero eigenvalues of the <span class="math">\(AA^T\)</span> and <span class="math">\(A^TA\)</span> matrices.</p>
+<div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">ATA.e</span><span class="o">$</span><span class="n">values</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">&lt;-</span> <span class="n">r</span> <span class="o">*</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span>
+<span class="n">r</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          [,1]     [,2]     [,3]</span>
+<span class="err">## [1,] 13.16121 0.000000 0.000000</span>
+<span class="err">## [2,]  0.00000 6.999892 0.000000</span>
+<span class="err">## [3,]  0.00000 0.000000 3.432793</span>
+</pre></div>
+
+
+<p>Our answers align with the output of the <code>svd()</code> function. We can also
+show that the matrix <span class="math">\(A\)</span> is indeed equal to the components resulting
+from singular value decomposition.</p>
+<div class="highlight"><pre><span></span><span class="n">svd.matrix</span> <span class="o">&lt;-</span> <span class="n">u.mat</span> <span class="o">%*%</span> <span class="n">r</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">v.mat</span><span class="p">)</span>
+<span class="n">svd.matrix</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    4   -5   -1</span>
+<span class="err">## [2,]    7   -2    3</span>
+<span class="err">## [3,]   -1    4   -3</span>
+<span class="err">## [4,]    8    2    6</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">==</span> <span class="nf">round</span><span class="p">(</span><span class="n">svd.matrix</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.</span>
+<span class="err">## [1,]           TRUE            TRUE            TRUE</span>
+<span class="err">## [2,]           TRUE            TRUE            TRUE</span>
+<span class="err">## [3,]           TRUE            TRUE            TRUE</span>
+<span class="err">## [4,]           TRUE            TRUE            TRUE</span>
+</pre></div>
+
+
+<h2>Summary</h2>
+<p>This post explored the very useful and frequently appearing matrix
+decomposition method known as singular value decomposition. The method
+is worthwhile to review as SVD is an essential technique in many
+statistical methods such as principal component analysis and factor
+analysis. I plan on writing more posts that explore practical
+applications of SVD such as compressing an image to provide more
+real-world examples.</p>
+<h2>References</h2>
+<p>Austin, D. Feature column from the AMS. Retrieved from
+<a href="http://www.ams.org/samplings/feature-column/fcarc-svd">http://www.ams.org/samplings/feature-column/fcarc-svd</a></p>
+<p>Baker, K. (2005, March). Singular value decomposition Tutorial.
+Retrieved from
+<a href="https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf">https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf</a></p>
+<p><a href="https://amzn.to/2SsiA5g">Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.</a></p>
+<p>Singular value decomposition (SVD). Retrieved from
+<a href="https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf">https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf</a></p>
+<p>SVD computation example. Retrieved from
+<a href="http://www.d.umn.edu/~mhampton/m4326svd_example.pdf">http://www.d.umn.edu/~mhampton/m4326svd_example.pdf</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/principal-component-analysis-r-example.html">Principal Component Analysis with R Example</a></li>
+                        <li><a href="https://aaronschlegel.me/calculate-matrix-inverse-2x2-3x3.html">How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

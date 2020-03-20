@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="There are two procedures for forming simultaneous confidence intervals, the Working-Hotelling and Bonferroni procedures. Each estimates intervals of the mean response using a family confidence coefficient. The Working-Hotelling coefficient is defined by \(W\) and Bonferroni \(B\). In practice, it is recommended to perform both procedures to determine which results in a tighter interval. The Bonferroni method will be explored first. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-06-01 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="There are two procedures for forming simultaneous confidence intervals, the Working-Hotelling and Bonferroni procedures. Each estimates intervals of the mean response using a family confidence coefficient. The Working-Hotelling coefficient is defined by \(W\) and Bonferroni \(B\). In practice, it is recommended to perform both procedures to determine which results in a tighter interval. The Bonferroni method will be explored first. if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) { var align = "center", indent = "0em", linebreak = "false"; if (false) { align = (screen.width" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html" rel="bookmark"
+                   title="Permalink to Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals">Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-06-01T00:00:00-07:00">
+                Fri 01 June 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>In a previous post on multiple regression with two predictor variables, the relationship between the number of products and the distance traveled on total delivery time was examined in the <a href="https://vincentarelbundock.github.io/Rdatasets/doc/robustbase/delivery.html">delivery dataset</a>. Often there is a need to form confidence intervals for the parameters of a model to estimate the range in which the actual parameter supposedly lies (at a given level of confidence, which will hereby default to 95%). However, forming individual intervals for each parameter as discussed in an earlier post on simple regression confidence intervals does not lead to an overall 95 percent confidence that the estimates for each parameter are correct. For one regression parameter and the intercept, the confidence would actually be <span class="math">\(.95^2 = .9025\)</span>. Therefore, to estimate a family of coefficients, the need for simulatenous confidence intervals arises. The essential difference between a family confidence coefficient and a statement confidence coefficient is the former indicates that the <em>entire</em> family of confidence intervals are correct assuming repeated sampling.</p>
+<h2>Simulatenous Confidence Intervals of Mean Response</h2>
+<p>There are two procedures for forming simultaneous confidence intervals, the Working-Hotelling and Bonferroni procedures. Each estimates intervals of the mean response using a family confidence coefficient. The Working-Hotelling coefficient is defined by <span class="math">\(W\)</span> and Bonferroni <span class="math">\(B\)</span>. In practice, it is recommended to perform both procedures to determine which results in a tighter interval. The Bonferroni method will be explored first.</p>
+<h2>The Bonferroni Procedure for Simultaneous Estimation of Mean Responses</h2>
+<p>The Bonferroni method is more general and conservative than Working-Hotelling. Confidence intervals are formed by adjusting each confidence coefficient to be higher than 1 − <span class="math">\(\alpha\)</span> so the overall family confidence coefficient stays at the desired level. The confidence limits of the Bonferroni procedure are defined as:</p>
+<div class="math">$$ \hat{Y}_h \pm Bs{\hat{Y}_h} $$</div>
+<p>Where <span class="math">\(\hat{Y}_h\)</span> is equal to the matrix of the fitted response values and B is defined as:</p>
+<div class="math">$$ B = t_{1 − \frac{\alpha}{2g}, n − 2} $$</div>
+<h2>Working-Hotelling Procedure for Simultaneous Confidence Intervals</h2>
+<p>The Working-Hotelling procedure is reminiscent of the familiar confidence band around a regression line. The confidence band contains all of the regression line and thus all mean responses. Due to this property, boundary values can be formed at various levels of the predictor variable in question. The confidence interval equation for the Working-Hotelling procedure is similar to the Bonferroni procedure with the exception of the former being F-distributed with 2 and <em>n</em> − 2 degrees of freedom:</p>
+<div class="math">$$ \hat{Y}_h \pm Ws{\hat{Y}_h} $$</div>
+<p>Where:</p>
+<div class="math">$$ W^2 = 2F_{1 − \alpha, 2, n − 2} $$</div>
+<p>The standard error in both simulatenous confidence interval procedures is defined as:</p>
+<div class="math">$$ s^2 {\hat{Y}_h} = MSE(X'_h (X'X)^{-1}X_h) = X'_h s^2{b}X_h $$</div>
+<h2>Forming Simultaneous Confidence Intervals in R</h2>
+<p>With the definitions and equations out of the way, we can explore how to build the simulatenous confidence intervals in R. The <a href="https://cran.r-project.org/web/packages/investr/">investr</a> is the only package I've found that performs the Bonferroni and Working-Hotelling procedures. Of course, not being satisified with just using a package and calling it a day as I often am, we will build a custom function that creates intervals using both procedures to verify our understanding.</p>
+<p>Start by loading the necessary packages and the <code>delivery</code> dataset.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">robustbase</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">investr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">gridExtra</span><span class="p">)</span>
+<span class="nf">data</span><span class="p">(</span><span class="s">&quot;delivery&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Fit linear models with each predictor variable.</p>
+<div class="highlight"><pre><span></span><span class="n">dist.lm</span> <span class="o">&lt;-</span> <span class="nf">lm</span><span class="p">(</span><span class="n">delTime</span> <span class="o">~</span> <span class="n">distance</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">delivery</span><span class="p">)</span>
+<span class="n">prod.lm</span> <span class="o">&lt;-</span> <span class="nf">lm</span><span class="p">(</span><span class="n">delTime</span> <span class="o">~</span> <span class="n">n.prod</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">delivery</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Using the <code>plotFit</code> function from the <code>investr</code> package, plot the Bonferroni and Working-Hotelling confidence intervals. Setting the argument <code>adjust</code> to <code>Scheffe</code> instructs the function to build Working-Hotelling intervals.</p>
+<div class="highlight"><pre><span></span><span class="nf">par</span><span class="p">(</span><span class="n">mfrow</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">))</span>
+
+<span class="nf">plotFit</span><span class="p">(</span><span class="n">dist.lm</span><span class="p">,</span> <span class="n">interval</span> <span class="o">=</span> <span class="s">&#39;confidence&#39;</span><span class="p">,</span> <span class="n">adjust</span> <span class="o">=</span> <span class="s">&#39;Scheffe&#39;</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#39;Working-Hotelling DelTime ~ Distance&#39;</span><span class="p">)</span>
+<span class="nf">plotFit</span><span class="p">(</span><span class="n">prod.lm</span><span class="p">,</span> <span class="n">interval</span> <span class="o">=</span> <span class="s">&#39;confidence&#39;</span><span class="p">,</span> <span class="n">adjust</span> <span class="o">=</span> <span class="s">&#39;Scheffe&#39;</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#39;Working-Hotelling DelTime ~ Products&#39;</span><span class="p">)</span>
+
+<span class="nf">plotFit</span><span class="p">(</span><span class="n">dist.lm</span><span class="p">,</span> <span class="n">interval</span> <span class="o">=</span> <span class="s">&#39;confidence&#39;</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">adjust</span> <span class="o">=</span> <span class="s">&#39;Bonferroni&#39;</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#39;Bonferroni DelTime ~ Distance&#39;</span><span class="p">)</span>
+<span class="nf">plotFit</span><span class="p">(</span><span class="n">prod.lm</span><span class="p">,</span> <span class="n">interval</span> <span class="o">=</span> <span class="s">&#39;confidence&#39;</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">adjust</span> <span class="o">=</span> <span class="s">&#39;Bonferroni&#39;</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#39;Bonferroni DelTime ~ Products&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="working_hotelling_bonferroni_files/figure-markdown_github/unnamed-chunk-3-1.png"></p>
+<p>It appears the Bonferroni intervals are tighter than the Working-Hotelling intervals, though there is no reported test statistic to confirm this. To verify the results of the function and our understanding, we can write a function that implements both the Working-Hotelling and Bonferroni simultaneous confidence intervals.</p>
+<div class="highlight"><pre><span></span><span class="n">working.hotelling.bonferroni.intervals</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+  <span class="n">x</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+  <span class="c1"># Get the fitted values of the linear model</span>
+  <span class="n">fit</span> <span class="o">&lt;-</span> <span class="nf">lm</span><span class="p">(</span><span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">)</span>
+  <span class="n">fit</span> <span class="o">&lt;-</span> <span class="n">fit</span><span class="o">$</span><span class="n">fitted.values</span>
+
+  <span class="c1"># Find standard error as defined above</span>
+  <span class="n">se</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">fit</span><span class="p">)</span><span class="n">^2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="m">2</span><span class="p">))</span> <span class="o">*</span> 
+    <span class="nf">sqrt</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="n">^2</span> <span class="o">/</span> 
+           <span class="nf">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="n">^2</span><span class="p">))</span>
+
+  <span class="c1"># Calculate B and W statistics for both procedures.</span>
+  <span class="n">W</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="m">2</span> <span class="o">*</span> <span class="nf">qf</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">df1</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">df2</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="m">2</span><span class="p">))</span>
+  <span class="n">B</span> <span class="o">&lt;-</span> <span class="m">1</span><span class="o">-</span><span class="nf">qt</span><span class="p">(</span><span class="m">.95</span><span class="o">/</span><span class="p">(</span><span class="m">2</span> <span class="o">*</span> <span class="m">3</span><span class="p">),</span> <span class="n">n</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+
+  <span class="c1"># Compute the simultaneous confidence intervals</span>
+
+  <span class="c1"># Working-Hotelling</span>
+  <span class="n">wh.upper</span> <span class="o">&lt;-</span> <span class="n">fit</span> <span class="o">+</span> <span class="n">W</span> <span class="o">*</span> <span class="n">se</span>
+  <span class="n">wh.lower</span> <span class="o">&lt;-</span> <span class="n">fit</span> <span class="o">-</span> <span class="n">W</span> <span class="o">*</span> <span class="n">se</span>
+
+  <span class="c1"># Bonferroni</span>
+  <span class="n">bon.upper</span> <span class="o">&lt;-</span> <span class="n">fit</span> <span class="o">+</span> <span class="n">B</span> <span class="o">*</span> <span class="n">se</span>
+  <span class="n">bon.lower</span> <span class="o">&lt;-</span> <span class="n">fit</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">se</span>
+
+  <span class="n">xy</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+
+  <span class="c1"># Plot the Working-Hotelling intervals</span>
+  <span class="n">wh</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span> <span class="o">+</span> 
+    <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">2.5</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">fit</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">wh.upper</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">wh.lower</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span>
+    <span class="nf">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Working-Hotelling&#39;</span><span class="p">)</span>
+
+  <span class="c1"># Plot the Bonferroni intervals</span>
+  <span class="n">bonn</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span> <span class="o">+</span> 
+    <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">2.5</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">fit</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">bon.upper</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">bon.lower</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="o">+</span>
+    <span class="nf">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Bonferroni&#39;</span><span class="p">)</span>
+
+  <span class="nf">grid.arrange</span><span class="p">(</span><span class="n">wh</span><span class="p">,</span> <span class="n">bonn</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+
+  <span class="c1"># Collect results of procedures into a data.frame and return</span>
+  <span class="n">res</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span> <span class="m">3</span><span class="p">),</span> <span class="n">row.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Result&#39;</span><span class="p">))</span>
+  <span class="nf">colnames</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;W&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">)</span>
+
+  <span class="nf">return</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">working.hotelling.bonferroni.intervals</span><span class="p">(</span><span class="n">delivery</span><span class="o">$</span><span class="n">n.prod</span><span class="p">,</span> <span class="n">delivery</span><span class="o">$</span><span class="n">delTime</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="working_hotelling_bonferroni_files/figure-markdown_github/unnamed-chunk-4-1.png"></p>
+<div class="highlight"><pre><span></span><span class="err">##            W     B</span>
+<span class="err">## Result 2.616 2.023</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">working.hotelling.bonferroni.intervals</span><span class="p">(</span><span class="n">delivery</span><span class="o">$</span><span class="n">distance</span><span class="p">,</span> <span class="n">delivery</span><span class="o">$</span><span class="n">delTime</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="working_hotelling_bonferroni_files/figure-markdown_github/unnamed-chunk-4-2.png"></p>
+<div class="highlight"><pre><span></span><span class="err">##            W     B</span>
+<span class="err">## Result 2.616 2.023</span>
+</pre></div>
+
+
+<p>The graphs from our function mirror those from the <code>plotFit</code> function. As we suspected, the Bonferroni intervals are indeed tighter as evidenced by a smaller <em>B</em> value compared to <em>W</em>. Thus, the Bonferroni intervals should be used in this particular case. Notice the <em>W</em> and <em>B</em> values are the same regardless of the predictor variable being examined, this is due to the procedures using the family confidence coefficient rather than the statement confidence coefficient as mentioned previously.</p>
+<h2>Summary</h2>
+<p>Simultaneous confidence intervals were explored and computed with the Bonferroni and Working-Hotelling procedures using the <code>investr</code> package and our own function. In the multiple regression setting, simulatenous confidence intervals are recommended as they provide certainty entire family of confidence coefficients are correct. Thus, the simulatenous intervals will always be wider than the statement confidence intervals as the former must take into account the joint confidence level of the coefficients. This <a href="http://stats.stackexchange.com/questions/188372/why-are-simultaneous-confidence-intervals-wider-than-the-normal-ones">answer on StackExchange</a> goes into more detail regarding why the simulatenous intervals are wider than intervals formed with the statement confidence coefficient.</p>
+<h2>References</h2>
+<p>Feng, Y. Simultaneous inferences and other topics in regression analysis. Retrieved from <a href="http://www.stat.columbia.edu/~yangfeng/W4315/lectures/lecture-4/lecture_4.pdf">http://www.stat.columbia.edu/~yangfeng/W4315/lectures/lecture-4/lecture_4.pdf</a></p>
+<p><a href="https://amzn.to/2vcB1my">Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., &amp; Wasserman, W.
+(2004). Applied linear statistical models (5th ed.). Boston, MA:
+McGraw-Hill Higher Education.</a></p>
+<p>Why are simultaneous confidence intervals wider than the normal ones? (2016). Retrieved from <a href="http://stats.stackexchange.com/questions/188372/why-are-simultaneous-confidence-intervals-wider-than-the-normal-ones">http://stats.stackexchange.com/questions/188372/why-are-simultaneous-confidence-intervals-wider-than-the-normal-ones</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html">Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-analysis-of-variance-anova.html">Calculating and Performing One-way Analysis of Variance (ANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/predicting-cat-genders-logistic-regression.html">Predicting Cat Genders with Logistic Regression</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

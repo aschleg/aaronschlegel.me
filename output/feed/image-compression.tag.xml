@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - image compression</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/image-compression.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2017-01-26T00:00:00-08:00</updated><entry><title>Image Compression with Principal Component Analysis</title><link href="https://aaronschlegel.me/image-compression-principal-component-analysis.html" rel="alternate"></link><published>2017-01-26T00:00:00-08:00</published><updated>2017-01-26T00:00:00-08:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2017-01-26:/image-compression-principal-component-analysis.html</id><summary type="html">&lt;p&gt;Image compression with principal component&lt;/p&gt;</summary><content type="html">&lt;p&gt;analysis is a frequently occurring application
+of the dimension reduction technique. Recall from a previous post that
+employed singular value decomposition to compress an image, that an image 
+is a matrix of pixels represented by RGB color values. Thus, principal 
+component analysis can be used to reduce the dimensions of the matrix 
+(image) and project those new dimensions to reform the image that retains 
+its qualities but is smaller in k-weight.&lt;/p&gt;
+&lt;p&gt;Image compression with &lt;a href="https://aaronschlegel.me/principal-component-analysis-r-example.html"&gt;principal component
+analysis&lt;/a&gt; is a frequently occurring application
+of the dimension reduction technique. Recall from a previous post that
+employed &lt;a href="https://aaronschlegel.me/image-compression-singular-value-decomposition.html"&gt;singular value decomposition to compress an
+image&lt;/a&gt;, that an image is a matrix of pixels
+represented by RGB color values. Thus, principal component analysis can
+be used to reduce the dimensions of the matrix (image) and project those
+new dimensions to reform the image that retains its qualities but is
+smaller in k-weight. We will use PCA to compress the image of a cute
+kitty cat below. As the number of principal components used to project
+the new data increases, the quality and representation compared to the
+original image improve.&lt;/p&gt;
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/cat.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;h2&gt;Image Compression with Principal Component Analysis&lt;/h2&gt;
+&lt;p&gt;The &lt;a href="https://cran.r-project.org/web/packages/jpeg/jpeg.pdf"&gt;jpeg
+package&lt;/a&gt; is very
+handy for reading and writing .jpeg files.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jpeg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;readJPEG&lt;/code&gt; function is used to convert the image into its matrix
+representation.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;cat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;readJPEG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 600&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 398&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The cat image is now represented as three 600x398 matrices as an array
+with each matrix corresponding to the RGB color value scheme. Extract
+the individual color value matrices to perform PCA on each.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;cat[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;cat[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;cat[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Principal component analysis is performed on each color value matrix. As
+this example is focused on image compression and not description or
+interpretation of the variables, the data does not require centering
+(subtracting the variable means from the respective observation
+vectors), and the &lt;code&gt;center&lt;/code&gt; argument is set to &lt;code&gt;FALSE&lt;/code&gt;. If the argument
+is not set to &lt;code&gt;FALSE&lt;/code&gt;, the returned image will not have the right RGB
+values due to having their respective means subtracted from each pixel
+color vector.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;cat.r.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;center&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cat.g.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;center&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cat.b.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;center&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Collect the PCA objects into a list.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;rgb.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cat.r.pca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cat.g.pca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cat.b.pca&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We are now ready to compress the image! Now that the principal
+components are found for each color value matrix, we have new dimensions
+that describe the original data (pixels). The pixel values are then
+projected onto the new dimensions of the data for each respective
+matrix.&lt;/p&gt;
+&lt;p&gt;The following loop reconstructs the original image using the projections
+of the data using increasing amounts of principal components. We will
+see that as the number of principal components increase, the more
+representative of the original image the reconstruction becomes. This
+sequential improvement in quality is because as more principal
+components are used, the more the variance (information) is described.
+The first few principal components will have the most drastic change in
+quality while the last few components will not make much if any,
+difference to quality.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="nf"&gt;seq.int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;length.out&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;pca.img&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rgb.pca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;compressed.img&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;x[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;i]&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;rotation[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;i]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="n"&gt;simplify&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;array&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nf"&gt;writeJPEG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pca.img&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/cat_compressed_&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;_components.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With three components, the resulting image retains very few of the
+original image's characteristics.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+3 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_3_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Wow! With just 43 additional components (out of 398 total), the image is
+much clearer and representative of the original. Remember the first
+principal components retain the most variation, so we are likely to see
+significant gains in quality for the first few iterations.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+46 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_46_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The images reconstructed from 89 to 260 components are very similar, and
+only slight gains in quality are made after each iteration.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+89 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_89_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+131 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_131_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+174 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_174_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+217 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_217_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+260 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_260_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The recreated image with 302 components is identical to the original (at
+least to me). The remaining iterations will, therefore, have little
+improvement.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+302 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_302_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+345 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_345_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+388 Components
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/pca_image_compression/compressed/cat_compressed_388_components.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;We can check the compression ratio for each iteration compared to the
+original image with a quick loop.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;original&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
+&lt;span class="n"&gt;imgs&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;imgs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;full.path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; size: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full.path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; original: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; % diff: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full.path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_131_components.jpg size: 31.219 original: 51.579 % diff: -39%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_174_components.jpg size: 31.646 original: 51.579 % diff: -39%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_217_components.jpg size: 31.63 original: 51.579 % diff: -39%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_260_components.jpg size: 31.248 original: 51.579 % diff: -39%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_3_components.jpg size: 17.111 original: 51.579 % diff: -67%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_302_components.jpg size: 31.021 original: 51.579 % diff: -40%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_345_components.jpg size: 31.009 original: 51.579 % diff: -40%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_388_components.jpg size: 31.015 original: 51.579 % diff: -40%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_46_components.jpg size: 29.135 original: 51.579 % diff: -44%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;cat_compressed_89_components.jpg size: 30.614 original: 51.579 % diff: -41%&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Image compression with principal component analysis reduced the original
+image by 40% with little to no loss in image quality. Although there are
+more sophisticated algorithms for image compression, PCA can still
+provide good compression ratios for the cost of implementation.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Image compression with principal component analysis is a useful and
+relatively straightforward application of the technique by imaging an
+image as a &lt;span class="math"&gt;\((n \times p)\)&lt;/span&gt; or &lt;span class="math"&gt;\((n \times n)\)&lt;/span&gt; matrix made of pixel color
+values. There are many other real-world applications of PCA, including
+face and handwriting recognition, and other situations when dealing with
+many variables such as gene expression experiments.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.scielo.br/scielo.php?script=sci_arttext&amp;amp;pid=S1679-45082012000200004"&gt;http://www.scielo.br/scielo.php?script=sci_arttext&amp;amp;pid=S1679-45082012000200004&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="linear algebra"></category><category term="image compression"></category></entry><entry><title>Image Compression with Singular Value Decomposition</title><link href="https://aaronschlegel.me/image-compression-singular-value-decomposition.html" rel="alternate"></link><published>2016-11-10T00:00:00-08:00</published><updated>2016-11-10T00:00:00-08:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2016-11-10:/image-compression-singular-value-decomposition.html</id><summary type="html">&lt;p&gt;The method of image compression with singular value decomposition is&lt;/p&gt;</summary><content type="html">&lt;p&gt;based on the idea that if the SVD is known, some of the singular values
+&lt;span class="math"&gt;\(\sigma\)&lt;/span&gt; are significant while the others are small and not significant.
+Thus, if the significant values are kept and the small values are
+discarded then only the columns of &lt;span class="math"&gt;\(U\)&lt;/span&gt; and &lt;span class="math"&gt;\(V\)&lt;/span&gt; corresponding to the
+singular values are used. We will see in the following example, as more
+and more singular values are kept, the quality and representation
+compared to the original image improves.&lt;/p&gt;
+&lt;p&gt;As mentioned in a previous post, image compression with &lt;a href="https://aaronschlegel.me/singular-value-decomposition-r.html"&gt;singular value
+decomposition&lt;/a&gt; is a frequently occurring
+application of the method. The image is treated as a matrix of pixels
+with corresponding color values and is decomposed into smaller ranks
+that retain only the essential information that comprises the image. In
+this example, we are interested in compressing the below 600x337 image
+of a lion into a real-valued representation of the picture which will
+result in a smaller image file size.&lt;/p&gt;
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The method of image compression with singular value decomposition is
+based on the idea that if the SVD is known, some of the singular values
+&lt;span class="math"&gt;\(\sigma\)&lt;/span&gt; are significant while the others are small and not significant.
+Thus, if the significant values are kept and the small values are
+discarded then only the columns of &lt;span class="math"&gt;\(U\)&lt;/span&gt; and &lt;span class="math"&gt;\(V\)&lt;/span&gt; corresponding to the
+singular values are used. We will see in the following example, as more
+and more singular values are kept, the quality and representation
+compared to the original image improves.&lt;/p&gt;
+&lt;h2&gt;Image Compression with Singular Value Decomposition&lt;/h2&gt;
+&lt;p&gt;The &lt;a href="https://cran.r-project.org/web/packages/jpeg/jpeg.pdf"&gt;jpeg
+package&lt;/a&gt; provides
+handy functions for reading and writing .jpeg files which we will need
+to turn the image of the lion into a matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jpeg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;readJPEG&lt;/code&gt; function is used to convert the image into a matrix
+representation.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;lion&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;readJPEG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;lion.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lion&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 600&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lion&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 337&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The output of the function gives us an array of three matrices with 337
+rows and 600 columns, the same size as the image. Each matrice
+represents a color value that comprises the RGB color scale. To perform
+SVD on these matrices, separate the array into separate objects.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;lion[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;lion[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;lion[&lt;/span&gt;&lt;span class="p"&gt;,,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;SVD is then performed on the extracted matrices that represent the
+individual RGB color values.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;lion.r.svd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;svd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;lion.g.svd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;svd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;lion.b.svd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;svd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Collect the results into a list that we will use to reconstruct the
+original image.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;rgb.svds&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lion.r.svd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lion.g.svd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lion.b.svd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With the singular value decompositions computed for the RGB color value
+matrices, we can take the resulting matrix factorizations and
+reconstruct the original matrix (image) as we saw in the previous post
+on SVD as we know that &lt;span class="math"&gt;\(A = U\Sigma V^T\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;As mentioned at the beginning of the post, the more significant singular
+values we keep results in a more accurate approximation of the original
+matrix. We can see this in action below. The following code takes each
+decomposed color value matrix and reconstructs the color value array
+that comprises the original lion image with increasing ranks. The loop
+will approximate the original image with eight different rank values
+starting from rank 3 to rank 300. The &lt;code&gt;writeJPEG()&lt;/code&gt; function from the
+&lt;code&gt;jpeg&lt;/code&gt; package takes the approximated color value array and writes it to
+a .jpeg.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="nf"&gt;seq.int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lion&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;length.out&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rgb.svds&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;lion.compress&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;u[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;j]&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;diag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;d[1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;j]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;v[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;j]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="n"&gt;simplify&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;array&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="nf"&gt;writeJPEG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/lion_compressed&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;_svd_rank_&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 3
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_3.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;With just three singular values remaining the resulting image retains
+very few of the original image's characteristics.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 45
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_45.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;At just rank 45, the resulting image is much more representative of the
+original.&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 88
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_88.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 130
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_130.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 173
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_173.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 215
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_215.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 258
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_258.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;At rank 300, the resulting compressed image is rather unrecognizable
+from the original (at least to me).&lt;/p&gt;
+&lt;p style="text-align: center; font-size: 1.5em;"&gt;
+Rank 300
+&lt;/p&gt;
+
+&lt;div style="text-align:center; padding-bottom: 25px"&gt;
+&lt;p&gt;&lt;img alt="" src="figure/svd_image_compression/lion_compressed_svd_rank_300.jpg"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;We can then see how much the SVD compressed the image by finding the
+percent difference of the compressed images and the original.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;original&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;lion.jpg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
+&lt;span class="n"&gt;imgs&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;imgs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;full.path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;compressed/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; size: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full.path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; original: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; % diff: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nf"&gt;file.info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full.path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_130.jpg size: 36.608 original: 52.05 % diff: -30%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_173.jpg size: 37.144 original: 52.05 % diff: -29%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_215.jpg size: 37.559 original: 52.05 % diff: -28%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_258.jpg size: 37.613 original: 52.05 % diff: -28%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_3.jpg size: 15.732 original: 52.05 % diff: -70%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_300.jpg size: 37.621 original: 52.05 % diff: -28%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_45.jpg size: 31.422 original: 52.05 % diff: -40%&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;## [1] &amp;quot;lion_compressed_svd_rank_88.jpg size: 35.266 original: 52.05 % diff: -32%&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The rank 300 image has a file size of 37.62KB compared to the original
+image size of 52.05KB, which results in a 28% smaller file size. We can
+see the difference in the file sizes quickly converge to around -28%,
+likely indicating further ranks would not result in a more efficient
+compression ratio.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;The following post was an example of image compression with singular
+value decomposition, a typical application of the method in real-world
+settings. Commercial image compression solutions use a more robust
+method than what was described here; however, I hope it serves as a good
+example of the power matrix decomposition methods such as singular value
+decomposition can have in the real-world.&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="linear algebra"></category><category term="image compression"></category></entry></feed>

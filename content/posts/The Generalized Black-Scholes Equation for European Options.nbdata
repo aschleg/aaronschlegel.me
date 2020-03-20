@@ -1,0 +1,7 @@
+Title: The Generalized Black-Scholes Formula for European Options
+Slug: generalized-black-scholes-formula-european-options
+Date: 2020-03-04
+Category: Finance
+Tags: Python, finance, mathematics
+Author: Aaron Schlegel
+Summary: Due to the number of different extensions and options on possible underlying assets, a generalized Black-Scholes model was created to simplify computations by significantly reducing the number of equations. In this post, we will explore several of the Black-Scholes option pricing models for different underlying assets and then introduce the generalized Black-Scholes pricing formula.

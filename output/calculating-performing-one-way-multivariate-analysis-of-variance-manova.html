@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/statistics.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="MANOVA, or Multiple Analysis of Variance, is an extension of Analysis of Variance (ANOVA) to several dependent variables. The approach to MANOVA is similar to ANOVA in many regards and requires the same assumptions (normally distributed dependent variables with equal covariance matrices)." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-07-24 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="MANOVA, or Multiple Analysis of Variance, is an extension of Analysis of Variance (ANOVA) to several dependent variables. The approach to MANOVA is similar to ANOVA in many regards and requires the same assumptions (normally distributed dependent variables with equal covariance matrices)." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/calculating-performing-one-way-multivariate-analysis-of-variance-manova.html" rel="bookmark"
+                   title="Permalink to Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)">Calculating and Performing One-way Multivariate Analysis of Variance (MANOVA)</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-07-24T00:00:00-07:00">
+                Tue 24 July 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>MANOVA, or Multiple Analysis of Variance, is an extension of Analysis of Variance (ANOVA) to several dependent variables. The approach to MANOVA is similar to ANOVA in many regards and requires the same assumptions (normally distributed dependent variables with equal covariance matrices). This post will explore how MANOVA is performed and interpreted by analyzing the growth of six different apple tree rootstocks from 1918 to 1934 (Andrews and Herzberg 1985, pp. 357-360).</p>
+<h2>Multiple Analysis of Variance</h2>
+<p>In the MANOVA setting, each observation vector can have a model denoted as:</p>
+<div class="math">$$ y_{ij} = \mu_i + \epsilon_{ij} \qquad  i = 1, 2, \cdots, k; \qquad j = 1, 2, \cdots, n $$</div>
+<p>An 'observation vector' is a set of observations measured over several variables. With <span class="math">\(p\)</span> variables, $y_{ij} becomes:</p>
+<div class="math">$$\begin{bmatrix}
+  y_{ij1} \\ y_{ij2} \\ \vdots \\ y_{ijp}
+\end{bmatrix} = \begin{bmatrix}
+  \mu_{i1} \\ \mu_{i2} \\ \vdots \\ \mu_{ip}
+\end{bmatrix} + \begin{bmatrix}
+  \epsilon_{ij1} \\ \epsilon_{ij2} \\ \vdots \\ \epsilon_{ijp}
+\end{bmatrix}$$</div>
+<p>Thus, for the <span class="math">\(r^{th}\)</span> variable in <span class="math">\((r = 1, 2, \cdots, p)\)</span> in each vector <span class="math">\(y_{ij}\)</span>, the model takes the form:</p>
+<div class="math">$$ y_{ij} = \mu_r + \epsilon_{ijr} $$</div>
+<p>As before in ANOVA, the goal is to compare the groups to see if there are any significant differences. However, instead of a single variable, the comparisons will be made with the mean vectors of the samples. The null hypothesis <span class="math">\(H_0\)</span> can be formalized the same way in MANOVA:</p>
+<div class="math">$$ H_0 : \mu_1 = \mu_2 = \cdots = \mu_k $$</div>
+<p>With an alternative hypothesis <span class="math">\(H_a\)</span> that at least two <em>μ</em> are unequal. There are <span class="math">\(p(k − 1)\)</span>, where <span class="math">\(k\)</span> is the number of groups in the data, equalities that must be true for <span class="math">\(H_0\)</span> to be accepted.</p>
+<h2>MANOVA Between and Within Variation</h2>
+<p>The totals and means of the samples in the data are defined as:</p>
+<ul>
+<li>Total of the <span class="math">\(i\)</span>th sample: <span class="math">\(y_{i.} = \sum^n_{j=1} y_{ij}\)</span></li>
+<li>Overall total: <span class="math">\(y_{..} = \sum^k_{i=1} \sum^n_{j=1} y_{ij}\)</span></li>
+<li>Mean of the ith sample: <span class="math">\(\bar{y}_{i.} = y_{i.} / n\)</span></li>
+<li>Overall mean: <span class="math">\(\bar{y}_{..} = y_{..} / kn\)</span></li>
+</ul>
+<p>Similar to ANOVA, we are interested in partitioning the data's total variation into variation between and within groups. In the case of ANOVA, this partitioning is done by calculating <span class="math">\(SSH\)</span> and <span class="math">\(SSE\)</span>; however, in the multivariate case, we must extend this to encompass the variation in all the <span class="math">\(p\)</span> variables. Therefore, we must compute the between and within sum of squares for each possible comparison. This procedure results in the <span class="math">\(H\)</span> "hypothesis matrix" and <span class="math">\(E\)</span> "error matrix."</p>
+<p>The <span class="math">\(H\)</span> matrix is a square <span class="math">\(p \times p\)</span> with the form:</p>
+<div class="math">$$H =
+\begin{bmatrix}
+  SSH_{11} &amp; SPH_{21} &amp; \dots &amp; SPH_{1p} \\
+  SPH_{12} &amp; SSH_{22} &amp; \dots &amp; SPH\_{2p} \\
+  \vdots &amp; \vdots &amp; &amp; \vdots \\
+  SPH_{1p} &amp; SPH_{2p} &amp; \cdots &amp; SSH_{pp}
+\end{bmatrix}$$</div>
+<p>Where the entries are equal to:</p>
+<div class="math">$$ H = n \sum^k_{i=1} (\bar{y}_{i.} - \bar{y}_{..}) (\bar{y}_{i.} - \bar{y}_{..})' $$</div>
+<p>Thus, for example, the above equation for the entries <span class="math">\(SSH_{11}\)</span> and <span class="math">\(SPH_{23}\)</span> would take the form:</p>
+<div class="math">$$ SSH_{11} = n \sum^k_{i=1} (\bar{y}_{i.1} - \bar{y}_{..1})^2 $$</div>
+<div class="math">$$ SPH_{23} = n \sum^k_{i=1} (\bar{y}_{i.2} - \bar{y}_{..2}) (\bar{y}_{i.3} - \bar{y}_{..3}) $$</div>
+<p>The error matrix <span class="math">\(E\)</span> is also <span class="math">\(p \times p\)</span> and can be expressed similarly to <span class="math">\(H\)</span>.</p>
+<div class="math">$$E = 
+\begin{bmatrix}
+  SSE_{11} &amp; SPE_{12} &amp; \cdots &amp; SPE_{1p} \\
+  SPE_{12} &amp; SSE_{22} &amp; \cdots &amp; SPE_{2p} \\
+  \vdots &amp; \vdots &amp; &amp; \vdots \\
+  SPE_{1p} &amp; SPE_{2p} &amp; \cdots &amp; SSE_{pp}
+\end{bmatrix}$$</div>
+<p>With the entries equal to:</p>
+<div class="math">$$ E = \sum^k_{i=1} \sum^n_{j=1} (y_{ij} - \bar{y}_{i.}) (y_{ij} - \bar{y}_{i.})' $$</div>
+<p>Therefore for corresponding entries <span class="math">\(SSE_{11}\)</span> and <span class="math">\(SPE_{23}\)</span>, the above equation is expressed as the following:</p>
+<div class="math">$$ SSE_{11} = \sum^k_{i=1} \sum^n_{j=1} (y_{ij1} - \bar{y}_{i.1})^2 $$</div>
+<div class="math">$$ SPE_{23} = \sum^k_{i=1} \sum^n_{j=1} (y_{ij2} - \bar{y}_{i.2}) (y_{ij3} - \bar{y}_{i.3}) $$</div>
+<p>Once the <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices are constructed, the mean vectors can be compared to determine if significant differences exist. There are several test statistics, of which the most common are Wilk's lambda, Roy's test, Pillai, and Lawley-Hotelling, that can be employed to test for significant differences. Each test statistic has specific properties and power and will be discussed in a future post. For now, the default Pillai test statistic from the <code>manova()</code> function will suffice (and is the recommended statistic to use in most cases according to the documentation in <code>?summary(manova())</code>).</p>
+<p>The rootstock data were obtained from the <a href="ftp://ftp.wiley.com">companion FTP site</a> of the book Methods of Multivariate Analysis by Alvin Rencher. The data contains four dependent variables as follows:</p>
+<ul>
+<li>trunk girth at four years (mm × 100)</li>
+<li>extension growth at four years (m)</li>
+<li>trunk girth at 15 years (mm × 100)</li>
+<li>weight of tree above ground at 15 years (lb × 1000)</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">&lt;-</span> <span class="nf">read.table</span><span class="p">(</span><span class="s">&#39;ROOT.DAT&#39;</span><span class="p">,</span> <span class="n">col.names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Tree.Number&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Ext.Growth.4.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Trunk.Girth.15.Years&#39;</span><span class="p">,</span> <span class="s">&#39;Weight.Above.Ground.15.Years&#39;</span><span class="p">))</span>
+
+<span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>MANOVA in R</h2>
+<p>The <code>manova()</code> function accepts a formula argument with the dependent variables formatted as a matrix and the grouping factor on the right of the <code>~</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">dependent.vars</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Trunk.Girth.4.Years</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Ext.Growth.4.Years</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Trunk.Girth.15.Years</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Weight.Above.Ground.15.Years</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Perform MANOVA and output a summary of the results.</p>
+<div class="highlight"><pre><span></span><span class="n">root.manova</span> <span class="o">&lt;-</span> <span class="nf">summary</span><span class="p">(</span><span class="nf">manova</span><span class="p">(</span><span class="n">dependent.vars</span> <span class="o">~</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+<span class="n">root.manova</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##                  Df Pillai approx F num Df den Df    Pr(&gt;F)    </span>
+<span class="err">## root$Tree.Number  5 1.3055   4.0697     20    168 1.983e-07 ***</span>
+<span class="err">## Residuals        42                                            </span>
+<span class="err">## ---</span>
+<span class="err">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+</pre></div>
+
+
+<p>The resultant MANOVA model reports a Pillai test statistic of 1.3055 and a p-value below 0.05, thus <span class="math">\(H_0\)</span> is rejected and it is concluded there are significant differences in the means.</p>
+<p>Although the test rejected <span class="math">\(H_0\)</span>, we can test each variable individually with an ANOVA test. The <code>aov()</code> function can output tests on individual variables when wrapped in a <code>summary()</code> call.</p>
+<div class="highlight"><pre><span></span><span class="nf">summary</span><span class="p">(</span><span class="nf">aov</span><span class="p">(</span><span class="n">dependent.vars</span> <span class="o">~</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##  Response 1 :</span>
+<span class="err">##                  Df  Sum Sq   Mean Sq F value Pr(&gt;F)</span>
+<span class="err">## root$Tree.Number  5 0.07356 0.0147121   1.931 0.1094</span>
+<span class="err">## Residuals        42 0.31999 0.0076187               </span>
+<span class="err">## </span>
+<span class="err">##  Response 2 :</span>
+<span class="err">##                  Df  Sum Sq Mean Sq F value Pr(&gt;F)  </span>
+<span class="err">## root$Tree.Number  5  4.1997 0.83993  2.9052 0.0243 *</span>
+<span class="err">## Residuals        42 12.1428 0.28911                 </span>
+<span class="err">## ---</span>
+<span class="err">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+<span class="err">## </span>
+<span class="err">##  Response 3 :</span>
+<span class="err">##                  Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span>
+<span class="err">## root$Tree.Number  5 6.1139 1.22279  11.969 3.112e-07 ***</span>
+<span class="err">## Residuals        42 4.2908 0.10216                      </span>
+<span class="err">## ---</span>
+<span class="err">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+<span class="err">## </span>
+<span class="err">##  Response 4 :</span>
+<span class="err">##                  Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span>
+<span class="err">## root$Tree.Number  5 2.4931 0.49862  12.158 2.587e-07 ***</span>
+<span class="err">## Residuals        42 1.7225 0.04101                      </span>
+<span class="err">## ---</span>
+<span class="err">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+</pre></div>
+
+
+<p>Only the first variable, trunk girth at four years, reports a p-value above 0.05. Thus it is concluded there are significant differences in the means for the variables except for trunk girth at four years amongst the six groups.</p>
+<h2>Replicating MANOVA in R</h2>
+<p>For a deeper understanding of how MANOVA is calculated, we can replicate the results of the <code>manova()</code> function by computing the <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices as mentioned above. To calculate these matrices, first split the data into a list by group and find the mean vectors of each group. The sample sizes <span class="math">\(n_i\)</span> of each group, and the total mean vector will also be required.</p>
+<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+
+<span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+<span class="p">},</span> <span class="n">simplify</span> <span class="o">=</span> <span class="s">&#39;data.frame&#39;</span><span class="p">)</span>
+
+
+<span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span> <span class="o">/</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+
+<span class="n">total.means</span> <span class="o">&lt;-</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices can be computed with the following code.</p>
+<div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">H[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">))</span>
+    <span class="n">H[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">H</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]      [,2]      [,3]     [,4]</span>
+<span class="err">## [1,] 0.07356042 0.5373852 0.3322646 0.208470</span>
+<span class="err">## [2,] 0.53738521 4.1996619 2.3553885 1.637108</span>
+<span class="err">## [3,] 0.33226458 2.3553885 6.1139354 3.781044</span>
+<span class="err">## [4,] 0.20847000 1.6371084 3.7810438 2.493091</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">E</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> 
+    <span class="nf">for </span><span class="p">(</span><span class="n">k</span> <span class="n">in</span> <span class="n">root.group</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">((</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span><span class="p">)))</span>
+      <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">E[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">E[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Verify the results by comparing the computed matrices to the output of <code>summary(manova())</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS[1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## $`root$Tree.Number`</span>
+<span class="err">##            [,1]      [,2]      [,3]     [,4]</span>
+<span class="err">## [1,] 0.07356042 0.5373852 0.3322646 0.208470</span>
+<span class="err">## [2,] 0.53738521 4.1996619 2.3553885 1.637108</span>
+<span class="err">## [3,] 0.33226458 2.3553885 6.1139354 3.781044</span>
+<span class="err">## [4,] 0.20847000 1.6371084 3.7810437 2.493091</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">H</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##            [,1]      [,2]      [,3]     [,4]</span>
+<span class="err">## [1,] 0.07356042 0.5373852 0.3322646 0.208470</span>
+<span class="err">## [2,] 0.53738521 4.1996619 2.3553885 1.637108</span>
+<span class="err">## [3,] 0.33226458 2.3553885 6.1139354 3.781044</span>
+<span class="err">## [4,] 0.20847000 1.6371084 3.7810438 2.493091</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS[2]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## $Residuals</span>
+<span class="err">##           [,1]      [,2]      [,3]     [,4]</span>
+<span class="err">## [1,] 0.3199875  1.696564 0.5540875 0.217140</span>
+<span class="err">## [2,] 1.6965637 12.142790 4.3636125 2.110214</span>
+<span class="err">## [3,] 0.5540875  4.363612 4.2908125 2.481656</span>
+<span class="err">## [4,] 0.2171400  2.110214 2.4816562 1.722525</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">E</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##           [,1]      [,2]      [,3]     [,4]</span>
+<span class="err">## [1,] 0.3199875  1.696564 0.5540875 0.217140</span>
+<span class="err">## [2,] 1.6965637 12.142790 4.3636125 2.110214</span>
+<span class="err">## [3,] 0.5540875  4.363613 4.2908125 2.481656</span>
+<span class="err">## [4,] 0.2171400  2.110214 2.4816563 1.722525</span>
+</pre></div>
+
+
+<p>The Pillai test statistic is denoted as <span class="math">\(V^{(s)}\)</span> and defined as:</p>
+<div class="math">$$ V^{(s)} = tr[(E + H)^{-1} H] = \sum^s_{i=1} \frac{\lambda_i}{1 + \lambda_i} $$</div>
+<p>Where <span class="math">\(\lambda_i\)</span> represents the <span class="math">\(i\)</span>th nonzero eigenvalue of <span class="math">\(E^{−1}H\)</span>. Thus we can manually calculate the Pillai statistic with either of the following:</p>
+<div class="highlight"><pre><span></span><span class="n">vs</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">diag</span><span class="p">(</span><span class="nf">solve</span><span class="p">(</span><span class="n">E</span> <span class="o">+</span> <span class="n">H</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">H</span><span class="p">))</span> <span class="c1"># Will be used later in the post to find approximate F-statistic</span>
+<span class="n">vs</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 1.305472</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nf">sum</span><span class="p">((</span><span class="nf">eigen</span><span class="p">(</span><span class="nf">solve</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">H</span><span class="p">)</span><span class="o">$</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">eigen</span><span class="p">(</span><span class="nf">solve</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">H</span><span class="p">)</span><span class="o">$</span><span class="n">values</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 1.305472</span>
+</pre></div>
+
+
+<p>Which is the same as the <code>manova()</code> function output. The Pillai statistic is then used to determine the significance of differences of the mean vectors by comparing it to the critical value <span class="math">\(V_{\alpha}^(s)\)</span>. The critical Pillai value is found by computing <span class="math">\(s\)</span>, <span class="math">\(m\)</span>, and <span class="math">\(N\)</span> which are also employed in Roy's test (the Pillai test is an extension of Roy's test). The values are defined as:</p>
+<div class="math">$$ s = min(p, V_h) \qquad m = \frac{1}{2} (\left| V_h - p \right| - 1) \qquad N = \frac{1}{2} (V_E - p - 1) $$</div>
+<p>An approximate F-statistic can be found with the following equation:</p>
+<div class="math">$$ F = \frac{(2N + s + 1)V^{(s)}}{(2m + s + 1)(s - V^{(s)})} $$</div>
+<div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+<span class="n">p</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<span class="n">vh</span> <span class="o">&lt;-</span> <span class="n">k</span> <span class="o">-</span> <span class="m">1</span>
+<span class="n">ve</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span> <span class="o">-</span> <span class="n">k</span>
+</pre></div>
+
+
+<p>Where <span class="math">\(v_H\)</span> is the degrees of freedom for the hypothesis and <span class="math">\(v_E\)</span> is the degrees of freedom for the error.</p>
+<div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">&lt;-</span> <span class="nf">min</span><span class="p">(</span><span class="n">vh</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">vh</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ve</span> <span class="o">-</span> <span class="n">p</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+
+<span class="n">f.approx</span> <span class="o">&lt;-</span> <span class="p">((</span><span class="m">2</span> <span class="o">*</span> <span class="n">N</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">vs</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="m">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">vs</span><span class="p">))</span>
+<span class="n">f.approx</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## [1] 4.069718</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">stats[</span><span class="p">,</span><span class="m">3</span><span class="n">][1]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">## root$Tree.Number </span>
+<span class="err">##         4.069718</span>
+</pre></div>
+
+
+<p>The calculated approximate F-statistic matches what was reported in the <code>manova()</code> function.</p>
+<h2>Summary</h2>
+<p>This post explored the extension of ANOVA to multiple dependent variables known as MANOVA and how to perform the procedure with built-in R functions and manual computations. The concepts of ANOVA are extended and generalized to encompass <em>p</em> variables, and thus the intuition and logic behind ANOVA also apply to the multivariate case. Future posts will examine more topics related to MANOVA including additional test statistics, unbalanced (unequal sample sizes) approaches and two-way classification.</p>
+<h2>References</h2>
+<p><a href="https://amzn.to/2HizNch">Andrews, D. F., and Herzberg, A. M. (1985), Data, New York: Springer-Verlag.</a></p>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/calculating-performing-one-way-analysis-of-variance-anova.html">Calculating and Performing One-way Analysis of Variance (ANOVA)</a></li>
+                        <li><a href="https://aaronschlegel.me/computing-working-hotelling-bonferroni-simultaneous-confidence-intervals.html">Computing Working-Hotelling and Bonferroni Simultaneous Confidence Intervals</a></li>
+                        <li><a href="https://aaronschlegel.me/predicting-cat-genders-logistic-regression.html">Predicting Cat Genders with Logistic Regression</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

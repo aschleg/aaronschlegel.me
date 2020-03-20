@@ -18,19 +18,6 @@
     </ul>
     {% endif %}
 
-<!--    {% if SOCIAL %}
-    <nav class="widget">
-      <h3>Social</h3>
-      <ul class="blank">
-      {% for name, url in SOCIAL %}
-        <li>
-            <a href="{{ url|e }}">{{ name }}</a>
-        </li>
-      {% endfor %}
-      </ul>
-    </nav>
-    {% endif %}-->
-
     <h3>Recent Posts</h3>
 
     {% set recent = articles if not all_articles else all_articles %}
@@ -43,5 +30,18 @@
           {% endif %}
         {% endfor %}
     </ul>
+
+    {% if LINKS %}
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+          {% for name, url in LINKS %}
+            <li>
+                <a href="{{ url|e }}">{{ name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        </nav>
+    {% endif %}
 
 </div>

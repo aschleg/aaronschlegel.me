@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Multiplicative Congruential Random Number Generators with R</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Multiplicative congruential generators, also known as Lehmer random number generators, is a type of linear congruential generator for generating uniform pseudorandom numbers. The multiplicative congruential generator, often abbreviated as MLCG or MCG, is defined as a recurrence relation similar to the LCG." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Multiplicative Congruential Random Number Generators with R" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-01-07 00:00:00-08:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Multiplicative congruential generators, also known as Lehmer random number generators, is a type of linear congruential generator for generating uniform pseudorandom numbers. The multiplicative congruential generator, often abbreviated as MLCG or MCG, is defined as a recurrence relation similar to the LCG." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/multiplicative-congruential-generator-rng-r.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/multiplicative-congruential-generator-rng-r.html" rel="bookmark"
+                   title="Permalink to Multiplicative Congruential Random Number Generators with R">Multiplicative Congruential Random Number Generators with R</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-01-07T00:00:00-08:00">
+                Sun 07 January 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>Multiplicative congruential generators, also known as Lehmer random
+number generators, is a type of linear congruential generator for
+generating pseudorandom numbers in <span class="math">\(U(0, 1)\)</span>. The multiplicative
+congruential generator, often abbreviated as MLCG or MCG, is defined as
+a recurrence relation similar to the LCG with <span class="math">\(c = 0\)</span>.</p>
+<div class="math">$$ \large{X_{i+1} = aX_i \space \text{mod} \space m} $$</div>
+<p>Unlike the LCG, the parameters <span class="math">\(a\)</span> and <span class="math">\(m\)</span> for multiplicative
+congruential generators are more restricted and the initial seed
+<span class="math">\(X_0\)</span> must be relatively prime to the modulus <span class="math">\(m\)</span> (the
+greatest common divisor between <span class="math">\(X_0\)</span> and <span class="math">\(m\)</span> is 0). The
+current parameters in common use are
+<span class="math">\(m = 2^31 − 1 = 2147483647\)</span> and <span class="math">\(a = 7^5 = 16807\)</span>.
+However, in a correspondence from the <em>Communications of the ACM</em>, Park,
+Miller and Stockmeyer changed the value of the parameter <span class="math">\(a\)</span>, stating:</p>
+<blockquote>
+<p>The minimal standard Lehmer generator we advocated had a modulus of m
+= 2^31 - 1 and a multiplier of a = 16807. Relative to this particular
+choice of multiplier, we wrote "... if this paper were to be written
+again in a few years it is quite possible that we would advocate a
+different multiplier .... " We are now prepared to do so. That is, we
+now advocate a = 48271 and, indeed, have done so "officially" since
+July 1990. This new advocacy is consistent with the discussion on page
+1198 of [10]. There is nothing wrong with 16807; we now believe,
+however, that 48271 is a little better (with q = 44488, r = 3399).</p>
+</blockquote>
+<h2>Schrage's Method</h2>
+<p>When using a large prime modulus <span class="math">\(m\)</span> such as <span class="math">\(2^31 − 1\)</span>, the
+multiplicative congruential generator can overflow. Schrage's method was
+invented to overcome the possibility of overflow and is based on the
+fact that <span class="math">\(a(m \space \text{mod} \space a) &lt; m\)</span>. We can check the
+parameters in use satisfy this condition:</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;-</span> <span class="m">48271</span>
+<span class="n">m</span> <span class="o">&lt;-</span> <span class="m">2</span> <span class="o">**</span> <span class="m">31</span> <span class="o">-</span> <span class="m">1</span>
+
+<span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">%%</span> <span class="n">a</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">m</span>
+
+<span class="c1">## [1] TRUE</span>
+</pre></div>
+
+
+<p>Schrage's method restates the modulus <span class="math">\(m\)</span> as a decomposition
+<span class="math">\(m = aq + r\)</span> where <span class="math">\(r = m \space \text{mod} \space a\)</span> and
+<span class="math">\(q = m/a\)</span>.</p>
+<div class="math">$$ ax \space \text{mod} \space m = \begin{cases} a(x \space \text{mod} \space q) - r\frac{x}{q} &amp; \text{if} \space x \space \text{is} \geq 0 \ a(x \space \text{mod} \space q) - r\frac{x}{q} + m &amp; \text{if} \space x \space \text{is} \leq 0 \end{cases} $$</div>
+<h2>Multiplicative Congruential Generator in R</h2>
+<p>We can implement a Lehmer random number generator in R using the
+parameters mentioned earlier.</p>
+<div class="highlight"><pre><span></span><span class="n">lehmer</span><span class="p">.</span><span class="n">rng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">rng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">m</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">2147483647</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">48271</span><span class="w"></span>
+<span class="w">  </span><span class="n">q</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">44488</span><span class="w"></span>
+<span class="w">  </span><span class="n">r</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="mi">3399</span><span class="w"></span>
+
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="k">Set</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="k">using</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">current</span><span class="w"> </span><span class="k">system</span><span class="w"> </span><span class="nc">time</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">microseconds</span><span class="p">.</span><span class="w"> </span>
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">initial</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">coprime</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">modulus</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="n">which</span><span class="w"> </span><span class="n">we</span><span class="w"> </span><span class="k">are</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">really</span><span class="w"> </span><span class="n">concerning</span><span class="w"> </span><span class="n">ourselves</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">example</span><span class="p">.</span><span class="w"></span>
+<span class="w">  </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">as</span><span class="p">.</span><span class="nc">numeric</span><span class="p">(</span><span class="n">Sys</span><span class="p">.</span><span class="nc">time</span><span class="p">())</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">q</span><span class="w"></span>
+<span class="w">    </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">%%</span><span class="w"> </span><span class="n">q</span><span class="w"></span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">h</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">t</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">d</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">rng</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+
+<span class="err">#</span><span class="w"> </span><span class="k">Print</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">first</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="n">randomly</span><span class="w"> </span><span class="n">generated</span><span class="w"> </span><span class="n">numbers</span><span class="w"></span>
+<span class="n">lehmer</span><span class="p">.</span><span class="n">rng</span><span class="p">()</span><span class="w"></span>
+
+<span class="err">##</span><span class="w">  </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="mf">0.2989853</span><span class="w"> </span><span class="mf">0.3212989</span><span class="w"> </span><span class="mf">0.4203729</span><span class="w"> </span><span class="mf">0.8204848</span><span class="w"> </span><span class="mf">0.6216723</span><span class="w"> </span><span class="mf">0.7438678</span><span class="w"> </span><span class="mf">0.2423953</span><span class="w"></span>
+<span class="err">##</span><span class="w">  </span><span class="o">[</span><span class="n">8</span><span class="o">]</span><span class="w"> </span><span class="mf">0.6624031</span><span class="w"> </span><span class="mf">0.8598363</span><span class="w"> </span><span class="mf">0.1600496</span><span class="w"></span>
+</pre></div>
+
+
+<p>Plotting our multiplicative congruential generator in three dimensions
+allows us to visualize the apparent 'randomness' of the generator. As
+before, we generate three random vectors <span class="math">\(x\)</span>, <span class="math">\(y\)</span>, <span class="math">\(z\)</span> with our Lehmer
+RNG function and plot the points. The <a href="https://cran.r-project.org/web/packages/plot3D/index.html">plot3d
+package</a> is
+used to create the scatterplot and the <a href="https://cran.r-project.org/web/packages/animation/">animation
+package</a> is used to
+animate each scatterplot as the length of the random vectors, <span class="math">\(n\)</span>,
+increases.</p>
+<div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plot3D</span><span class="p">)</span><span class="w"></span>
+<span class="n">library</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">c</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span><span class="w"> </span><span class="mi">20000</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">saveGIF</span><span class="p">(</span><span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="n">length</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lehmer</span><span class="p">.</span><span class="n">rng</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lehmer</span><span class="p">.</span><span class="n">rng</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">z</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lehmer</span><span class="p">.</span><span class="n">rng</span><span class="p">(</span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">scatter3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">colvar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">pch</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">cex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">theta</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="s1">&#39;n = &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+<span class="err">}</span><span class="p">,</span><span class="w"> </span><span class="n">movie</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lehmer.gif&#39;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+
+
+<p>The generator appears to be generating suitably random numbers
+demonstrated by the increasing swarm of points as <span class="math">\(n\)</span> increases.</p>
+<p><img alt="" src="figure/lehmer/lehmer.gif"></p>
+<h2>References</h2>
+<p>Anne Gille-Genest (March 1, 2012). Implementation of the Pseudo-Random
+Number Generators and the Low Discrepancy Sequences.</p>
+<p>Saucier, R. (2000). Computer Generation of Statistical Distributions
+(1st ed.). Aberdeen, MD. Army Research Lab.</p>
+<p>Stephen K. Park; Keith W. Miller; Paul K. Stockmeyer (1988). "Technical
+Correspondence". Communications of the ACM. 36 (7): 105â110.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/combined-linear-congruential-generator-prng-r.html">Combined Linear Congruential Generator for Pseudo-random Number Generation</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-congruential-generator-r.html">Linear Congruential Generator for Pseudo-random Number Generation with R</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

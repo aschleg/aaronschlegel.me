@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Introduction to Rpoet</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/r.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="The Rpoet package is a wrapper of the PoetryDB API, which enables developers and other users to extract a vast amount of English-language poetry from nearly 130 authors. The package provides a simple R interface for interacting and accessing the PoetryDB database. This vignette will introduce the basic functionality of Rpoet and some example usages of the package." />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Introduction to Rpoet" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2018-07-28 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="The Rpoet package is a wrapper of the PoetryDB API, which enables developers and other users to extract a vast amount of English-language poetry from nearly 130 authors. The package provides a simple R interface for interacting and accessing the PoetryDB database. This vignette will introduce the basic functionality of Rpoet and some example usages of the package." />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/introduction-rpoet.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/introduction-rpoet.html" rel="bookmark"
+                   title="Permalink to Introduction to Rpoet">Introduction to Rpoet</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2018-07-28T00:00:00-07:00">
+                Sat 28 July 2018
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>The <code>Rpoet</code> package is a wrapper of the <a href="http://poetrydb.org">PoetryDB API</a>, which enables developers and other users to extract a vast amount of English-language poetry from nearly 130 authors (as of this writing). The package provides a simple R interface for interacting and accessing the PoetryDB database. This vignette will introduce the basic functionality of <code>Rpoet</code> and some example usages of the package.</p>
+<h2>First Steps</h2>
+<p>If not done already, install <code>Rpoet</code> using <code>install.packages()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#39;Rpoet&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The latest development version can also be installed using the <a href="https://CRAN.R-project.org/package=devtools">devtools</a> function <code>install_github</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">devtools</span><span class="o">::</span><span class="nf">install_github</span><span class="p">(</span><span class="s">&#39;aschleg/Rpoet&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>After <code>Rpoet</code> is installed, load it using the <code>library()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">Rpoet</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Using Rpoet</h2>
+<p>The <code>get.poetry</code> function acts as the interface to the <code>PoetryDB</code> API. The only required parameter in the function is the <code>input_term</code>, which must be one or a combination of the following:</p>
+<ul>
+<li>'author'</li>
+<li>'title'</li>
+<li>'lines'</li>
+<li>'linecount'</li>
+</ul>
+<p>The <code>search_term</code> parameter should correspond to the given <code>input_term</code>. For example, if we are interested in finding the poems and sonnets of <a href="https://en.wikipedia.org/wiki/William_Shakespeare">William Shakespeare</a>, we would use the <code>get.poetry</code> function like so:</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="s">&#39;William Shakespeare&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>In the case of searching for a particular poem or sonnet:</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="s">&#39;Paradise Lost&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For users who know of a certain line in a poem and want the full poem:</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;lines&#39;</span><span class="p">,</span> <span class="s">&#39;But thou contracted to thine own bright eyes,&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Limiting Returned Results</h3>
+<p>In the samples given above, all of the data found by the API will be returned. The resulting data returned from the API can be specified by utilizing the <code>output</code> parameter. Similar to the <code>input_term</code> parameter, <code>output</code> can be any one or a combination of 'author', 'title', 'lines' or 'linecount'. For example, the following would return all of Shakespeare's poem titles and linecounts rather than the full returned object.</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="s">&#39;William Shakespeare&#39;</span><span class="p">,</span> <span class="s">&#39;title,linecount&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>If we only wanted to get the lines of John Milton's <a href="https://en.wikipedia.org/wiki/Paradise_Lost"><em>Paradise Lost</em></a>, the function would look similar to the following:</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="s">&#39;Paradise Lost&#39;</span><span class="p">,</span> <span class="s">&#39;lines&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Combination Searches</h3>
+<p>Multiple input and search terms can be passed in the <code>input_term</code> and <code>search_term</code> parameters. Each term passed in the <code>input_term</code> parameter must be delimited by a comma, while the terms in the <code>search_term</code> parameter should be delimited by a semi-colon. There must be a corresponding search term for each passed input term. For example, let's say we want to find the full title name and the line count of <a href="https://en.wikipedia.org/wiki/John_Milton">John Milton's</a> poetry with <a href="https://en.wikipedia.org/wiki/Paradise_Lost"><em>Paradise Lost</em></a> in the title.</p>
+<div class="highlight"><pre><span></span><span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;title,author&#39;</span><span class="p">,</span> <span class="s">&#39;Paradise Lost;Milton&#39;</span><span class="p">,</span> <span class="s">&#39;title,linecount&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>As another example, let's say we are interested in finding all of William Shakespeare's poems and sonnets that are fourteen lines long (a <a href="http://www.english.illinois.edu/maps/sonnet.htm">sonnet</a> is a poem of 14 equal length lines).</p>
+<div class="highlight"><pre><span></span><span class="n">fourteen_lines</span> <span class="o">&lt;-</span> <span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;author,linecount&#39;</span><span class="p">,</span> <span class="s">&#39;William Shakespeare;14&#39;</span><span class="p">,</span> <span class="s">&#39;title,linecount&#39;</span><span class="p">)</span>
+<span class="nf">nrow</span><span class="p">(</span><span class="n">fourteen_lines</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Other Examples</h2>
+<h3>Getting Available Authors and Titles</h3>
+<p>A list of authors and titles in the PoetryDB can be found by setting the <code>input_term</code> parameter to 'author' or 'title' while keeping the <code>search_term</code> parameter <code>NULL</code>. In the example below, we see how many authors and poetry titles are currently in <code>PoetryDB</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">authors</span> <span class="o">&lt;-</span> <span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">)</span>
+<span class="n">titles</span> <span class="o">&lt;-</span> <span class="nf">get.poetry</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="nf">paste</span><span class="p">(</span><span class="s">&#39;Number of authors:&#39;</span><span class="p">,</span> <span class="nf">length</span><span class="p">(</span><span class="n">authors</span><span class="o">$</span><span class="n">authors</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="p">),</span> 
+        <span class="nf">paste</span><span class="p">(</span><span class="s">&#39;Number of titles:&#39;</span><span class="p">,</span> <span class="nf">length</span><span class="p">(</span><span class="n">titles</span><span class="o">$</span><span class="n">titles</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>We see there are 129 authors and just under 3,000 titles in <code>PoetryDB</code> at the time of this writing. Therefore, the average number of poems for each author in the database can be calculated:</p>
+<div class="highlight"><pre><span></span><span class="nf">length</span><span class="p">(</span><span class="n">titles</span><span class="o">$</span><span class="n">titles</span><span class="p">)</span> <span class="o">/</span> <span class="nf">length</span><span class="p">(</span><span class="n">authors</span><span class="o">$</span><span class="n">authors</span><span class="p">)</span>
+</pre></div>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-two.html">PetfindeR, R Wrapper for the Petfinder API, Introduction Part Two</a></li>
+                        <li><a href="https://aaronschlegel.me/petfinder-r-wrapper-petfinder-api-introduction-part-one.html">PetfindeR, R Wrapper for the Petfinder API, Introduction Part One</a></li>
+                        <li><a href="https://aaronschlegel.me/tukeys-test-post-hoc-analysis.html">Tukey's Test for Post-Hoc Analysis</a></li>
+                        <li><a href="https://aaronschlegel.me/kruskal-wallis-one-way-analysis-variance-ranks.html">Kruskal-Wallis One-Way Analysis of Variance of Ranks</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>

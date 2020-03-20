@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - poetry</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/poetry.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2018-07-28T00:00:00-07:00</updated><entry><title>Introduction to Rpoet</title><link href="https://aaronschlegel.me/introduction-rpoet.html" rel="alternate"></link><published>2018-07-28T00:00:00-07:00</published><updated>2018-07-28T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2018-07-28:/introduction-rpoet.html</id><summary type="html">&lt;p&gt;The Rpoet package is a wrapper of the PoetryDB API, which enables developers and other users to extract a vast amount of English-language poetry from nearly 130 authors. The package provides a simple R interface for interacting and accessing the PoetryDB database. This vignette will introduce the basic functionality of Rpoet and some example usages of the package.&lt;/p&gt;</summary><content type="html">&lt;p&gt;The &lt;code&gt;Rpoet&lt;/code&gt; package is a wrapper of the &lt;a href="http://poetrydb.org"&gt;PoetryDB API&lt;/a&gt;, which enables developers and other users to extract a vast amount of English-language poetry from nearly 130 authors (as of this writing). The package provides a simple R interface for interacting and accessing the PoetryDB database. This vignette will introduce the basic functionality of &lt;code&gt;Rpoet&lt;/code&gt; and some example usages of the package.&lt;/p&gt;
+&lt;h2&gt;First Steps&lt;/h2&gt;
+&lt;p&gt;If not done already, install &lt;code&gt;Rpoet&lt;/code&gt; using &lt;code&gt;install.packages()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Rpoet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The latest development version can also be installed using the &lt;a href="https://CRAN.R-project.org/package=devtools"&gt;devtools&lt;/a&gt; function &lt;code&gt;install_github&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;devtools&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;install_github&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;aschleg/Rpoet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After &lt;code&gt;Rpoet&lt;/code&gt; is installed, load it using the &lt;code&gt;library()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Rpoet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Using Rpoet&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;get.poetry&lt;/code&gt; function acts as the interface to the &lt;code&gt;PoetryDB&lt;/code&gt; API. The only required parameter in the function is the &lt;code&gt;input_term&lt;/code&gt;, which must be one or a combination of the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;'author'&lt;/li&gt;
+&lt;li&gt;'title'&lt;/li&gt;
+&lt;li&gt;'lines'&lt;/li&gt;
+&lt;li&gt;'linecount'&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The &lt;code&gt;search_term&lt;/code&gt; parameter should correspond to the given &lt;code&gt;input_term&lt;/code&gt;. For example, if we are interested in finding the poems and sonnets of &lt;a href="https://en.wikipedia.org/wiki/William_Shakespeare"&gt;William Shakespeare&lt;/a&gt;, we would use the &lt;code&gt;get.poetry&lt;/code&gt; function like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;William Shakespeare&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the case of searching for a particular poem or sonnet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Paradise Lost&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For users who know of a certain line in a poem and want the full poem:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;lines&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;But thou contracted to thine own bright eyes,&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Limiting Returned Results&lt;/h3&gt;
+&lt;p&gt;In the samples given above, all of the data found by the API will be returned. The resulting data returned from the API can be specified by utilizing the &lt;code&gt;output&lt;/code&gt; parameter. Similar to the &lt;code&gt;input_term&lt;/code&gt; parameter, &lt;code&gt;output&lt;/code&gt; can be any one or a combination of 'author', 'title', 'lines' or 'linecount'. For example, the following would return all of Shakespeare's poem titles and linecounts rather than the full returned object.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;William Shakespeare&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;title,linecount&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If we only wanted to get the lines of John Milton's &lt;a href="https://en.wikipedia.org/wiki/Paradise_Lost"&gt;&lt;em&gt;Paradise Lost&lt;/em&gt;&lt;/a&gt;, the function would look similar to the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Paradise Lost&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;lines&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Combination Searches&lt;/h3&gt;
+&lt;p&gt;Multiple input and search terms can be passed in the &lt;code&gt;input_term&lt;/code&gt; and &lt;code&gt;search_term&lt;/code&gt; parameters. Each term passed in the &lt;code&gt;input_term&lt;/code&gt; parameter must be delimited by a comma, while the terms in the &lt;code&gt;search_term&lt;/code&gt; parameter should be delimited by a semi-colon. There must be a corresponding search term for each passed input term. For example, let's say we want to find the full title name and the line count of &lt;a href="https://en.wikipedia.org/wiki/John_Milton"&gt;John Milton's&lt;/a&gt; poetry with &lt;a href="https://en.wikipedia.org/wiki/Paradise_Lost"&gt;&lt;em&gt;Paradise Lost&lt;/em&gt;&lt;/a&gt; in the title.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;title,author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Paradise Lost;Milton&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;title,linecount&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As another example, let's say we are interested in finding all of William Shakespeare's poems and sonnets that are fourteen lines long (a &lt;a href="http://www.english.illinois.edu/maps/sonnet.htm"&gt;sonnet&lt;/a&gt; is a poem of 14 equal length lines).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;fourteen_lines&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;author,linecount&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;William Shakespeare;14&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;title,linecount&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fourteen_lines&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Other Examples&lt;/h2&gt;
+&lt;h3&gt;Getting Available Authors and Titles&lt;/h3&gt;
+&lt;p&gt;A list of authors and titles in the PoetryDB can be found by setting the &lt;code&gt;input_term&lt;/code&gt; parameter to 'author' or 'title' while keeping the &lt;code&gt;search_term&lt;/code&gt; parameter &lt;code&gt;NULL&lt;/code&gt;. In the example below, we see how many authors and poetry titles are currently in &lt;code&gt;PoetryDB&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;authors&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;titles&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;get.poetry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Number of authors:&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;authors&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;authors&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; 
+        &lt;span class="nf"&gt;paste&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Number of titles:&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;titles&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;titles&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We see there are 129 authors and just under 3,000 titles in &lt;code&gt;PoetryDB&lt;/code&gt; at the time of this writing. Therefore, the average number of poems for each author in the database can be calculated:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;titles&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;titles&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;authors&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;authors&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="R"></category><category term="APIs"></category><category term="poetry"></category></entry></feed>

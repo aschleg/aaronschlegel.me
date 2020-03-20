@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - singular value decomposition</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/singular-value-decomposition.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2016-11-03T00:00:00-07:00</updated><entry><title>Singular Value Decomposition and R Example</title><link href="https://aaronschlegel.me/singular-value-decomposition-r.html" rel="alternate"></link><published>2016-11-03T00:00:00-07:00</published><updated>2016-11-03T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2016-11-03:/singular-value-decomposition-r.html</id><summary type="html">&lt;p&gt;SVD underpins many statistical and real-world&lt;/p&gt;</summary><content type="html">&lt;p&gt;applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \$1 million recommendation system improvement contest.&lt;/p&gt;
+&lt;p&gt;Following from a previous post on the &lt;a href="http://www.aaronschlegel.com/cholesky-decomposition-r-example.html"&gt;Cholesky
+decomposition&lt;/a&gt; of
+a matrix, I wanted to explore another often used decomposition method
+known as &lt;a href="https://en.wikipedia.org/wiki/Singular_value_decomposition"&gt;Singular Value
+Decomposition&lt;/a&gt;,
+also called SVD. SVD underpins many statistical and real-world
+applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \&lt;span class="math"&gt;\(1 million recommendation system improvement contest. The
+method of SVD works by reducing a matrix $A\)&lt;/span&gt; of rank &lt;span class="math"&gt;\(R\)&lt;/span&gt; to a matrix of
+rank &lt;span class="math"&gt;\(k\)&lt;/span&gt; and is applicable for both square and rectangular matrices.&lt;/p&gt;
+&lt;p&gt;Singular value decomposition can be thought of as a method that
+transforms correlated variables into a set of uncorrelated variables,
+enabling one to better analyze the relationships of the original data
+(Baker, 2005). Similar to Cholesky decomposition, SVD factors a matrix
+&lt;span class="math"&gt;\(A\)&lt;/span&gt; into a product of three matrices:&lt;/p&gt;
+&lt;div class="math"&gt;$$ A = U\Sigma V^T $$&lt;/div&gt;
+&lt;p&gt;Where the columns of matrices &lt;span class="math"&gt;\(U\)&lt;/span&gt; and &lt;span class="math"&gt;\(V\)&lt;/span&gt; are orthonormal (orthogonal
+unit vectors) and &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; is a diagonal matrix. The columns of &lt;span class="math"&gt;\(U\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(V\)&lt;/span&gt; are the eigenvectors of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and &lt;span class="math"&gt;\(A^T A\)&lt;/span&gt;, respectively. The
+entries in the diagonal matrix &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; are the singular values &lt;span class="math"&gt;\(r\)&lt;/span&gt;,
+which are the square roots of the non-zero eigenvalues of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(A^T A\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Singular Value Decomposition in R&lt;/h2&gt;
+&lt;p&gt;Base R provides the function &lt;code&gt;svd()&lt;/code&gt; for performing SVD. The following
+matrix was taken from Problem 2.23 in the book Methods of Multivariate
+Analysis by Alvin Rencher.&lt;/p&gt;
+&lt;div class="math"&gt;$$A = 
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 \\
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;A&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]              4              -5              -1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]              7              -2               3&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]             -1               4              -3&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]              8               2               6&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The singular value decomposition of the matrix is computed using the
+&lt;code&gt;svd()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A.svd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;svd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;A.svd&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## $d&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 13.161210  6.999892  3.432793&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $u&lt;/span&gt;
+&lt;span class="err"&gt;##            [,1]       [,2]        [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.2816569  0.7303849 -0.42412326&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.5912537  0.1463017 -0.18371213&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.2247823 -0.4040717 -0.88586638&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.7214994 -0.5309048  0.04012567&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $v&lt;/span&gt;
+&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.8557101  0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.1555269 -0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.4935297 -0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Thus the above matrix &lt;span class="math"&gt;\(A\)&lt;/span&gt; can be factorized as the following:&lt;/p&gt;
+&lt;div class="math"&gt;$$\begin{bmatrix}
+ 0.281657 &amp;amp; -0.730385 &amp;amp; -0.424123 &amp;amp; 0.455332 \\
+ 0.591254 &amp;amp; -0.146302 &amp;amp; -0.183712 &amp;amp; -0.771534 \\
+ -0.224782 &amp;amp; 0.404072 &amp;amp; -0.885866 &amp;amp; -0.0379443 \\
+ 0.721499 &amp;amp; 0.530905 &amp;amp; 0.0401257 &amp;amp; 0.442683 \\
+\end{bmatrix}\begin{bmatrix}
+ 13.1612 &amp;amp; 0 &amp;amp; 0 \\
+ 0 &amp;amp; 6.99989 &amp;amp; 0 \\
+ 0 &amp;amp; 0 &amp;amp; 3.43279 \\
+ 0 &amp;amp; 0 &amp;amp; 0 \\
+\end{bmatrix}\begin{bmatrix}
+ 0.85571 &amp;amp; -0.0146409 &amp;amp; -0.517248 \\
+ -0.155527 &amp;amp; 0.946104 &amp;amp; -0.284076 \\
+ 0.49353 &amp;amp; 0.323533 &amp;amp; 0.807314 \\
+\end{bmatrix}$$&lt;/div&gt;
+&lt;h2&gt;Singular Value Decomposition Step-by-Step&lt;/h2&gt;
+&lt;p&gt;SVD can be performed step-by-step with R by calculating &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; then finding the eigenvalues and eigenvectors of the matrices.
+However, it should be noted this is only for demonstration and not
+recommended in practice as the results can be slightly different than
+the output of the &lt;code&gt;svd()&lt;/code&gt;. This is due to somewhat random changes in
+signs of the eigenvectors from the &lt;code&gt;eigen()&lt;/code&gt; function as the
+eigenvectors can be scaled by &lt;span class="math"&gt;\(-1\)&lt;/span&gt;. &lt;a href="http://stackoverflow.com/questions/17998228/sign-of-eigenvectors-change-depending-on-specification-of-the-symmetric-argument"&gt;This question on
+Stackoverflow&lt;/a&gt;
+contains more information for those curious.&lt;/p&gt;
+&lt;p&gt;First, find &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; and &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="math"&gt;$$A^TA = 
+\begin{bmatrix}
+  4 &amp;amp; 7 &amp;amp; -1 &amp;amp; 8 \\
+  -5 &amp;amp; -2 &amp;amp; 4 &amp;amp; 2 \\
+  -1 &amp;amp; 3 &amp;amp; -3 &amp;amp; 6
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 
+\end{bmatrix} = 
+\begin{bmatrix}
+  130 &amp;amp; -22 &amp;amp; 68 \\
+  -22 &amp;amp; 49 &amp;amp; -1 \\
+  68 &amp;amp; -1 &amp;amp; 55
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ATA&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;
+&lt;span class="n"&gt;ATA&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                 c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## c.4..7...1..8.             130             -22              68&lt;/span&gt;
+&lt;span class="err"&gt;## c..5...2..4..2.            -22              49              -1&lt;/span&gt;
+&lt;span class="err"&gt;## c..1..3...3..6.             68              -1              55&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;span class="math"&gt;\(V\)&lt;/span&gt; component of the singular value decomposition is then found by
+calculating the eigenvectors of the resultant &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ATA.e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ATA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ATA.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.8557101 -0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.1555269  0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.4935297  0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here we see the &lt;span class="math"&gt;\(V\)&lt;/span&gt; matrix is the same as the output of the &lt;code&gt;svd()&lt;/code&gt; but
+with some sign changes. These sign changes can happen, as mentioned
+earlier, as the eigenvector scaled by &lt;span class="math"&gt;\(-1\)&lt;/span&gt; is still the same
+eigenvector, just scaled. We will alter the signs of our calculated &lt;span class="math"&gt;\(V\)&lt;/span&gt;
+to match the output of the &lt;code&gt;svd()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;v.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;v.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.8557101  0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.1555269 -0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.4935297 -0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The same routine is done for the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="math"&gt;$$AA^T = 
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp;amp; 7 &amp;amp; -1 &amp;amp; 8 \\
+  -5 &amp;amp; -2 &amp;amp; 4 &amp;amp; 2 \\
+  -1 &amp;amp; 3 &amp;amp; -3 &amp;amp; 6
+\end{bmatrix} = 
+\begin{bmatrix}
+  42 &amp;amp; 35 &amp;amp; -21 &amp;amp; 16 \\
+  35 &amp;amp; 62 &amp;amp; -24 &amp;amp; 70 \\
+  -21 &amp;amp; -24 &amp;amp; 26 &amp;amp; -18 \\
+  16 &amp;amp; 70 &amp;amp; -17 &amp;amp; 104
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;AAT&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;AAT&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3] [,4]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]   42   35  -21   16&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]   35   62  -24   70&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  -21  -24   26  -18&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]   16   70  -18  104&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The eigenvectors are again found for the computed &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;AAT.e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AAT&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;AAT.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;span class="n"&gt;u.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]       [,2]        [,3]       [,4]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.2816569  0.7303849 -0.42412326 -0.4553316&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.5912537  0.1463017 -0.18371213  0.7715340&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.2247823 -0.4040717 -0.88586638  0.0379443&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.7214994 -0.5309048  0.04012567 -0.4426835&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There are four eigenvectors in the resulting matrix; however, we are
+only interested in the non-zero eigenvalues and their respective
+eigenvectors. Therefore, we can remove the last eigenvector from the
+matrix which gives us the &lt;span class="math"&gt;\(U\)&lt;/span&gt; matrix. Note the eigenvalues of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; are the same except the &lt;span class="math"&gt;\(0\)&lt;/span&gt; eigenvalue in the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;u.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As mentioned earlier, the singular values &lt;span class="math"&gt;\(r\)&lt;/span&gt; are the square roots of
+the non-zero eigenvalues of the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; matrices.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ATA.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;diag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="n"&gt;[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;r&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##          [,1]     [,2]     [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] 13.16121 0.000000 0.000000&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.00000 6.999892 0.000000&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.00000 0.000000 3.432793&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Our answers align with the output of the &lt;code&gt;svd()&lt;/code&gt; function. We can also
+show that the matrix &lt;span class="math"&gt;\(A\)&lt;/span&gt; is indeed equal to the components resulting
+from singular value decomposition.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;svd.matrix&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v.mat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;svd.matrix&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    4   -5   -1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    7   -2    3&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]   -1    4   -3&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]    8    2    6&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;svd.matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;This post explored the very useful and frequently appearing matrix
+decomposition method known as singular value decomposition. The method
+is worthwhile to review as SVD is an essential technique in many
+statistical methods such as principal component analysis and factor
+analysis. I plan on writing more posts that explore practical
+applications of SVD such as compressing an image to provide more
+real-world examples.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;Austin, D. Feature column from the AMS. Retrieved from
+&lt;a href="http://www.ams.org/samplings/feature-column/fcarc-svd"&gt;http://www.ams.org/samplings/feature-column/fcarc-svd&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Baker, K. (2005, March). Singular value decomposition Tutorial.
+Retrieved from
+&lt;a href="https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf"&gt;https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/2SsiA5g"&gt;Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Singular value decomposition (SVD). Retrieved from
+&lt;a href="https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf"&gt;https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;SVD computation example. Retrieved from
+&lt;a href="http://www.d.umn.edu/~mhampton/m4326svd_example.pdf"&gt;http://www.d.umn.edu/~mhampton/m4326svd_example.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="singular value decomposition"></category><category term="linear algebra"></category><category term="matrices"></category></entry></feed>

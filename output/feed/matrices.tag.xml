@@ -1,0 +1,1349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - matrices</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/matrices.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2017-01-19T00:00:00-08:00</updated><entry><title>Principal Component Analysis with R Example</title><link href="https://aaronschlegel.me/principal-component-analysis-r-example.html" rel="alternate"></link><published>2017-01-19T00:00:00-08:00</published><updated>2017-01-19T00:00:00-08:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2017-01-19:/principal-component-analysis-r-example.html</id><summary type="html">&lt;p&gt;Often, it is not helpful or informative to only look at all the variables in a dataset for correlations or covariances. A preferable approach is to derive new variables from the original variables that preserve most of the information given by their variances. Principal component analysis is a widely used and popular statistical method for reducing data with many dimensions (variables) by projecting the data with fewer dimensions using linear combinations of the variables, known as principal components.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Often, it is not helpful or informative to only look at all the
+variables in a dataset for correlations or covariances. A preferable
+approach is to derive new variables from the original variables that
+preserve most of the information given by their variances. Principal
+component analysis is a widely used and popular statistical method for
+reducing data with many dimensions (variables) by projecting the data
+with fewer dimensions using linear combinations of the variables, known
+as principal components. The new projected variables (principal
+components) are uncorrelated with each other and are ordered so that the
+first few components retain most of the variation present in the
+original variables. Thus, PCA is also useful in situations where the
+independent variables are correlated with each other and can be employed
+in exploratory data analysis or for making predictive models. Principal
+component analysis can also reveal important features of the data such
+as outliers and departures from a multinormal distribution.&lt;/p&gt;
+&lt;h2&gt;Defining Principal Components&lt;/h2&gt;
+&lt;p&gt;The first step in defining the principal components of &lt;span class="math"&gt;\(p\)&lt;/span&gt; original
+variables is to find a linear function &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt;, where &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is a vector
+of &lt;span class="math"&gt;\(p\)&lt;/span&gt; constants, for the observation vectors that have maximum
+variance. This linear function is defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ a_1'y = a_{11}x_1 + a_{12}x_2 + \cdots + a_{1p}x_p = \sum_{j=1}^p a_{1j}x_j $$&lt;/div&gt;
+&lt;p&gt;Principal component analysis continues to find a linear function &lt;span class="math"&gt;\(a_2'y\)&lt;/span&gt;
+that is uncorrelated with &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt; with maximized variance and so on up
+to &lt;span class="math"&gt;\(k\)&lt;/span&gt; principal components.&lt;/p&gt;
+&lt;h2&gt;Derivation of Principal Components&lt;/h2&gt;
+&lt;p&gt;The principal components of a dataset are obtained from the sample
+covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt; or the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt;. Although principal
+components obtained from &lt;span class="math"&gt;\(S\)&lt;/span&gt; is the original method of principal
+component analysis, components from &lt;span class="math"&gt;\(R\)&lt;/span&gt; may be more interpretable if the
+original variables have different units or wide variances (Rencher 2002,
+pp. 393). For now, &lt;span class="math"&gt;\(S\)&lt;/span&gt; will be referred to as &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; (denotes a known
+covariance matrix) which will be used in the derivation.&lt;/p&gt;
+&lt;p&gt;The goal of the derivation is to find &lt;span class="math"&gt;\(a'_ky\)&lt;/span&gt; that maximizes the
+variance of &lt;span class="math"&gt;\(a'_ky \Sigma a_k\)&lt;/span&gt;. For this, we will consider the first
+vector &lt;span class="math"&gt;\(a'_1y\)&lt;/span&gt; that maximizes &lt;span class="math"&gt;\(Var(a'_1y) = a'_1y \Sigma a_1\)&lt;/span&gt;. To do
+this maximization, we will need a constraint to rein in otherwise
+unnecessarily large values of &lt;span class="math"&gt;\(a_1\)&lt;/span&gt;. The constraint in this example is
+the unit length vector &lt;span class="math"&gt;\(a_1' a_1 = 1\)&lt;/span&gt;. This constraint is employed with
+a Lagrange multiplier &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; so that the function is maximized at an
+equality constraint of &lt;span class="math"&gt;\(g(x) = 0\)&lt;/span&gt;. Thus the Lagrangian function is
+defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ a'_1 \Sigma a_1 - \lambda(a_1'y a_1 - 1) $$&lt;/div&gt;
+&lt;h2&gt;Brief Aside: Lagrange Multipliers&lt;/h2&gt;
+&lt;p&gt;The Lagrange mulitiplier method is used for finding a maximum or minimum
+of a multivariate function with some constraint on the input values. As
+we are interested in maximization, the problem can be briefly stated as
+'maximize &lt;span class="math"&gt;\(f(x)\)&lt;/span&gt; subject to &lt;span class="math"&gt;\(g(x) = c\)&lt;/span&gt;'. In this example,
+&lt;span class="math"&gt;\(g(x) = a_1'y a_1 = 1\)&lt;/span&gt; and &lt;span class="math"&gt;\(f(x) = a_1'y \Sigma a_1\)&lt;/span&gt;. The Lagrange
+multiplier, defined as &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; allows the combination of &lt;span class="math"&gt;\(f(x)\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(g(x)\)&lt;/span&gt; into a new function &lt;span class="math"&gt;\(L(x, \lambda)\)&lt;/span&gt;, defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ L(a_1'y, \lambda) = f(a_1'y) - \lambda(g(a_1'y) - c) $$&lt;/div&gt;
+&lt;p&gt;The sign of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; can be positive or negative. The new function is
+then solved for a stationary point, in this case &lt;span class="math"&gt;\(0\)&lt;/span&gt;, using partial
+derivatives:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \frac{\partial L(a_1'y, \lambda)}{\partial a_1'y} = 0 $$&lt;/div&gt;
+&lt;p&gt;Returning to principal component analysis, we differentiate
+&lt;span class="math"&gt;\(L(a_1) = a'_1 \Sigma a_1 - \lambda(a_1'y a_1 - 1)\)&lt;/span&gt; with respect to
+&lt;span class="math"&gt;\(a_1\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \frac{\partial L}{\partial a_1} = 2\Sigma a_1 - 2\lambda a_1 = 0 $$&lt;/div&gt;
+&lt;div class="math"&gt;$$ \Sigma a_1 - \lambda a_1 = 0 $$&lt;/div&gt;
+&lt;p&gt;Expressing the above with an identity matrix, &lt;span class="math"&gt;\(I\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;$$ (\Sigma - \lambda I) a_1 = 0 $$&lt;/div&gt;
+&lt;p&gt;Which shows &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is an eigenvector of the covariance matrix
+&lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; and &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is the corresponding eigenvector. As stated
+previously, we are interested in finding &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt; with maximum variance.
+Therefore &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; must be as large as possible which follows &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is
+the eigenvector corresponding to the largest eigenvalue of &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The remaining principal components are found in a similar manner and
+correspond to the &lt;span class="math"&gt;\(k\)&lt;/span&gt;th principal component. Thus the second principal
+component is &lt;span class="math"&gt;\(a_2'y\)&lt;/span&gt; and is equivalent to the eigenvector of the second
+largest eigenvalue of &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt;, and so on.&lt;/p&gt;
+&lt;h2&gt;Principal Component Analysis&lt;/h2&gt;
+&lt;p&gt;Twenty engineer apprentices and twenty pilots were given six tests. The
+data were obtained from the &lt;a href="ftp://ftp.wiley.com"&gt;companion FTP site&lt;/a&gt; of
+the book Methods of Multivariate Analysis by Alvin Rencher. The tests
+measured the following attributes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Intelligence&lt;/li&gt;
+&lt;li&gt;Form Relations&lt;/li&gt;
+&lt;li&gt;Dynamometer&lt;/li&gt;
+&lt;li&gt;Dotting&lt;/li&gt;
+&lt;li&gt;Sensory Motor Coordination&lt;/li&gt;
+&lt;li&gt;Perservation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Principal component analysis will be performed on the data to transform
+the attributes into new variables that will hopefully be more open to
+interpretation and allow us to find any irregularities in the data such
+as outliers.&lt;/p&gt;
+&lt;p&gt;Load the data and name the columns. The factors in the &lt;code&gt;Group&lt;/code&gt; column
+are renamed to their actual grouping names.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read.table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PILOTS.DAT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;col.names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Intelligence&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Form Relations&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                                  &lt;span class="s"&gt;&amp;#39;Dynamometer&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Dotting&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Sensory Motor Coordination&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                                  &lt;span class="s"&gt;&amp;#39;Perservation&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;ifelse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Apprentice&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Pilot&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Inspect the first few rows of the data.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##        Group Intelligence Form.Relations Dynamometer Dotting&lt;/span&gt;
+&lt;span class="err"&gt;## 1 Apprentice          121             22          74     223&lt;/span&gt;
+&lt;span class="err"&gt;## 2 Apprentice          108             30          80     175&lt;/span&gt;
+&lt;span class="err"&gt;## 3 Apprentice          122             49          87     266&lt;/span&gt;
+&lt;span class="err"&gt;## 4 Apprentice           77             37          66     178&lt;/span&gt;
+&lt;span class="err"&gt;## 5 Apprentice          140             35          71     175&lt;/span&gt;
+&lt;span class="err"&gt;## 6 Apprentice          108             37          57     241&lt;/span&gt;
+&lt;span class="err"&gt;##   Sensory.Motor.Coordination Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## 1                         54          254&lt;/span&gt;
+&lt;span class="err"&gt;## 2                         40          300&lt;/span&gt;
+&lt;span class="err"&gt;## 3                         41          223&lt;/span&gt;
+&lt;span class="err"&gt;## 4                         80          209&lt;/span&gt;
+&lt;span class="err"&gt;## 5                         38          261&lt;/span&gt;
+&lt;span class="err"&gt;## 6                         59          245&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The variables appear to be measured in different units which may lead to
+the variables with larger variances dominating the principal components
+of the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;. We will perform principal component
+analysis on the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; later in the example to find a
+scaled and more balanced representation of the components.&lt;/p&gt;
+&lt;p&gt;Find the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt; of the data. The grouping column is not
+included.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;cov&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;S&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                            Intelligence Form.Relations Dynamometer&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                  528.19487       35.98974    27.97949&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations                 35.98974       68.91282   -12.09744&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                    27.97949      -12.09744   145.18974&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                       104.42821      -81.75128   128.88205&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination    -20.03077      -33.00513   -30.85641&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                  291.15385      -18.28205    29.38462&lt;/span&gt;
+&lt;span class="err"&gt;##                               Dotting Sensory.Motor.Coordination&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                104.42821                  -20.03077&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations              -81.75128                  -33.00513&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 128.88205                  -30.85641&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    1366.43013                 -113.58077&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -113.58077                  264.35641&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                395.18590                  -79.85897&lt;/span&gt;
+&lt;span class="err"&gt;##                            Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                  291.15385&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations                -18.28205&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                    29.38462&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                       395.18590&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination    -79.85897&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 1069.11538&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The total variance is defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \sum^k_{j=1} s_{jj} $$&lt;/div&gt;
+&lt;p&gt;Which is also equal to the sum of the eigenvalues of &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;diag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 3442.199&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Compute the eigenvalues and corresponding eigenvectors of &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;s.eigen&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## eigen() decomposition&lt;/span&gt;
+&lt;span class="err"&gt;## $values&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 1722.0424  878.3578  401.4386  261.0769  128.9051   50.3785&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $vectors&lt;/span&gt;
+&lt;span class="err"&gt;##             [,1]        [,2]        [,3]        [,4]        [,5]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.21165160 -0.38949336  0.88819049  0.03082062 -0.04760343&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.03883125 -0.06379320  0.09571590 -0.19128493 -0.14793191&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.08012946  0.06602004  0.08145863 -0.12854488  0.97505667&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.77552673  0.60795970  0.08071120  0.08125631 -0.10891968&lt;/span&gt;
+&lt;span class="err"&gt;## [5,]  0.09593926 -0.01046493  0.01494473  0.96813856  0.10919120&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.58019734 -0.68566916 -0.43426141  0.04518327  0.03644629&lt;/span&gt;
+&lt;span class="err"&gt;##             [,6]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## [5,] -0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The eigenvectors represent the principal components of &lt;span class="math"&gt;\(S\)&lt;/span&gt;. The
+eigenvalues of &lt;span class="math"&gt;\(S\)&lt;/span&gt; are used to find the proportion of the total variance
+explained by the components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 0.5002739&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.2551734&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1166227&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.07584597&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.03744848&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.01463556&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first two principal components account for 75.5% of the total
+variance. A scree graph of the eigenvalues can be plotted to visualize
+the proportion of variance explained by each subsequential eigenvalue.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;xlab&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Eigenvalue Number&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ylab&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Eigenvalue Size&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Scree Graph&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;lines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-8-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The elements of the eigenvectors of &lt;span class="math"&gt;\(S\)&lt;/span&gt; are the 'coefficients' or
+'loadings' of the principal components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##             [,1]        [,2]        [,3]        [,4]        [,5]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.21165160 -0.38949336  0.88819049  0.03082062 -0.04760343&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.03883125 -0.06379320  0.09571590 -0.19128493 -0.14793191&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.08012946  0.06602004  0.08145863 -0.12854488  0.97505667&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.77552673  0.60795970  0.08071120  0.08125631 -0.10891968&lt;/span&gt;
+&lt;span class="err"&gt;## [5,]  0.09593926 -0.01046493  0.01494473  0.96813856  0.10919120&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.58019734 -0.68566916 -0.43426141  0.04518327  0.03644629&lt;/span&gt;
+&lt;span class="err"&gt;##             [,6]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## [5,] -0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first two principal components are thus:&lt;/p&gt;
+&lt;div class="math"&gt;$$ z_1 = a'_1y = -.212y_1 + .039y_2 - 0.080y_3 - 0.776y_4 + 0.096y_5 - 0.580y_6 $$&lt;/div&gt;
+&lt;div class="math"&gt;$$ z_2 = a'_2y = -.389y_1 - .064y_2 + 0.066y_3 + 0.608y_4 - 0.010y_5 - 0.686y_6 $$&lt;/div&gt;
+&lt;h2&gt;Principal Component Analysis with R&lt;/h2&gt;
+&lt;p&gt;Computing the principal components in R is straightforward with the
+functions &lt;code&gt;prcomp()&lt;/code&gt; and &lt;code&gt;princomp()&lt;/code&gt;. The difference between the two is
+simply the method employed to calculate PCA. According to &lt;code&gt;?prcomp&lt;/code&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The calculation is done by a singular value decomposition of the
+(centered and possibly scaled) data matrix, not by using eigen on the
+covariance matrix. This is generally the preferred method for
+numerical accuracy.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;From &lt;code&gt;?princomp&lt;/code&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The calculation is done using eigen on the correlation or covariance
+matrix, as determined by cor. This is done for compatibility with the
+S-PLUS result.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pilots.pca&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Standard deviations (1, .., p=6):&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 41.497499 29.637102 20.035932 16.157875 11.353640  7.097781&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## Rotation (n x k) = (6 x 6):&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC1         PC2         PC3         PC4&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.21165160 -0.38949336  0.88819049 -0.03082062&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.03883125 -0.06379320  0.09571590  0.19128493&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.08012946  0.06602004  0.08145863  0.12854488&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.77552673  0.60795970  0.08071120 -0.08125631&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.09593926 -0.01046493  0.01494473 -0.96813856&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.58019734 -0.68566916 -0.43426141 -0.04518327&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC5         PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence               -0.04760343 -0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.14793191  0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.97505667  0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    -0.10891968  0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  0.10919120  0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.03644629  0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Although we didn't use the preferred method of applying singular value
+decomposition, the components reported by the &lt;code&gt;prcomp()&lt;/code&gt; are the same as
+what was computed earlier save arbitrary scalings of &lt;span class="math"&gt;\(-1\)&lt;/span&gt; to some of the
+eigenvectors.&lt;/p&gt;
+&lt;p&gt;The summary method of &lt;code&gt;prcomp()&lt;/code&gt; also outputs the proportion of variance
+explained by the components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Importance of components:&lt;/span&gt;
+&lt;span class="err"&gt;##                            PC1     PC2     PC3      PC4      PC5     PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Standard deviation     41.4975 29.6371 20.0359 16.15788 11.35364 7.09778&lt;/span&gt;
+&lt;span class="err"&gt;## Proportion of Variance  0.5003  0.2552  0.1166  0.07585  0.03745 0.01464&lt;/span&gt;
+&lt;span class="err"&gt;## Cumulative Proportion   0.5003  0.7554  0.8721  0.94792  0.98536 1.00000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Plotting of Principal Components&lt;/h2&gt;
+&lt;p&gt;The first two principal components are often plotted as a scatterplot
+which may reveal interesting features of the data, such as departures
+from normality, outliers or non-linearity. The first two principal
+components are evaluated for each observation vector and plotted.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="https://cran.r-project.org/web/packages/ggfortify/index.html"&gt;ggfortify
+package&lt;/a&gt;
+provides a handy method for plotting the first two principal components
+with &lt;code&gt;autoplot()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ggfortify&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;autoplot()&lt;/code&gt; function also generates a useful data table of the
+calculated principal components we which we will use later.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pca.plot&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;autoplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pca.plot&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-13-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The points of the two groups are clustered for the most part; however,
+the three points at the top of the graph may be outliers. The data does
+not appear to depart widely from multivariate normality. We will see if
+this conclusion changes when the PCs from the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; are
+plotted.&lt;/p&gt;
+&lt;p&gt;To recreate the graph generated by &lt;code&gt;autoplot()&lt;/code&gt;, scale the data using
+the standard deviations of the principal components multiplied by the
+square root of the number of observations. The principal components are
+then computed for each observation vector. Note the first eigenvector is
+multiplied by a scaling factor of &lt;span class="math"&gt;\(-1\)&lt;/span&gt; so the signs what was reported by
+the &lt;code&gt;prcomp()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;scaling&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;sdev[1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;pc1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rowSums&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sweep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;colMeans&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;scaling[1]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pc2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rowSums&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sweep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;colMeans&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;scaling[2]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Collect the PCs in a &lt;code&gt;data.frame&lt;/code&gt; and plot using &lt;code&gt;ggplot&lt;/code&gt; (loaded when
+&lt;code&gt;ggfortify&lt;/code&gt; was loaded).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pc1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pc2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Apprentice&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Pilot&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PC1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;PC2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;ggplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;PC1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;PC2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="nf"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-15-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The scaling employed when calculating the PCs can be omitted. To remove
+scaling in the &lt;code&gt;autplot()&lt;/code&gt; function, set the &lt;code&gt;scaling&lt;/code&gt; argument to 0.&lt;/p&gt;
+&lt;h2&gt;Principal Component Analysis with the Correlation Matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;As mentioned previously, although principal component analysis is
+typically performed on the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;, it often makes more
+intuitive sense to apply PCA to the correlation matrix. Cases where
+using &lt;span class="math"&gt;\(R\)&lt;/span&gt; may be preferable to &lt;span class="math"&gt;\(S\)&lt;/span&gt; include data that is measured in
+different units or has wide variances. The pilot data analyzed does not
+appear to have commensurate units for each variable, and because we have
+very little information regarding the tests and the measurements
+collected, it might make sense to employ the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix rather than &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The correlation matrix is found with the &lt;code&gt;cor()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;R&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                            Intelligence Form.Relations Dynamometer&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                 1.00000000     0.18863907  0.10103566&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations               0.18863907     1.00000000 -0.12094150&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                  0.10103566    -0.12094150  1.00000000&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                      0.12292126    -0.26641020  0.28935484&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  -0.05360504    -0.24453244 -0.15750071&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 0.38744776    -0.06735388  0.07458298&lt;/span&gt;
+&lt;span class="err"&gt;##                               Dotting Sensory.Motor.Coordination&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.1229213                -0.05360504&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.2664102                -0.24453244&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2893548                -0.15750071&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     1.0000000                -0.18898014&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.1889801                 1.00000000&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.3269606                -0.15021611&lt;/span&gt;
+&lt;span class="err"&gt;##                            Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                 0.38744776&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations              -0.06735388&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                  0.07458298&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                      0.32696061&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  -0.15021611&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 1.00000000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Find the eigenvalues and eigenvectors of the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r.eigen&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As with the covariance matrix, we can compute the proportion of total
+variance explained by the eigenvalues.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;r.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 0.2958546&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.225736&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1787751&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1357993&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.08843547&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.07539955&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What is readily noticeable is the first eigenvalue accounts for 30% of
+total variance compared with 50% of the variance of the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix. The
+first two components of &lt;span class="math"&gt;\(R\)&lt;/span&gt; only account for 52% of total variance while
+the last two components have little significance. Thus, one may want to
+keep the first four components rather than the first two or three with
+the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;p&gt;To perform principal component analysis using the correlation matrix
+using the &lt;code&gt;prcomp()&lt;/code&gt; function, set the &lt;code&gt;scale&lt;/code&gt; argument to &lt;code&gt;TRUE&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;scale&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Standard deviations (1, .., p=6):&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 1.3323392 1.1637937 1.0356884 0.9026604 0.7284317 0.6726049&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## Rotation (n x k) = (6 x 6):&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC1        PC2        PC3        PC4&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.40239072 -0.3964661  0.4617841 -0.3928149&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.09715877 -0.7472294 -0.1752970 -0.1315611&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.38541311  0.2181560 -0.4329575 -0.7177525&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.54333623  0.3144601 -0.1065065  0.2453920&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.31188931  0.3559400  0.6268314 -0.3992852&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.53629229 -0.1062657  0.4053555  0.3058981&lt;/span&gt;
+&lt;span class="err"&gt;##                                   PC5        PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence               -0.2103062 -0.5187674&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.2801896  0.5528697&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2585104  0.1855163&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    -0.7066663  0.1869825&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.2012981  0.4279773&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.5201339  0.4155385&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Importance of components:&lt;/span&gt;
+&lt;span class="err"&gt;##                           PC1    PC2    PC3    PC4     PC5    PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Standard deviation     1.3323 1.1638 1.0357 0.9027 0.72843 0.6726&lt;/span&gt;
+&lt;span class="err"&gt;## Proportion of Variance 0.2959 0.2257 0.1788 0.1358 0.08844 0.0754&lt;/span&gt;
+&lt;span class="err"&gt;## Cumulative Proportion  0.2959 0.5216 0.7004 0.8362 0.92460 1.0000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Plot the first two PCs of the correlation matrix using the &lt;code&gt;autoplot()&lt;/code&gt;
+function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;autoplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-20-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The points remain clustered for the most part; however, there does
+appear to be more points outside that may be considered outliers, though
+they don't appear to be too far off from the cluster. It is important to
+remember the first two PCs of the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix only represent 52% of the
+total variance and thus may not be fully representative of the variance
+in the dataset.&lt;/p&gt;
+&lt;h2&gt;Interpreting Principal Components&lt;/h2&gt;
+&lt;p&gt;Interpretation of principal components is still a heavily researched
+topic in statistics, and although the components may be readily
+interpreted in most settings, this is not always the case (Joliffe,
+2002).&lt;/p&gt;
+&lt;p&gt;One method of interpretation of the principal components is to calculate
+the correlation between the original data and the component. The
+&lt;code&gt;autoplot()&lt;/code&gt; function also generates a nice data table with the original
+variables and the calculated PCs, which we will use here to find the
+correlations.&lt;/p&gt;
+&lt;p&gt;First, compute the correlations between the data and the calculated
+components of the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;comps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pca.plot&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;data[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;comps[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;comps[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                                   PC1         PC2         PC3&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.3821610 -0.50227170  0.77431660&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.1941124 -0.22775091  0.23101683&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2759600  0.16238412  0.13544989&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.8706127  0.48743512  0.04374714&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.2448631 -0.01907555  0.01841632&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.7363518 -0.62149561 -0.26610222&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The PCs can then be interpreted based on which variables they are most
+correlated in either a positive or negative direction. The level at
+which the correlations are significant is left to the researcher.&lt;/p&gt;
+&lt;p&gt;The first component is positively correlated with Dotting, Perservation,
+Intelligence and Dynamometer. This correlation suggests the five
+variables vary together and when one goes down, the others decrease as
+well. The component is most correlated with Dotting at &lt;span class="math"&gt;\(.087\)&lt;/span&gt; and could
+be considered as primarily a measure of Dotting.&lt;/p&gt;
+&lt;p&gt;The second component is most correlated with Perservation and
+Intelligence, both in a negative direction. Dotting is correlated with
+the second component in a positive direction, which would indicate that
+as Perservation and Intelligence decrease, Dotting increases.&lt;/p&gt;
+&lt;p&gt;The third component is primarily correlated with Intelligence and not
+much else. This component could be viewed as a measure of the
+intelligence of the individual apprentice or pilot.&lt;/p&gt;
+&lt;p&gt;It was decided previously that due to lack of information regarding the
+variables and their units of measurement, it makes more sense to use the
+correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; for performing principal component analysis.
+Let's see how the interpretation of the principal components changes
+when we use the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;comps.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;data[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;comps.scaled[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;comps.scaled[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                                   PC1        PC2        PC3&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.5361209 -0.4614047  0.4782644&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.1294484 -0.8696209 -0.1815530&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.5135010  0.2538886 -0.4484090&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.7239081  0.3659667 -0.1103075&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.4155423  0.4142408  0.6492020&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.7145232 -0.1236713  0.4198220&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The most apparent changes between the correlations of the original
+variables and the PCs of the &lt;span class="math"&gt;\(S\)&lt;/span&gt; and &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrices are in components 2
+and 3. The first principal component is still strongly correlated with
+the variables Dotting and Perservation, but now the variables
+Intelligence and Dynamometer are much more correlated and could indicate
+that as the former two variables decrease, the latter two increase.&lt;/p&gt;
+&lt;p&gt;The second component is now correlated the most with Forming Relations
+and not much else, whereas with the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix the component was
+correlated more to Perservation and Intelligence. This difference in
+variable correlations between the components of the two matrices may
+indicate Perservation and Intelligence were unduly dominating the
+variances.&lt;/p&gt;
+&lt;p&gt;The third component is now most correlated with Sensory Motor
+Coordination and secondarily Intelligence and Perservation, which
+indicates that subjects with high Sensory Motor Coordination test scores
+also have higher Intelligence and Perservation scores.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;This post ended up being much longer than I had anticipated but I hope
+it is a good introduction to the power and benefits of principal
+component analysis. The post covered PCA with the covariance and
+correlation matrices as well as plotting and interpreting the principal
+components. I plan to continue discussing PCA in the future as there are
+many more topics and applications related to the dimension reduction
+technique.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/2H8GIoi"&gt;Joliffe, I. T. (2002). Principal Component Analysis (2nd ed.). Springer.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/39gsldt"&gt;Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://onlinecourses.science.psu.edu/stat505/node/54"&gt;https://onlinecourses.science.psu.edu/stat505/node/54&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="principal component analysis"></category><category term="linear algebra"></category><category term="matrices"></category></entry><entry><title>Singular Value Decomposition and R Example</title><link href="https://aaronschlegel.me/singular-value-decomposition-r.html" rel="alternate"></link><published>2016-11-03T00:00:00-07:00</published><updated>2016-11-03T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2016-11-03:/singular-value-decomposition-r.html</id><summary type="html">&lt;p&gt;SVD underpins many statistical and real-world&lt;/p&gt;</summary><content type="html">&lt;p&gt;applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \$1 million recommendation system improvement contest.&lt;/p&gt;
+&lt;p&gt;Following from a previous post on the &lt;a href="http://www.aaronschlegel.com/cholesky-decomposition-r-example.html"&gt;Cholesky
+decomposition&lt;/a&gt; of
+a matrix, I wanted to explore another often used decomposition method
+known as &lt;a href="https://en.wikipedia.org/wiki/Singular_value_decomposition"&gt;Singular Value
+Decomposition&lt;/a&gt;,
+also called SVD. SVD underpins many statistical and real-world
+applications principal component analysis, image compression, noise
+reduction of an image, and even climate studies. Singular value
+decomposition was also a primary technique used in the winning solution
+of Netflix's \&lt;span class="math"&gt;\(1 million recommendation system improvement contest. The
+method of SVD works by reducing a matrix $A\)&lt;/span&gt; of rank &lt;span class="math"&gt;\(R\)&lt;/span&gt; to a matrix of
+rank &lt;span class="math"&gt;\(k\)&lt;/span&gt; and is applicable for both square and rectangular matrices.&lt;/p&gt;
+&lt;p&gt;Singular value decomposition can be thought of as a method that
+transforms correlated variables into a set of uncorrelated variables,
+enabling one to better analyze the relationships of the original data
+(Baker, 2005). Similar to Cholesky decomposition, SVD factors a matrix
+&lt;span class="math"&gt;\(A\)&lt;/span&gt; into a product of three matrices:&lt;/p&gt;
+&lt;div class="math"&gt;$$ A = U\Sigma V^T $$&lt;/div&gt;
+&lt;p&gt;Where the columns of matrices &lt;span class="math"&gt;\(U\)&lt;/span&gt; and &lt;span class="math"&gt;\(V\)&lt;/span&gt; are orthonormal (orthogonal
+unit vectors) and &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; is a diagonal matrix. The columns of &lt;span class="math"&gt;\(U\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(V\)&lt;/span&gt; are the eigenvectors of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and &lt;span class="math"&gt;\(A^T A\)&lt;/span&gt;, respectively. The
+entries in the diagonal matrix &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; are the singular values &lt;span class="math"&gt;\(r\)&lt;/span&gt;,
+which are the square roots of the non-zero eigenvalues of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(A^T A\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Singular Value Decomposition in R&lt;/h2&gt;
+&lt;p&gt;Base R provides the function &lt;code&gt;svd()&lt;/code&gt; for performing SVD. The following
+matrix was taken from Problem 2.23 in the book Methods of Multivariate
+Analysis by Alvin Rencher.&lt;/p&gt;
+&lt;div class="math"&gt;$$A = 
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 \\
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;A&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]              4              -5              -1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]              7              -2               3&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]             -1               4              -3&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]              8               2               6&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The singular value decomposition of the matrix is computed using the
+&lt;code&gt;svd()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A.svd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;svd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;A.svd&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## $d&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 13.161210  6.999892  3.432793&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $u&lt;/span&gt;
+&lt;span class="err"&gt;##            [,1]       [,2]        [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.2816569  0.7303849 -0.42412326&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.5912537  0.1463017 -0.18371213&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.2247823 -0.4040717 -0.88586638&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.7214994 -0.5309048  0.04012567&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $v&lt;/span&gt;
+&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.8557101  0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.1555269 -0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.4935297 -0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Thus the above matrix &lt;span class="math"&gt;\(A\)&lt;/span&gt; can be factorized as the following:&lt;/p&gt;
+&lt;div class="math"&gt;$$\begin{bmatrix}
+ 0.281657 &amp;amp; -0.730385 &amp;amp; -0.424123 &amp;amp; 0.455332 \\
+ 0.591254 &amp;amp; -0.146302 &amp;amp; -0.183712 &amp;amp; -0.771534 \\
+ -0.224782 &amp;amp; 0.404072 &amp;amp; -0.885866 &amp;amp; -0.0379443 \\
+ 0.721499 &amp;amp; 0.530905 &amp;amp; 0.0401257 &amp;amp; 0.442683 \\
+\end{bmatrix}\begin{bmatrix}
+ 13.1612 &amp;amp; 0 &amp;amp; 0 \\
+ 0 &amp;amp; 6.99989 &amp;amp; 0 \\
+ 0 &amp;amp; 0 &amp;amp; 3.43279 \\
+ 0 &amp;amp; 0 &amp;amp; 0 \\
+\end{bmatrix}\begin{bmatrix}
+ 0.85571 &amp;amp; -0.0146409 &amp;amp; -0.517248 \\
+ -0.155527 &amp;amp; 0.946104 &amp;amp; -0.284076 \\
+ 0.49353 &amp;amp; 0.323533 &amp;amp; 0.807314 \\
+\end{bmatrix}$$&lt;/div&gt;
+&lt;h2&gt;Singular Value Decomposition Step-by-Step&lt;/h2&gt;
+&lt;p&gt;SVD can be performed step-by-step with R by calculating &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; then finding the eigenvalues and eigenvectors of the matrices.
+However, it should be noted this is only for demonstration and not
+recommended in practice as the results can be slightly different than
+the output of the &lt;code&gt;svd()&lt;/code&gt;. This is due to somewhat random changes in
+signs of the eigenvectors from the &lt;code&gt;eigen()&lt;/code&gt; function as the
+eigenvectors can be scaled by &lt;span class="math"&gt;\(-1\)&lt;/span&gt;. &lt;a href="http://stackoverflow.com/questions/17998228/sign-of-eigenvectors-change-depending-on-specification-of-the-symmetric-argument"&gt;This question on
+Stackoverflow&lt;/a&gt;
+contains more information for those curious.&lt;/p&gt;
+&lt;p&gt;First, find &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; and &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="math"&gt;$$A^TA = 
+\begin{bmatrix}
+  4 &amp;amp; 7 &amp;amp; -1 &amp;amp; 8 \\
+  -5 &amp;amp; -2 &amp;amp; 4 &amp;amp; 2 \\
+  -1 &amp;amp; 3 &amp;amp; -3 &amp;amp; 6
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 
+\end{bmatrix} = 
+\begin{bmatrix}
+  130 &amp;amp; -22 &amp;amp; 68 \\
+  -22 &amp;amp; 49 &amp;amp; -1 \\
+  68 &amp;amp; -1 &amp;amp; 55
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ATA&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;
+&lt;span class="n"&gt;ATA&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                 c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## c.4..7...1..8.             130             -22              68&lt;/span&gt;
+&lt;span class="err"&gt;## c..5...2..4..2.            -22              49              -1&lt;/span&gt;
+&lt;span class="err"&gt;## c..1..3...3..6.             68              -1              55&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;span class="math"&gt;\(V\)&lt;/span&gt; component of the singular value decomposition is then found by
+calculating the eigenvectors of the resultant &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ATA.e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ATA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ATA.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.8557101 -0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.1555269  0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.4935297  0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here we see the &lt;span class="math"&gt;\(V\)&lt;/span&gt; matrix is the same as the output of the &lt;code&gt;svd()&lt;/code&gt; but
+with some sign changes. These sign changes can happen, as mentioned
+earlier, as the eigenvector scaled by &lt;span class="math"&gt;\(-1\)&lt;/span&gt; is still the same
+eigenvector, just scaled. We will alter the signs of our calculated &lt;span class="math"&gt;\(V\)&lt;/span&gt;
+to match the output of the &lt;code&gt;svd()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;v.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;v.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;
+&lt;span class="n"&gt;v.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]        [,2]       [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.8557101  0.01464091 -0.5172483&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.1555269 -0.94610374 -0.2840759&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.4935297 -0.32353262  0.8073135&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The same routine is done for the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="math"&gt;$$AA^T = 
+\begin{bmatrix}
+  4 &amp;amp; -5 &amp;amp; -1 \\
+  7 &amp;amp; -2 &amp;amp; 3 \\
+  -1 &amp;amp; 4 &amp;amp; -3 \\
+  8 &amp;amp; 2 &amp;amp; 6 
+\end{bmatrix}
+\begin{bmatrix}
+  4 &amp;amp; 7 &amp;amp; -1 &amp;amp; 8 \\
+  -5 &amp;amp; -2 &amp;amp; 4 &amp;amp; 2 \\
+  -1 &amp;amp; 3 &amp;amp; -3 &amp;amp; 6
+\end{bmatrix} = 
+\begin{bmatrix}
+  42 &amp;amp; 35 &amp;amp; -21 &amp;amp; 16 \\
+  35 &amp;amp; 62 &amp;amp; -24 &amp;amp; 70 \\
+  -21 &amp;amp; -24 &amp;amp; 26 &amp;amp; -18 \\
+  16 &amp;amp; 70 &amp;amp; -17 &amp;amp; 104
+\end{bmatrix}$$&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;AAT&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;AAT&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3] [,4]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]   42   35  -21   16&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]   35   62  -24   70&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  -21  -24   26  -18&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]   16   70  -18  104&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The eigenvectors are again found for the computed &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;AAT.e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AAT&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;AAT.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;span class="n"&gt;u.mat&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##            [,1]       [,2]        [,3]       [,4]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.2816569  0.7303849 -0.42412326 -0.4553316&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.5912537  0.1463017 -0.18371213  0.7715340&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.2247823 -0.4040717 -0.88586638  0.0379443&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.7214994 -0.5309048  0.04012567 -0.4426835&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There are four eigenvectors in the resulting matrix; however, we are
+only interested in the non-zero eigenvalues and their respective
+eigenvectors. Therefore, we can remove the last eigenvector from the
+matrix which gives us the &lt;span class="math"&gt;\(U\)&lt;/span&gt; matrix. Note the eigenvalues of &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; are the same except the &lt;span class="math"&gt;\(0\)&lt;/span&gt; eigenvalue in the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;u.mat[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As mentioned earlier, the singular values &lt;span class="math"&gt;\(r\)&lt;/span&gt; are the square roots of
+the non-zero eigenvalues of the &lt;span class="math"&gt;\(AA^T\)&lt;/span&gt; and &lt;span class="math"&gt;\(A^TA\)&lt;/span&gt; matrices.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ATA.e&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;diag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="n"&gt;[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;r&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##          [,1]     [,2]     [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] 13.16121 0.000000 0.000000&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.00000 6.999892 0.000000&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]  0.00000 0.000000 3.432793&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Our answers align with the output of the &lt;code&gt;svd()&lt;/code&gt; function. We can also
+show that the matrix &lt;span class="math"&gt;\(A\)&lt;/span&gt; is indeed equal to the components resulting
+from singular value decomposition.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;svd.matrix&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;u.mat&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v.mat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;svd.matrix&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    4   -5   -1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    7   -2    3&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]   -1    4   -3&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]    8    2    6&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nf"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;svd.matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      c.4..7...1..8. c..5...2..4..2. c..1..3...3..6.&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;span class="err"&gt;## [4,]           TRUE            TRUE            TRUE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;This post explored the very useful and frequently appearing matrix
+decomposition method known as singular value decomposition. The method
+is worthwhile to review as SVD is an essential technique in many
+statistical methods such as principal component analysis and factor
+analysis. I plan on writing more posts that explore practical
+applications of SVD such as compressing an image to provide more
+real-world examples.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;Austin, D. Feature column from the AMS. Retrieved from
+&lt;a href="http://www.ams.org/samplings/feature-column/fcarc-svd"&gt;http://www.ams.org/samplings/feature-column/fcarc-svd&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Baker, K. (2005, March). Singular value decomposition Tutorial.
+Retrieved from
+&lt;a href="https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf"&gt;https://www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/2SsiA5g"&gt;Enderton, H. (1977). Elements of set theory (1st ed.). New York:
+Academic Press.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Singular value decomposition (SVD). Retrieved from
+&lt;a href="https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf"&gt;https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;SVD computation example. Retrieved from
+&lt;a href="http://www.d.umn.edu/~mhampton/m4326svd_example.pdf"&gt;http://www.d.umn.edu/~mhampton/m4326svd_example.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="singular value decomposition"></category><category term="linear algebra"></category><category term="matrices"></category></entry><entry><title>How to Calculate the Inverse Matrix for 2×2 and 3×3 Matrices</title><link href="https://aaronschlegel.me/calculate-matrix-inverse-2x2-3x3.html" rel="alternate"></link><published>2016-08-18T00:00:00-07:00</published><updated>2016-08-18T00:00:00-07:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2016-08-18:/calculate-matrix-inverse-2x2-3x3.html</id><summary type="html">&lt;p&gt;The inverse of a number is its reciprocal. For example, the inverse of 8&lt;/p&gt;</summary><content type="html">&lt;p&gt;is &lt;span class="math"&gt;\(\frac{1}{8}\)&lt;/span&gt;, the inverse of 20 is &lt;span class="math"&gt;\(\frac{1}{20}\)&lt;/span&gt; and so on.
+Therefore, a number multiplied by its inverse will always equal 1. An
+inverse of a number is denoted with a &lt;span class="math"&gt;\(-1\)&lt;/span&gt; superscript.&lt;/p&gt;
+&lt;h2&gt;Inverses of Numbers and Matrices&lt;/h2&gt;
+&lt;p&gt;The inverse of a number is its reciprocal. For example, the inverse of 8
+is &lt;span class="math"&gt;\(\frac{1}{8}\)&lt;/span&gt;, the inverse of 20 is &lt;span class="math"&gt;\(\frac{1}{20}\)&lt;/span&gt; and so on.
+Therefore, a number multiplied by its inverse will always equal 1. An
+inverse of a number is denoted with a &lt;span class="math"&gt;\(-1\)&lt;/span&gt; superscript.&lt;/p&gt;
+&lt;div class="math"&gt;$$ x \cdot \frac{1}{x} = x \cdot x^{-1} = x^{-1} \cdot x = 1 $$&lt;/div&gt;
+&lt;p&gt;The inverse of a matrix &lt;span class="math"&gt;\(A\)&lt;/span&gt; is another matrix denoted by &lt;span class="math"&gt;\(A^{-1}\)&lt;/span&gt; and is
+defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ A^{-1}A = AA^{-1} = I $$&lt;/div&gt;
+&lt;p&gt;Where &lt;span class="math"&gt;\(I\)&lt;/span&gt; is the &lt;a href="https://en.wikipedia.org/wiki/Identity_matrix"&gt;identity
+matrix&lt;/a&gt;. Thus, similar to
+a number and its inverse always equaling 1, a matrix multiplied by its
+inverse equals the identity.&lt;/p&gt;
+&lt;p&gt;This post will explore several concepts related to the inverse of a
+matrix, including linear dependence and the rank of a matrix. Afterward,
+the method of computing an inverse (if one exists) of a &lt;span class="math"&gt;\(2 \times 2\)&lt;/span&gt; or
+&lt;span class="math"&gt;\(3 \times 3\)&lt;/span&gt; matrix shall be demonstrated. Finding the inverse of a
+square matrix with &lt;span class="math"&gt;\(\geq 4\)&lt;/span&gt; columns is computationally intensive and
+best left to R's built-in linear algebra routines which are built on
+&lt;a href="https://en.wikipedia.org/wiki/LINPACK"&gt;LINPACK&lt;/a&gt; and
+&lt;a href="https://en.wikipedia.org/wiki/LAPACK"&gt;LAPACK&lt;/a&gt;. Here is an excellent
+resource that lists the &lt;a href="http://www.statmethods.net/advstats/matrix.html"&gt;linear algebra
+operations&lt;/a&gt; available
+in R. Here is a good resource on how to compute a &lt;a href="http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html"&gt;4x4 inverse
+matrix&lt;/a&gt;
+manually for those interested.&lt;/p&gt;
+&lt;p&gt;The example inverse matrix problems used in the post are from Jim
+Hefferon's excellent book &lt;a href="http://joshua.smcvt.edu/linearalgebra"&gt;Linear
+Algebra&lt;/a&gt; on page 249. I highly
+recommend the book to those learning more about linear algebra. The book
+is free to download and comes with many exercises and other features.&lt;/p&gt;
+&lt;h2&gt;Linear Dependence of a Matrix&lt;/h2&gt;
+&lt;p&gt;The following matrix A has three column vectors.&lt;/p&gt;
+&lt;div class="math"&gt;$$A = 
+\begin{bmatrix}
+  2 &amp;amp; 2 &amp;amp; 3 \\
+  1 &amp;amp; -2 &amp;amp; -3 \\
+  4 &amp;amp; -2 &amp;amp; - 3
+\end{bmatrix}$$&lt;/div&gt;
+&lt;p&gt;Notice the second column vector is a multiple of the third column. The
+matrix is therefore linearly dependent as the matrix contains a column
+vector that is a multiple of another. The matrix is linearly independent
+when no column vector can be expressed as a multiple of another vector
+in the matrix.&lt;/p&gt;
+&lt;div class="math"&gt;$$\begin{bmatrix}
+  2 \\
+  -2 \\
+  -2
+\end{bmatrix}
+=
+\frac{3}{2}
+\begin{bmatrix}
+  3 \\
+  -3 \\
+  -3
+\end{bmatrix}$$&lt;/div&gt;
+&lt;h2&gt;Rank of a Matrix&lt;/h2&gt;
+&lt;p&gt;The rank of a matrix is the maximum number of linearly independent
+columns or linearly independent rows in the matrix. Therefore, the rank
+of a &lt;span class="math"&gt;\(row \times column\)&lt;/span&gt; matrix is the minimum of the two values. For
+example, the above matrix would have a rank of 1. Inverses only exist
+for a square &lt;span class="math"&gt;\(r \times r\)&lt;/span&gt; matrix with rank &lt;span class="math"&gt;\(r\)&lt;/span&gt;, which is called a full
+rank or nonsingular matrix.&lt;/p&gt;
+&lt;h2&gt;Computing an inverse matrix&lt;/h2&gt;
+&lt;p&gt;Consider a 2x2 matrix:&lt;/p&gt;
+&lt;div class="math"&gt;$$\underset{2 \times 2}{A} = 
+\begin{bmatrix}
+  a &amp;amp; b \\
+  c &amp;amp; d
+\end{bmatrix}$$&lt;/div&gt;
+&lt;p&gt;The &lt;span class="math"&gt;\(2 \times 2\)&lt;/span&gt; inverse matrix is then:&lt;/p&gt;
+&lt;div class="math"&gt;$$\underset{2 \times 2}{A^{-1}} = 
+\begin{bmatrix}
+  a &amp;amp; b \\
+  c &amp;amp; d
+\end{bmatrix}^{-1} = 
+\frac{1}{D}
+\begin{bmatrix}
+  d &amp;amp; -b \\
+  -c &amp;amp; a
+\end{bmatrix}$$&lt;/div&gt;
+&lt;p&gt;Where &lt;span class="math"&gt;\(D = ad - bc\)&lt;/span&gt;. &lt;span class="math"&gt;\(D\)&lt;/span&gt; is called the determinant of the matrix.&lt;/p&gt;
+&lt;p&gt;The &lt;span class="math"&gt;\(3 \times 3\)&lt;/span&gt; matrix can be defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$\underset{3 \times 3}{B} = 
+\begin{bmatrix}
+  a &amp;amp; b &amp;amp; c \\
+  d &amp;amp; e &amp;amp; f \\
+  g &amp;amp; h &amp;amp; k
+\end{bmatrix}$$&lt;/div&gt;
+&lt;p&gt;Then the inverse matrix is:&lt;/p&gt;
+&lt;div class="math"&gt;$$\underset{3 \times 3}{B^{-1}} = 
+\begin{bmatrix}
+  a &amp;amp; b &amp;amp; c \\
+  d &amp;amp; e &amp;amp; f \\
+  g &amp;amp; h &amp;amp; k
+\end{bmatrix}^{-1} = 
+\frac{1}{det(B)}
+\begin{bmatrix}
+  (ek - fh) &amp;amp; -(bk - ch) &amp;amp; (bf - ce) \\
+  -(dk - fg) &amp;amp; (ak - cg) &amp;amp; -(af - cd) \\
+  (dh - eg) &amp;amp; -(ah - bg) &amp;amp; (ae - bd)
+\end{bmatrix}$$&lt;/div&gt;
+&lt;p&gt;Where &lt;span class="math"&gt;\(det(B)\)&lt;/span&gt; is equal to:&lt;/p&gt;
+&lt;div class="math"&gt;$$ det(B) = a(ek - fh) - b(dk -fg) + c(dh - eg) $$&lt;/div&gt;
+&lt;p&gt;The following function implements a quick and rough routine to find the
+inverse of a &lt;span class="math"&gt;\(2 \times 2\)&lt;/span&gt; or &lt;span class="math"&gt;\(3 \times 3\)&lt;/span&gt; matrix should one exist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;matrix.inverse&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="c1"&gt;# If there are more than four columns in the supplied matrix, stop routine&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nf"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Matrix is not 2x2 or 3x3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="c1"&gt;# Stop if matrix is a single column vector&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nf"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Matrix is a vector&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="c1"&gt;# 2x2 inverse matrix&lt;/span&gt;
+  &lt;span class="nf"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# Determinant&lt;/span&gt;
+    &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[1]&lt;/span&gt;
+    &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[3]&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[2]&lt;/span&gt;
+    &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[4]&lt;/span&gt;
+    &lt;span class="n"&gt;det&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;
+    &lt;span class="c1"&gt;# Check to see if matrix is singular&lt;/span&gt;
+    &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;det&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nf"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Determinant of matrix equals 0, no inverse exists&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="c1"&gt;# Compute inverse matrix elements&lt;/span&gt;
+    &lt;span class="n"&gt;a.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;b.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;c.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;d.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="c1"&gt;# Collect the results into a new matrix&lt;/span&gt;
+    &lt;span class="n"&gt;inv.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c.inv&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;d.inv&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="c1"&gt;# 3x3 inverse matrix&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;ncol&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# Extract the entries from the matrix&lt;/span&gt;
+    &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[1]&lt;/span&gt;
+    &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[4]&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[7]&lt;/span&gt;
+    &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[2]&lt;/span&gt;
+    &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[5]&lt;/span&gt;
+    &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[8]&lt;/span&gt;
+    &lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[3]&lt;/span&gt;
+    &lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[6]&lt;/span&gt;
+    &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;A[9]&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Compute the determinant and check that it is not 0&lt;/span&gt;
+    &lt;span class="n"&gt;det&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;det&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nf"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Determinant of matrix equals 0, no inverse exists&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Using the equations defined above, calculate the inverse matrix entries.&lt;/span&gt;
+    &lt;span class="n"&gt;A.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;B.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;C.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;D.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;E.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="bp"&gt;F&lt;/span&gt;&lt;span class="n"&gt;.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;G.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;H.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;h&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+    &lt;span class="n"&gt;K.inv&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;det&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Collect the results into a new matrix&lt;/span&gt;
+    &lt;span class="n"&gt;inv.mat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;D.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;G.inv&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;B.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;E.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;H.inv&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;C.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="bp"&gt;F&lt;/span&gt;&lt;span class="n"&gt;.inv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;K.inv&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nf"&gt;return&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;inv.mat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The results from the above function can be used to verify the
+definitions and equations of the inverse matrix above in conjunction
+with R's built-in methods.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;A&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    3    1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    0    2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;matrix.inverse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;A1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##           [,1]       [,2]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] 0.3333333 -0.1666667&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] 0.0000000  0.5000000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##           [,1]       [,2]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] 0.3333333 -0.1666667&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] 0.0000000  0.5000000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;B&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    1    1    3&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    0    2    4&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]   -1    1    0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;B1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;matrix.inverse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;B1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    2 -1.5    1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    2 -1.5    2&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]   -1  1.0   -1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    2 -1.5    1&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    2 -1.5    2&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]   -1  1.0   -1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Recall the product of the matrix and its inverse will always equal the
+identity matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;A1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    1    0&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    0    1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="o"&gt;%*%&lt;/span&gt; &lt;span class="n"&gt;B1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    1    0    0&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    0    1    0&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]    0    0    1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Matrices that are singular or not of full rank will have a determinant
+of 0, and thus no inverse exists.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;C&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;C&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    2   -4&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]   -1    2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Error in solve.default(C): Lapack routine dgesv: system is exactly singular: U[2,2] = 0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;D&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;-3&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="n"&gt;D&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##      [,1] [,2] [,3]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]    2    2    3&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]    1   -2   -3&lt;/span&gt;
+&lt;span class="err"&gt;## [3,]    4   -2   -3&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;D&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Error in solve.default(D): Lapack routine dgesv: system is exactly singular: U[3,3] = 0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;The inverse matrix was explored by examining several concepts such as
+linear dependency and the rank of a matrix. The method of calculating an
+inverse of a &lt;span class="math"&gt;\(2 \times 2\)&lt;/span&gt; and &lt;span class="math"&gt;\(3 \times 3\)&lt;/span&gt; matrix (if one exists) was
+also demonstrated. As stated earlier, finding an inverse matrix is best
+left to a computer, especially when dealing with matrices of
+&lt;span class="math"&gt;\(4 \times 4\)&lt;/span&gt; or above.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;Hefferon, J. (n.d.). Linear Algebra&lt;/p&gt;
+&lt;p&gt;Inverse matrix of 2x2 matrix, 3x3 matrix, 4x4 matrix. Retrieved August
+10, 2016, from
+&lt;a href="http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html"&gt;http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/2vcB1my"&gt;Kutner, M. H., Nachtsheim, C. J., Neter, J., Li, W., &amp;amp; Wasserman, W.
+(2004). Applied linear statistical models (5th ed.). Boston, MA:
+McGraw-Hill Higher Education.&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="linear algebra"></category><category term="matrices"></category></entry></feed>

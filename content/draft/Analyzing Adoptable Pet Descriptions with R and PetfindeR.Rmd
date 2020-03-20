@@ -1,0 +1,136 @@
+---
+title: "Analyzing Adoptable Pet Descriptions with R and PetfindeR"
+author: "Aaron Schlegel"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with PetfindeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+library(httptest)
+start_vignette("PetfindeR_Introduction_Part_One")
+```
+
+## Getting Started
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(PetfindeR)
+library(reshape2)
+library(dplyr)
+```
+
+```{r}
+key <- Sys.getenv('PETFINDER_KEY')
+pf <- Petfinder(key)
+```
+
+## Extracting Adoptable Cat and Dog Descriptions from Petfinder
+
+```{r, eval=FALSE}
+cats <- pf$pet.find(location = 'United States', count = 1000, pages = 2, animal = 'cat', return_df = TRUE)
+dogs <- pf$pet.find(location = 'United States', count = 1000, pages = 2, animal = 'dog', return_df = TRUE)
+```
+
+```{r, eval=FALSE}
+write.csv(cats, '../data/cats.csv')
+write.csv(dogs, '../data/dogs.csv')
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+cats <- read_csv('../data/cats.csv')
+dogs <- read_csv('../data/dogs.csv')
+```
+
+
+```{r}
+cols <- c('animal', 'description')
+
+cats.desc <- cats[,cols]
+dogs.desc <- dogs[,cols]
+
+catdog <- rbind(cats.desc, dogs.desc)
+```
+
+
+```{r}
+clean_text <- function(x) {
+  x <- tm_map(x, tolower)
+  x <- gsub("http\\w+", "", x)
+  x <- tm_map(x, stripWhitespace)
+  x <- tm_map(x, removePunctuation)
+  x <- tm_map(x, removeNumbers)
+  x <- tm_map(x, removeWords, stopwords('english'))
+  x <- tm_map(x, removeWords, c('cat', 'dog', 'will', 'can'))
+  
+  return(x)
+}
+```
+
+```{r}
+descriptions <- Corpus(VectorSource(catdog$description))
+```
+
+```{r}
+descriptions <- Corpus(VectorSource(catdog$description)) %>%
+  tm_map(tolower) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removeWords, stopwords('english')) %>%
+  tm_map(removeWords, c('cat', 'dog', 'will', 'can', 'http\\w+'))
+```
+
+```{r}
+term.mat <- as.matrix(TermDocumentMatrix(descriptions))
+wordcount <- sort(rowSums(term.mat), decreasing = TRUE)
+word.df <- data.frame(word_freq = wordcount)
+```
+
+```{r}
+head(word.df, 10)
+```
+
+```{r, warning=FALSE, message=FALSE}
+wordcloud(words = rownames(word.df), freq = word.df$word_freq, min.freq = 1,
+          max.words=500, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+```{r}
+cats <- filter(cats)
+split.animal <- split(catdog[,2], catdog$animal)
+
+split.animal <- lapply(split.animal, function(x) {
+  paste(x, collapse = '')
+})
+
+cat_dogs <- c(paste(dogs.desc$description, collapse = ' '), paste(cats.desc$description, collapse = ' '))
+
+cat_dogs <- Corpus(VectorSource(cat_dogs)) %>%
+  tm_map(tolower) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removeWords, stopwords('english')) %>%
+  tm_map(removeWords, c('cat', 'dog', 'will', 'can', 'http\\w+'))
+
+descrip <- unlist(descriptions)
+td <- as.matrix(TermDocumentMatrix(Corpus(VectorSource(descrip))))
+split.animal <- c()
+
+colnames(td) <- c('Cat', 'Dog')
+comparison.cloud(tdm, random.order=FALSE, title.size=2.5, max.words=400, colors=brewer.pal(2, "Dark2"))
+```
+
+```{r, include=FALSE}
+end_vignette()
+```

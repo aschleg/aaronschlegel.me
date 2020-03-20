@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Aaron Schlegel's Notebook of Interesting Things - principal component analysis</title><link href="https://aaronschlegel.me/" rel="alternate"></link><link href="https://aaronschlegel.me/feed/principal-component-analysis.tag.xml" rel="self"></link><id>https://aaronschlegel.me/</id><updated>2017-01-19T00:00:00-08:00</updated><entry><title>Principal Component Analysis with R Example</title><link href="https://aaronschlegel.me/principal-component-analysis-r-example.html" rel="alternate"></link><published>2017-01-19T00:00:00-08:00</published><updated>2017-01-19T00:00:00-08:00</updated><author><name>Aaron Schlegel</name></author><id>tag:aaronschlegel.me,2017-01-19:/principal-component-analysis-r-example.html</id><summary type="html">&lt;p&gt;Often, it is not helpful or informative to only look at all the variables in a dataset for correlations or covariances. A preferable approach is to derive new variables from the original variables that preserve most of the information given by their variances. Principal component analysis is a widely used and popular statistical method for reducing data with many dimensions (variables) by projecting the data with fewer dimensions using linear combinations of the variables, known as principal components.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Often, it is not helpful or informative to only look at all the
+variables in a dataset for correlations or covariances. A preferable
+approach is to derive new variables from the original variables that
+preserve most of the information given by their variances. Principal
+component analysis is a widely used and popular statistical method for
+reducing data with many dimensions (variables) by projecting the data
+with fewer dimensions using linear combinations of the variables, known
+as principal components. The new projected variables (principal
+components) are uncorrelated with each other and are ordered so that the
+first few components retain most of the variation present in the
+original variables. Thus, PCA is also useful in situations where the
+independent variables are correlated with each other and can be employed
+in exploratory data analysis or for making predictive models. Principal
+component analysis can also reveal important features of the data such
+as outliers and departures from a multinormal distribution.&lt;/p&gt;
+&lt;h2&gt;Defining Principal Components&lt;/h2&gt;
+&lt;p&gt;The first step in defining the principal components of &lt;span class="math"&gt;\(p\)&lt;/span&gt; original
+variables is to find a linear function &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt;, where &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is a vector
+of &lt;span class="math"&gt;\(p\)&lt;/span&gt; constants, for the observation vectors that have maximum
+variance. This linear function is defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ a_1'y = a_{11}x_1 + a_{12}x_2 + \cdots + a_{1p}x_p = \sum_{j=1}^p a_{1j}x_j $$&lt;/div&gt;
+&lt;p&gt;Principal component analysis continues to find a linear function &lt;span class="math"&gt;\(a_2'y\)&lt;/span&gt;
+that is uncorrelated with &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt; with maximized variance and so on up
+to &lt;span class="math"&gt;\(k\)&lt;/span&gt; principal components.&lt;/p&gt;
+&lt;h2&gt;Derivation of Principal Components&lt;/h2&gt;
+&lt;p&gt;The principal components of a dataset are obtained from the sample
+covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt; or the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt;. Although principal
+components obtained from &lt;span class="math"&gt;\(S\)&lt;/span&gt; is the original method of principal
+component analysis, components from &lt;span class="math"&gt;\(R\)&lt;/span&gt; may be more interpretable if the
+original variables have different units or wide variances (Rencher 2002,
+pp. 393). For now, &lt;span class="math"&gt;\(S\)&lt;/span&gt; will be referred to as &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; (denotes a known
+covariance matrix) which will be used in the derivation.&lt;/p&gt;
+&lt;p&gt;The goal of the derivation is to find &lt;span class="math"&gt;\(a'_ky\)&lt;/span&gt; that maximizes the
+variance of &lt;span class="math"&gt;\(a'_ky \Sigma a_k\)&lt;/span&gt;. For this, we will consider the first
+vector &lt;span class="math"&gt;\(a'_1y\)&lt;/span&gt; that maximizes &lt;span class="math"&gt;\(Var(a'_1y) = a'_1y \Sigma a_1\)&lt;/span&gt;. To do
+this maximization, we will need a constraint to rein in otherwise
+unnecessarily large values of &lt;span class="math"&gt;\(a_1\)&lt;/span&gt;. The constraint in this example is
+the unit length vector &lt;span class="math"&gt;\(a_1' a_1 = 1\)&lt;/span&gt;. This constraint is employed with
+a Lagrange multiplier &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; so that the function is maximized at an
+equality constraint of &lt;span class="math"&gt;\(g(x) = 0\)&lt;/span&gt;. Thus the Lagrangian function is
+defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ a'_1 \Sigma a_1 - \lambda(a_1'y a_1 - 1) $$&lt;/div&gt;
+&lt;h2&gt;Brief Aside: Lagrange Multipliers&lt;/h2&gt;
+&lt;p&gt;The Lagrange mulitiplier method is used for finding a maximum or minimum
+of a multivariate function with some constraint on the input values. As
+we are interested in maximization, the problem can be briefly stated as
+'maximize &lt;span class="math"&gt;\(f(x)\)&lt;/span&gt; subject to &lt;span class="math"&gt;\(g(x) = c\)&lt;/span&gt;'. In this example,
+&lt;span class="math"&gt;\(g(x) = a_1'y a_1 = 1\)&lt;/span&gt; and &lt;span class="math"&gt;\(f(x) = a_1'y \Sigma a_1\)&lt;/span&gt;. The Lagrange
+multiplier, defined as &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; allows the combination of &lt;span class="math"&gt;\(f(x)\)&lt;/span&gt; and
+&lt;span class="math"&gt;\(g(x)\)&lt;/span&gt; into a new function &lt;span class="math"&gt;\(L(x, \lambda)\)&lt;/span&gt;, defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ L(a_1'y, \lambda) = f(a_1'y) - \lambda(g(a_1'y) - c) $$&lt;/div&gt;
+&lt;p&gt;The sign of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; can be positive or negative. The new function is
+then solved for a stationary point, in this case &lt;span class="math"&gt;\(0\)&lt;/span&gt;, using partial
+derivatives:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \frac{\partial L(a_1'y, \lambda)}{\partial a_1'y} = 0 $$&lt;/div&gt;
+&lt;p&gt;Returning to principal component analysis, we differentiate
+&lt;span class="math"&gt;\(L(a_1) = a'_1 \Sigma a_1 - \lambda(a_1'y a_1 - 1)\)&lt;/span&gt; with respect to
+&lt;span class="math"&gt;\(a_1\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \frac{\partial L}{\partial a_1} = 2\Sigma a_1 - 2\lambda a_1 = 0 $$&lt;/div&gt;
+&lt;div class="math"&gt;$$ \Sigma a_1 - \lambda a_1 = 0 $$&lt;/div&gt;
+&lt;p&gt;Expressing the above with an identity matrix, &lt;span class="math"&gt;\(I\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;$$ (\Sigma - \lambda I) a_1 = 0 $$&lt;/div&gt;
+&lt;p&gt;Which shows &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is an eigenvector of the covariance matrix
+&lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt; and &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is the corresponding eigenvector. As stated
+previously, we are interested in finding &lt;span class="math"&gt;\(a_1'y\)&lt;/span&gt; with maximum variance.
+Therefore &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; must be as large as possible which follows &lt;span class="math"&gt;\(a_1\)&lt;/span&gt; is
+the eigenvector corresponding to the largest eigenvalue of &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The remaining principal components are found in a similar manner and
+correspond to the &lt;span class="math"&gt;\(k\)&lt;/span&gt;th principal component. Thus the second principal
+component is &lt;span class="math"&gt;\(a_2'y\)&lt;/span&gt; and is equivalent to the eigenvector of the second
+largest eigenvalue of &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt;, and so on.&lt;/p&gt;
+&lt;h2&gt;Principal Component Analysis&lt;/h2&gt;
+&lt;p&gt;Twenty engineer apprentices and twenty pilots were given six tests. The
+data were obtained from the &lt;a href="ftp://ftp.wiley.com"&gt;companion FTP site&lt;/a&gt; of
+the book Methods of Multivariate Analysis by Alvin Rencher. The tests
+measured the following attributes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Intelligence&lt;/li&gt;
+&lt;li&gt;Form Relations&lt;/li&gt;
+&lt;li&gt;Dynamometer&lt;/li&gt;
+&lt;li&gt;Dotting&lt;/li&gt;
+&lt;li&gt;Sensory Motor Coordination&lt;/li&gt;
+&lt;li&gt;Perservation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Principal component analysis will be performed on the data to transform
+the attributes into new variables that will hopefully be more open to
+interpretation and allow us to find any irregularities in the data such
+as outliers.&lt;/p&gt;
+&lt;p&gt;Load the data and name the columns. The factors in the &lt;code&gt;Group&lt;/code&gt; column
+are renamed to their actual grouping names.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read.table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PILOTS.DAT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;col.names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Intelligence&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Form Relations&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                                  &lt;span class="s"&gt;&amp;#39;Dynamometer&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Dotting&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Sensory Motor Coordination&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                                  &lt;span class="s"&gt;&amp;#39;Perservation&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;ifelse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Apprentice&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Pilot&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Inspect the first few rows of the data.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##        Group Intelligence Form.Relations Dynamometer Dotting&lt;/span&gt;
+&lt;span class="err"&gt;## 1 Apprentice          121             22          74     223&lt;/span&gt;
+&lt;span class="err"&gt;## 2 Apprentice          108             30          80     175&lt;/span&gt;
+&lt;span class="err"&gt;## 3 Apprentice          122             49          87     266&lt;/span&gt;
+&lt;span class="err"&gt;## 4 Apprentice           77             37          66     178&lt;/span&gt;
+&lt;span class="err"&gt;## 5 Apprentice          140             35          71     175&lt;/span&gt;
+&lt;span class="err"&gt;## 6 Apprentice          108             37          57     241&lt;/span&gt;
+&lt;span class="err"&gt;##   Sensory.Motor.Coordination Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## 1                         54          254&lt;/span&gt;
+&lt;span class="err"&gt;## 2                         40          300&lt;/span&gt;
+&lt;span class="err"&gt;## 3                         41          223&lt;/span&gt;
+&lt;span class="err"&gt;## 4                         80          209&lt;/span&gt;
+&lt;span class="err"&gt;## 5                         38          261&lt;/span&gt;
+&lt;span class="err"&gt;## 6                         59          245&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The variables appear to be measured in different units which may lead to
+the variables with larger variances dominating the principal components
+of the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;. We will perform principal component
+analysis on the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; later in the example to find a
+scaled and more balanced representation of the components.&lt;/p&gt;
+&lt;p&gt;Find the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt; of the data. The grouping column is not
+included.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;cov&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;S&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                            Intelligence Form.Relations Dynamometer&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                  528.19487       35.98974    27.97949&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations                 35.98974       68.91282   -12.09744&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                    27.97949      -12.09744   145.18974&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                       104.42821      -81.75128   128.88205&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination    -20.03077      -33.00513   -30.85641&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                  291.15385      -18.28205    29.38462&lt;/span&gt;
+&lt;span class="err"&gt;##                               Dotting Sensory.Motor.Coordination&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                104.42821                  -20.03077&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations              -81.75128                  -33.00513&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 128.88205                  -30.85641&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    1366.43013                 -113.58077&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -113.58077                  264.35641&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                395.18590                  -79.85897&lt;/span&gt;
+&lt;span class="err"&gt;##                            Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                  291.15385&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations                -18.28205&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                    29.38462&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                       395.18590&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination    -79.85897&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 1069.11538&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The total variance is defined as:&lt;/p&gt;
+&lt;div class="math"&gt;$$ \sum^k_{j=1} s_{jj} $$&lt;/div&gt;
+&lt;p&gt;Which is also equal to the sum of the eigenvalues of &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;diag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 3442.199&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Compute the eigenvalues and corresponding eigenvectors of &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;s.eigen&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## eigen() decomposition&lt;/span&gt;
+&lt;span class="err"&gt;## $values&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 1722.0424  878.3578  401.4386  261.0769  128.9051   50.3785&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## $vectors&lt;/span&gt;
+&lt;span class="err"&gt;##             [,1]        [,2]        [,3]        [,4]        [,5]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.21165160 -0.38949336  0.88819049  0.03082062 -0.04760343&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.03883125 -0.06379320  0.09571590 -0.19128493 -0.14793191&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.08012946  0.06602004  0.08145863 -0.12854488  0.97505667&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.77552673  0.60795970  0.08071120  0.08125631 -0.10891968&lt;/span&gt;
+&lt;span class="err"&gt;## [5,]  0.09593926 -0.01046493  0.01494473  0.96813856  0.10919120&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.58019734 -0.68566916 -0.43426141  0.04518327  0.03644629&lt;/span&gt;
+&lt;span class="err"&gt;##             [,6]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## [5,] -0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The eigenvectors represent the principal components of &lt;span class="math"&gt;\(S\)&lt;/span&gt;. The
+eigenvalues of &lt;span class="math"&gt;\(S\)&lt;/span&gt; are used to find the proportion of the total variance
+explained by the components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 0.5002739&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.2551734&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1166227&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.07584597&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.03744848&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.01463556&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first two principal components account for 75.5% of the total
+variance. A scree graph of the eigenvalues can be plotted to visualize
+the proportion of variance explained by each subsequential eigenvalue.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;xlab&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Eigenvalue Number&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ylab&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Eigenvalue Size&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Scree Graph&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;lines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-8-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The elements of the eigenvectors of &lt;span class="math"&gt;\(S\)&lt;/span&gt; are the 'coefficients' or
+'loadings' of the principal components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##             [,1]        [,2]        [,3]        [,4]        [,5]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,] -0.21165160 -0.38949336  0.88819049  0.03082062 -0.04760343&lt;/span&gt;
+&lt;span class="err"&gt;## [2,]  0.03883125 -0.06379320  0.09571590 -0.19128493 -0.14793191&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.08012946  0.06602004  0.08145863 -0.12854488  0.97505667&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.77552673  0.60795970  0.08071120  0.08125631 -0.10891968&lt;/span&gt;
+&lt;span class="err"&gt;## [5,]  0.09593926 -0.01046493  0.01494473  0.96813856  0.10919120&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.58019734 -0.68566916 -0.43426141  0.04518327  0.03644629&lt;/span&gt;
+&lt;span class="err"&gt;##             [,6]&lt;/span&gt;
+&lt;span class="err"&gt;## [1,]  0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## [2,] -0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## [3,] -0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## [4,] -0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## [5,] -0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## [6,] -0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first two principal components are thus:&lt;/p&gt;
+&lt;div class="math"&gt;$$ z_1 = a'_1y = -.212y_1 + .039y_2 - 0.080y_3 - 0.776y_4 + 0.096y_5 - 0.580y_6 $$&lt;/div&gt;
+&lt;div class="math"&gt;$$ z_2 = a'_2y = -.389y_1 - .064y_2 + 0.066y_3 + 0.608y_4 - 0.010y_5 - 0.686y_6 $$&lt;/div&gt;
+&lt;h2&gt;Principal Component Analysis with R&lt;/h2&gt;
+&lt;p&gt;Computing the principal components in R is straightforward with the
+functions &lt;code&gt;prcomp()&lt;/code&gt; and &lt;code&gt;princomp()&lt;/code&gt;. The difference between the two is
+simply the method employed to calculate PCA. According to &lt;code&gt;?prcomp&lt;/code&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The calculation is done by a singular value decomposition of the
+(centered and possibly scaled) data matrix, not by using eigen on the
+covariance matrix. This is generally the preferred method for
+numerical accuracy.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;From &lt;code&gt;?princomp&lt;/code&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The calculation is done using eigen on the correlation or covariance
+matrix, as determined by cor. This is done for compatibility with the
+S-PLUS result.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pilots.pca&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Standard deviations (1, .., p=6):&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 41.497499 29.637102 20.035932 16.157875 11.353640  7.097781&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## Rotation (n x k) = (6 x 6):&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC1         PC2         PC3         PC4&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.21165160 -0.38949336  0.88819049 -0.03082062&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.03883125 -0.06379320  0.09571590  0.19128493&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.08012946  0.06602004  0.08145863  0.12854488&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.77552673  0.60795970  0.08071120 -0.08125631&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.09593926 -0.01046493  0.01494473 -0.96813856&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.58019734 -0.68566916 -0.43426141 -0.04518327&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC5         PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence               -0.04760343 -0.10677164&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.14793191  0.96269790&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.97505667  0.12379748&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    -0.10891968  0.06295166&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  0.10919120  0.20309559&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.03644629  0.03572141&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Although we didn't use the preferred method of applying singular value
+decomposition, the components reported by the &lt;code&gt;prcomp()&lt;/code&gt; are the same as
+what was computed earlier save arbitrary scalings of &lt;span class="math"&gt;\(-1\)&lt;/span&gt; to some of the
+eigenvectors.&lt;/p&gt;
+&lt;p&gt;The summary method of &lt;code&gt;prcomp()&lt;/code&gt; also outputs the proportion of variance
+explained by the components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Importance of components:&lt;/span&gt;
+&lt;span class="err"&gt;##                            PC1     PC2     PC3      PC4      PC5     PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Standard deviation     41.4975 29.6371 20.0359 16.15788 11.35364 7.09778&lt;/span&gt;
+&lt;span class="err"&gt;## Proportion of Variance  0.5003  0.2552  0.1166  0.07585  0.03745 0.01464&lt;/span&gt;
+&lt;span class="err"&gt;## Cumulative Proportion   0.5003  0.7554  0.8721  0.94792  0.98536 1.00000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Plotting of Principal Components&lt;/h2&gt;
+&lt;p&gt;The first two principal components are often plotted as a scatterplot
+which may reveal interesting features of the data, such as departures
+from normality, outliers or non-linearity. The first two principal
+components are evaluated for each observation vector and plotted.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="https://cran.r-project.org/web/packages/ggfortify/index.html"&gt;ggfortify
+package&lt;/a&gt;
+provides a handy method for plotting the first two principal components
+with &lt;code&gt;autoplot()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ggfortify&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;autoplot()&lt;/code&gt; function also generates a useful data table of the
+calculated principal components we which we will use later.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pca.plot&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;autoplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pca.plot&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-13-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The points of the two groups are clustered for the most part; however,
+the three points at the top of the graph may be outliers. The data does
+not appear to depart widely from multivariate normality. We will see if
+this conclusion changes when the PCs from the correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; are
+plotted.&lt;/p&gt;
+&lt;p&gt;To recreate the graph generated by &lt;code&gt;autoplot()&lt;/code&gt;, scale the data using
+the standard deviations of the principal components multiplied by the
+square root of the number of observations. The principal components are
+then computed for each observation vector. Note the first eigenvector is
+multiplied by a scaling factor of &lt;span class="math"&gt;\(-1\)&lt;/span&gt; so the signs what was reported by
+the &lt;code&gt;prcomp()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;scaling&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pilots.pca&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;sdev[1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;pc1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rowSums&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sweep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;colMeans&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;scaling[1]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pc2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rowSums&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;t&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sweep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;colMeans&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;s.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;vectors[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;scaling[2]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Collect the PCs in a &lt;code&gt;data.frame&lt;/code&gt; and plot using &lt;code&gt;ggplot&lt;/code&gt; (loaded when
+&lt;code&gt;ggfortify&lt;/code&gt; was loaded).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pc1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pc2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Apprentice&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Pilot&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;PC1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;PC2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;ggplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;PC1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;PC2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Group&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="nf"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-15-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The scaling employed when calculating the PCs can be omitted. To remove
+scaling in the &lt;code&gt;autplot()&lt;/code&gt; function, set the &lt;code&gt;scaling&lt;/code&gt; argument to 0.&lt;/p&gt;
+&lt;h2&gt;Principal Component Analysis with the Correlation Matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;As mentioned previously, although principal component analysis is
+typically performed on the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;, it often makes more
+intuitive sense to apply PCA to the correlation matrix. Cases where
+using &lt;span class="math"&gt;\(R\)&lt;/span&gt; may be preferable to &lt;span class="math"&gt;\(S\)&lt;/span&gt; include data that is measured in
+different units or has wide variances. The pilot data analyzed does not
+appear to have commensurate units for each variable, and because we have
+very little information regarding the tests and the measurements
+collected, it might make sense to employ the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix rather than &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The correlation matrix is found with the &lt;code&gt;cor()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;R&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                            Intelligence Form.Relations Dynamometer&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                 1.00000000     0.18863907  0.10103566&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations               0.18863907     1.00000000 -0.12094150&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                  0.10103566    -0.12094150  1.00000000&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                      0.12292126    -0.26641020  0.28935484&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  -0.05360504    -0.24453244 -0.15750071&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 0.38744776    -0.06735388  0.07458298&lt;/span&gt;
+&lt;span class="err"&gt;##                               Dotting Sensory.Motor.Coordination&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.1229213                -0.05360504&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.2664102                -0.24453244&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2893548                -0.15750071&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     1.0000000                -0.18898014&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.1889801                 1.00000000&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.3269606                -0.15021611&lt;/span&gt;
+&lt;span class="err"&gt;##                            Perservation&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                 0.38744776&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations              -0.06735388&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                  0.07458298&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                      0.32696061&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination  -0.15021611&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                 1.00000000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Find the eigenvalues and eigenvectors of the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;r.eigen&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;eigen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As with the covariance matrix, we can compute the proportion of total
+variance explained by the eigenvalues.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;for &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;r.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r.eigen&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## [1] 0.2958546&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.225736&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1787751&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.1357993&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.08843547&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 0.07539955&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What is readily noticeable is the first eigenvalue accounts for 30% of
+total variance compared with 50% of the variance of the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix. The
+first two components of &lt;span class="math"&gt;\(R\)&lt;/span&gt; only account for 52% of total variance while
+the last two components have little significance. Thus, one may want to
+keep the first four components rather than the first two or three with
+the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;p&gt;To perform principal component analysis using the correlation matrix
+using the &lt;code&gt;prcomp()&lt;/code&gt; function, set the &lt;code&gt;scale&lt;/code&gt; argument to &lt;code&gt;TRUE&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;prcomp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;scale&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Standard deviations (1, .., p=6):&lt;/span&gt;
+&lt;span class="err"&gt;## [1] 1.3323392 1.1637937 1.0356884 0.9026604 0.7284317 0.6726049&lt;/span&gt;
+&lt;span class="err"&gt;## &lt;/span&gt;
+&lt;span class="err"&gt;## Rotation (n x k) = (6 x 6):&lt;/span&gt;
+&lt;span class="err"&gt;##                                    PC1        PC2        PC3        PC4&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.40239072 -0.3964661  0.4617841 -0.3928149&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.09715877 -0.7472294 -0.1752970 -0.1315611&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.38541311  0.2181560 -0.4329575 -0.7177525&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.54333623  0.3144601 -0.1065065  0.2453920&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.31188931  0.3559400  0.6268314 -0.3992852&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.53629229 -0.1062657  0.4053555  0.3058981&lt;/span&gt;
+&lt;span class="err"&gt;##                                   PC5        PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence               -0.2103062 -0.5187674&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.2801896  0.5528697&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2585104  0.1855163&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                    -0.7066663  0.1869825&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.2012981  0.4279773&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.5201339  0.4155385&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;## Importance of components:&lt;/span&gt;
+&lt;span class="err"&gt;##                           PC1    PC2    PC3    PC4     PC5    PC6&lt;/span&gt;
+&lt;span class="err"&gt;## Standard deviation     1.3323 1.1638 1.0357 0.9027 0.72843 0.6726&lt;/span&gt;
+&lt;span class="err"&gt;## Proportion of Variance 0.2959 0.2257 0.1788 0.1358 0.08844 0.0754&lt;/span&gt;
+&lt;span class="err"&gt;## Cumulative Proportion  0.2959 0.5216 0.7004 0.8362 0.92460 1.0000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Plot the first two PCs of the correlation matrix using the &lt;code&gt;autoplot()&lt;/code&gt;
+function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;autoplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pilots.pca.scaled&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pilots&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Group&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="figure/pca/unnamed-chunk-20-1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The points remain clustered for the most part; however, there does
+appear to be more points outside that may be considered outliers, though
+they don't appear to be too far off from the cluster. It is important to
+remember the first two PCs of the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix only represent 52% of the
+total variance and thus may not be fully representative of the variance
+in the dataset.&lt;/p&gt;
+&lt;h2&gt;Interpreting Principal Components&lt;/h2&gt;
+&lt;p&gt;Interpretation of principal components is still a heavily researched
+topic in statistics, and although the components may be readily
+interpreted in most settings, this is not always the case (Joliffe,
+2002).&lt;/p&gt;
+&lt;p&gt;One method of interpretation of the principal components is to calculate
+the correlation between the original data and the component. The
+&lt;code&gt;autoplot()&lt;/code&gt; function also generates a nice data table with the original
+variables and the calculated PCs, which we will use here to find the
+correlations.&lt;/p&gt;
+&lt;p&gt;First, compute the correlations between the data and the calculated
+components of the covariance matrix &lt;span class="math"&gt;\(S\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;comps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pca.plot&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;data[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;comps[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;comps[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                                   PC1         PC2         PC3&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.3821610 -0.50227170  0.77431660&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.1941124 -0.22775091  0.23101683&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.2759600  0.16238412  0.13544989&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.8706127  0.48743512  0.04374714&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.2448631 -0.01907555  0.01841632&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.7363518 -0.62149561 -0.26610222&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The PCs can then be interpreted based on which variables they are most
+correlated in either a positive or negative direction. The level at
+which the correlations are significant is left to the researcher.&lt;/p&gt;
+&lt;p&gt;The first component is positively correlated with Dotting, Perservation,
+Intelligence and Dynamometer. This correlation suggests the five
+variables vary together and when one goes down, the others decrease as
+well. The component is most correlated with Dotting at &lt;span class="math"&gt;\(.087\)&lt;/span&gt; and could
+be considered as primarily a measure of Dotting.&lt;/p&gt;
+&lt;p&gt;The second component is most correlated with Perservation and
+Intelligence, both in a negative direction. Dotting is correlated with
+the second component in a positive direction, which would indicate that
+as Perservation and Intelligence decrease, Dotting increases.&lt;/p&gt;
+&lt;p&gt;The third component is primarily correlated with Intelligence and not
+much else. This component could be viewed as a measure of the
+intelligence of the individual apprentice or pilot.&lt;/p&gt;
+&lt;p&gt;It was decided previously that due to lack of information regarding the
+variables and their units of measurement, it makes more sense to use the
+correlation matrix &lt;span class="math"&gt;\(R\)&lt;/span&gt; for performing principal component analysis.
+Let's see how the interpretation of the principal components changes
+when we use the &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;comps.scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;pca.plot.scaled&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;data[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;cor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;comps.scaled[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;comps.scaled[&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;##                                   PC1        PC2        PC3&lt;/span&gt;
+&lt;span class="err"&gt;## Intelligence                0.5361209 -0.4614047  0.4782644&lt;/span&gt;
+&lt;span class="err"&gt;## Form.Relations             -0.1294484 -0.8696209 -0.1815530&lt;/span&gt;
+&lt;span class="err"&gt;## Dynamometer                 0.5135010  0.2538886 -0.4484090&lt;/span&gt;
+&lt;span class="err"&gt;## Dotting                     0.7239081  0.3659667 -0.1103075&lt;/span&gt;
+&lt;span class="err"&gt;## Sensory.Motor.Coordination -0.4155423  0.4142408  0.6492020&lt;/span&gt;
+&lt;span class="err"&gt;## Perservation                0.7145232 -0.1236713  0.4198220&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The most apparent changes between the correlations of the original
+variables and the PCs of the &lt;span class="math"&gt;\(S\)&lt;/span&gt; and &lt;span class="math"&gt;\(R\)&lt;/span&gt; matrices are in components 2
+and 3. The first principal component is still strongly correlated with
+the variables Dotting and Perservation, but now the variables
+Intelligence and Dynamometer are much more correlated and could indicate
+that as the former two variables decrease, the latter two increase.&lt;/p&gt;
+&lt;p&gt;The second component is now correlated the most with Forming Relations
+and not much else, whereas with the &lt;span class="math"&gt;\(S\)&lt;/span&gt; matrix the component was
+correlated more to Perservation and Intelligence. This difference in
+variable correlations between the components of the two matrices may
+indicate Perservation and Intelligence were unduly dominating the
+variances.&lt;/p&gt;
+&lt;p&gt;The third component is now most correlated with Sensory Motor
+Coordination and secondarily Intelligence and Perservation, which
+indicates that subjects with high Sensory Motor Coordination test scores
+also have higher Intelligence and Perservation scores.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;This post ended up being much longer than I had anticipated but I hope
+it is a good introduction to the power and benefits of principal
+component analysis. The post covered PCA with the covariance and
+correlation matrices as well as plotting and interpreting the principal
+components. I plan to continue discussing PCA in the future as there are
+many more topics and applications related to the dimension reduction
+technique.&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/2H8GIoi"&gt;Joliffe, I. T. (2002). Principal Component Analysis (2nd ed.). Springer.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://amzn.to/39gsldt"&gt;Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://onlinecourses.science.psu.edu/stat505/node/54"&gt;https://onlinecourses.science.psu.edu/stat505/node/54&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="R"></category><category term="principal component analysis"></category><category term="linear algebra"></category><category term="matrices"></category></entry></feed>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+
+        <title>Cholesky Decomposition with R Example</title>
+        <meta charset="utf-8" />
+        <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
+        <link href="https://aaronschlegel.me/feed/linear-algebra.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Categories Atom Feed" />
+
+
+        <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1">
+        <meta name="description" content="Cholesky decomposition, also known as Cholesky factorization, is a" />
+        <meta property="og:site_name" content="Aaron Schlegel's Notebook of Interesting Things" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Cholesky Decomposition with R Example" />
+        <meta property="og:url" content="https://aaronschlegel.me" />
+        <meta property="og:description" content="" />
+        <meta property="article:published_time" content="2016-10-06 00:00:00-07:00" />
+        <meta property="article:modified_time" content="" />
+        <meta name="twitter:site" content="@Aaron_Schlegel" />
+        <meta name="twitter:creator" content="@Aaron_Schlegel" />
+        <meta name="twitter:card" content="Cholesky decomposition, also known as Cholesky factorization, is a" />
+        <meta name="twitter:card" content="The Blog and Notebooks of Aaron Schlegel" />
+
+        <link rel="stylesheet" type="text/css" href="https://aaronschlegel.me/theme/css/styles.min.css" />
+        <link rel="canonical" href="https://aaronschlegel.me/cholesky-decomposition-r-example.html" />
+
+        <script src="https://aaronschlegel.me/theme/js/libs/modernizr-2.6.2.min.js"></script>
+
+              <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-48350829-2', 'aaronschlegel.me');
+                ga('send', 'pageview');
+
+              </script>
+
+
+</head>
+
+<body id="index" class="home">
+    <div class="container">
+        <div class="row">
+
+            <div id="navigation" class="navbar row">
+              <a href="#" gumby-trigger="#navigation &gt; ul" class="toggle"><i class="icon-menu"></i></a>
+
+              <ul class="columns-right">
+                <li><a href="https://aaronschlegel.me/">Home</a></li>
+
+                <li><a href="https://aaronschlegel.me/pages/projects.html">Projects</a></li>
+
+              </ul>
+            </div>
+
+<section id="content" class="body">
+
+   <div class="row">
+        <div class="eleven columns">
+            <header>
+              <h2 class="entry-title">
+                <a href="https://aaronschlegel.me/cholesky-decomposition-r-example.html" rel="bookmark"
+                   title="Permalink to Cholesky Decomposition with R Example">Cholesky Decomposition with R Example</a></h2>
+           
+            </header>
+            <footer class="post-info">
+              <abbr class="published" title="2016-10-06T00:00:00-07:00">
+                Thu 06 October 2016
+              </abbr>
+              <address class="vcard author">By 
+                <a class="url fn" href="https://aaronschlegel.me/author/aaron-schlegel.html"> Aaron Schlegel</a>
+              </address>
+            </footer><!-- /.post-info -->
+            <div class="entry-content">
+                <p>method of decomposing a positive-definite matrix. A positive-definite matrix 
+is defined as a symmetric matrix where for all possible vectors <span class="math">\(x\)</span>, <span class="math">\(x'Ax &gt; 0\)</span>. 
+Cholesky decomposition and other decomposition methods are important as it is 
+not often feasible to perform matrix computations explicitly.</p>
+<p>Cholesky decomposition, also known as Cholesky factorization, is a
+method of decomposing a <a href="https://en.wikipedia.org/wiki/Positive-definite_matrix">positive-definite
+matrix</a>. A
+positive-definite matrix is defined as a symmetric matrix where for all
+possible vectors <span class="math">\(x\)</span>, <span class="math">\(x'Ax &gt; 0\)</span>. Cholesky decomposition and other
+decomposition methods are important as it is not often feasible to
+perform matrix computations explicitly. Some <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition#Applications">applications of Cholesky
+decomposition</a>
+include solving systems of linear equations, Monte Carlo simulation, and
+Kalman filters.</p>
+<p>Cholesky decomposition factors a positive-definite matrix <span class="math">\(A\)</span> into:</p>
+<div class="math">$$ A = LL^T$$</div>
+<p>Where <span class="math">\(L\)</span> is a <a href="https://en.wikipedia.org/wiki/Triangular_matrix#lower_triangular">lower triangular
+matrix</a>.
+<span class="math">\(L\)</span> is known as the Cholesky factor of <span class="math">\(A\)</span> and can be interpreted as the
+square root of a positive-definite matrix.</p>
+<h2>How to Decompose a Matrix with Cholesky Decomposition</h2>
+<p>There are many methods for computing a matrix decomposition with the
+Cholesky approach. This post takes a similar approach to <a href="http://www.math.sjsu.edu/~foster/m143m/cholesky.pdf">this
+implementation</a>.</p>
+<p>We define the decomposed matrix as <span class="math">\(L\)</span>. Thus <span class="math">\(L_{k-1}\)</span> represents the
+<span class="math">\(k-1 \times k-1\)</span> upper left corner of <span class="math">\(L\)</span>. <span class="math">\(a_k\)</span> and <span class="math">\(l_k\)</span> denote the
+first <span class="math">\(k - 1\)</span> entries in column <span class="math">\(k\)</span> of <span class="math">\(A\)</span> and <span class="math">\(L\)</span>, respectively.
+<span class="math">\(a_{kk}\)</span> and <span class="math">\(l_{kk}\)</span> are defined as the entries of <span class="math">\(A\)</span> and <span class="math">\(L\)</span>.</p>
+<p>The steps in factoring the matrix are as follows:</p>
+<ol>
+<li>Compute <span class="math">\(L_1 = \sqrt{a_{11}}\)</span></li>
+<li>
+<p>For <span class="math">\(k = 2, \dots, n\)</span>:</p>
+</li>
+<li>
+<p>Find <span class="math">\(L_{k-1} l_k = a_k\)</span> for <span class="math">\(l_k\)</span></p>
+</li>
+<li><span class="math">\(l_{kk} = \sqrt{a_{kk} - l_k^T l_k}\)</span></li>
+<li><span class="math">\(L_k = <div class="math">\begin{bmatrix} L_{k-1} &amp; 0 \\ l_k^T &amp; l_{kk}\end{bmatrix}</div>\)</span></li>
+</ol>
+<h2>An Example of Cholesky Decomposition</h2>
+<p>Consider the following matrix <span class="math">\(A\)</span>.</p>
+<div class="math">$$A = 
+\begin{bmatrix}
+  3 &amp; 4 &amp; 3 \\
+  4 &amp; 8 &amp; 6 \\
+  3 &amp; 6 &amp; 9
+\end{bmatrix}$$</div>
+<p>The matrix <span class="math">\(A\)</span> above is taken from Exercise 2.16 in the book Methods of
+Multivariate Analysis by Alvin Rencher.</p>
+<p>Begin by finding <span class="math">\(L_1\)</span>.</p>
+<div class="math">$$ L_1 = \sqrt{a_{11}} = \sqrt{3} = 1.732051 $$</div>
+<p>Next we find <span class="math">\(l_2\)</span></p>
+<div class="math">$$ l_2 = \frac{a_{21}}{L_1} = \frac{4}{\sqrt{3}} = 2.309401 $$</div>
+<p>Then <span class="math">\(l_{22}\)</span> can be computed.</p>
+<div class="math">$$ l_{22} = \sqrt{a_{22} - l_2^T l_2} = \sqrt{8 - 2.309401^2} = 1.632993 $$</div>
+<p>We now have the <span class="math">\(L_2\)</span> matrix:</p>
+<div class="math">$$L_2 = 
+\begin{bmatrix}
+  L_1 &amp; 0 \\
+  l_2^T &amp; l_{22}
+\end{bmatrix} = 
+\begin{bmatrix}
+  1.732051 &amp; 0 \\
+  2.309401 &amp; 1.632993
+\end{bmatrix}$$</div>
+<p>Since the matrix is <span class="math">\(3 \times 3\)</span>, we only require one more iteration.</p>
+<p>With <span class="math">\(L_2\)</span> computed, <span class="math">\(l_3\)</span> can be found:</p>
+<div class="math">$$ l_3 = \frac{a_3}{L_2} = a_3 L_2^{-1} = 
+\begin{bmatrix}
+  1.732051 &amp; 0 \\
+  2.309401 &amp; 1.632993
+\end{bmatrix}^{-1} 
+\begin{bmatrix}
+  3 \\
+  6
+\end{bmatrix}$$</div>
+<div class="math">$$l_3 = 
+\begin{bmatrix}
+  1.7320508 \\
+  1.224745 
+\end{bmatrix}$$</div>
+<p><span class="math">\(l_{33}\)</span> is then found:</p>
+<div class="math">$$ l_{33} = \sqrt{a_{33} - l_3^T l_3} = \sqrt{9 - \begin{bmatrix}1.7320508 &amp; 1.224745\end{bmatrix} \begin{bmatrix}1.7320508 \\ 1.224745\end{bmatrix}} = 2.12132 $$</div>
+<p>Which gives us the <span class="math">\(L_3\)</span> matrix:</p>
+<div class="math">$$L_3 = 
+\begin{bmatrix}
+  1.7320508 &amp; 0 &amp; 0 \\
+  2.309401 &amp; 1.632993 &amp; 0 \\
+  1.7320508 &amp; 1.224745 &amp; 2.12132
+\end{bmatrix}$$</div>
+<p>The <span class="math">\(L_3\)</span> matrix can then be taken as the solution. Transposing the
+decomposition changes the matrix into an upper triangular matrix.</p>
+<h2>Cholesky Decomposition in R</h2>
+<p>The function <code>chol()</code> performs Cholesky decomposition on a
+positive-definite matrix. We define the matrix <span class="math">\(A\)</span> as follows.</p>
+<div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">8</span><span class="p">,</span><span class="m">6</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">9</span><span class="p">)))</span>
+<span class="nf">colnames</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+<span class="n">A</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    3    4    3</span>
+<span class="err">## [2,]    4    8    6</span>
+<span class="err">## [3,]    3    6    9</span>
+</pre></div>
+
+
+<p>Then factor the matrix with the <code>chol()</code> function.</p>
+<div class="highlight"><pre><span></span><span class="n">A.chol</span> <span class="o">&lt;-</span> <span class="nf">chol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">A.chol</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          [,1]     [,2]     [,3]</span>
+<span class="err">## [1,] 1.732051 2.309401 1.732051</span>
+<span class="err">## [2,] 0.000000 1.632993 1.224745</span>
+<span class="err">## [3,] 0.000000 0.000000 2.121320</span>
+</pre></div>
+
+
+<p>The <code>chol()</code> function returns an upper triangular matrix. Transposing
+the decomposed matrix yields a lower triangular matrix as in our result
+above.</p>
+<div class="highlight"><pre><span></span><span class="nf">t</span><span class="p">(</span><span class="n">A.chol</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##          [,1]     [,2]    [,3]</span>
+<span class="err">## [1,] 1.732051 0.000000 0.00000</span>
+<span class="err">## [2,] 2.309401 1.632993 0.00000</span>
+<span class="err">## [3,] 1.732051 1.224745 2.12132</span>
+</pre></div>
+
+
+<p>Our result above matches the output of the <code>chol()</code> function.</p>
+<p>We can also show the identity <span class="math">\(A = LL^T\)</span> with the result.</p>
+<div class="highlight"><pre><span></span><span class="nf">t</span><span class="p">(</span><span class="n">A.chol</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">A.chol</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="err">##      [,1] [,2] [,3]</span>
+<span class="err">## [1,]    3    4    3</span>
+<span class="err">## [2,]    4    8    6</span>
+<span class="err">## [3,]    3    6    9</span>
+</pre></div>
+
+
+<h2>Summary</h2>
+<p>Cholesky decomposition is frequently utilized when direct computation of
+a matrix is not optimal. The method is employed in a variety of
+applications such as multivariate analysis due to its relatively
+efficient nature and stability.</p>
+<h2>References</h2>
+<p>(2011). Retrieved from
+<a href="http://www.seas.ucla.edu/~vandenbe/103/lectures/chol.pdf">http://www.seas.ucla.edu/~vandenbe/103/lectures/chol.pdf</a></p>
+<p>Algorithm for Cholesky decomposition. Retrieved from
+<a href="http://www.math.sjsu.edu/~foster/m143m/cholesky.pdf">http://www.math.sjsu.edu/~foster/m143m/cholesky.pdf</a></p>
+<p>Cholesky decomposition (2016). In Wikipedia. Retrieved from
+<a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">https://en.wikipedia.org/wiki/Cholesky_decomposition</a></p>
+<p><a href="https://amzn.to/39gsldt">Rencher, A. C. (2002). Methods of multivariate analysis. New York: J. Wiley.</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+                <h3 style="margin-top: 2em;">Related Posts</h3>
+
+                    <ul class="blank">
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html">Quadratic Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-two-groups.html">Quadratic Discriminant Analysis of Two Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/discriminant-analysis-several-groups.html">Discriminant Analysis of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-several-groups.html">Linear Discriminant Analysis for the Classification of Several Groups</a></li>
+                        <li><a href="https://aaronschlegel.me/linear-discriminant-analysis-classification-two-groups.html">Linear Discriminant Analysis for the Classification of Two Groups</a></li>
+                    </ul>
+            </div><!-- /.entry-content -->
+
+
+
+        </div><!-- /.eleven.columns -->
+
+<div class="three columns">
+
+        <h3>Categories</h3>
+        <ul class="blank">
+                <li><a href="https://aaronschlegel.me/category/analysis.html">Analysis</a></li>
+                <li><a href="https://aaronschlegel.me/category/calculus.html">Calculus</a></li>
+                <li><a href="https://aaronschlegel.me/category/finance.html">Finance</a></li>
+                <li><a href="https://aaronschlegel.me/category/linear-algebra.html">Linear Algebra</a></li>
+                <li><a href="https://aaronschlegel.me/category/machine-learning.html">Machine Learning</a></li>
+                <li><a href="https://aaronschlegel.me/category/nasapy.html">nasapy</a></li>
+                <li><a href="https://aaronschlegel.me/category/petpy.html">petpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/poetpy.html">poetpy</a></li>
+                <li><a href="https://aaronschlegel.me/category/python.html">Python</a></li>
+                <li><a href="https://aaronschlegel.me/category/r.html">R</a></li>
+                <li><a href="https://aaronschlegel.me/category/sql.html">SQL</a></li>
+                <li><a href="https://aaronschlegel.me/category/statistics.html">Statistics</a></li>
+        </ul>
+
+
+    <h3>Recent Posts</h3>
+
+    <ul class="blank">
+            <li>
+              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/analyzing-next-decade-earth-close-approaching-objects-nasapy.html">Analyzing the Next Decade of Earth Close-Approaching Objects with nasapy</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/plot-earth-fireball-impacts-nasapy-pandas-folium.html">Plot Earth Fireball Impacts with nasapy, pandas and folium</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
+            </li>
+    </ul>
+
+        <nav class="widget">
+          <h3>Blogroll</h3>
+          <ul class="blank">
+            <li>
+                <a href="https://www.r-bloggers.com">R-Bloggers</a>
+            </li>
+          </ul>
+        </nav>
+
+</div> </div><!-- /.row -->
+
+
+</section>
+
+
+
+       </div><!-- /.row -->
+    </div><!-- /.container -->
+       <div class="container.nopad bg">
+        <footer id="credits" class="row">
+          <div class="seven columns left-center">
+
+                   <address id="about" class="vcard body">
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    <br />
+                    Based on the <a target="_blank" href="http://gumbyframework.com">Gumby Framework</a>
+                    </address>
+          </div>
+
+
+          <div class="seven columns">
+            <div class="row">
+              <ul class="socbtns">
+
+                <li><div class="btn primary"><a href="https://github.com/aschleg" target="_blank">Github</a></div></li>
+
+                <li><div class="btn twitter"><a href="http://www.twitter.com/Aaron_Schlegel" target="_blank">Twitter</a></div></li>
+
+
+                <li><div class="btn danger"><a href="https://plus.google.com/u/0/102881569650657098667" target="_blank">Google+</a></div></li>
+
+              </ul>
+            </div>
+          </div>
+        </footer>
+
+    </div>
+
+
+  <script src="https://aaronschlegel.me/theme/js/libs/jquery-1.9.1.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/libs/gumby.min.js"></script>
+  <script src="https://aaronschlegel.me/theme/js/plugins.js"></script>
+</body>
+</html>
