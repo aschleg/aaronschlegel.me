@@ -6,7 +6,6 @@ Slug: factor-analysis-principal-factor-r
 Author: Aaron Schlegel
 Summary: As discussed in a previous post on the principal component method of factor analysis, the $\hat{\Psi}$ term in the estimated covariance matrix $S$, $S = \hat{\Lambda} \hat{\Lambda}' + \hat{\Psi}$, was excluded and we proceeded directly to factoring $S$ and $R$. The principal factor method of factor analysis (also called the principal axis method) finds an initial estimate of $\hat{\Psi}$ and factors $S - \hat{\Psi}$, or $R - \hat{\Psi}$ for the correlation matrix.
 
-
 As discussed in a previous post on the [principal component method of
 factor analysis](https://aaronschlegel.me/factor-analysis-principal-component-method-r.html), the $\hat{\Psi}$ term in the
 estimated covariance matrix $S$,

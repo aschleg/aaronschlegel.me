@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 
+# General Settings
+
 AUTHOR = 'Aaron Schlegel'
 SITENAME = "Aaron Schlegel's Notebook of Interesting Things"
 SITESUBTITLE = ''
@@ -25,7 +27,8 @@ ARTICLE_PATHS = ['posts']
 
 IGNORE_FILES = ['content/draft', '.ipynb_checkpoints']
 
-#Gum Theme Options
+# Gum Theme Options
+
 GITHUB_URL = 'https://github.com/aschleg'
 TWITTER_URL = 'http://www.twitter.com/Aaron_Schlegel'
 GOOGLEPLUS_URL = 'https://plus.google.com/u/0/102881569650657098667'
@@ -36,7 +39,8 @@ GOOGLE_ANALYTICS_SITENAME = 'aaronschlegel.me'
 TIMEZONE = 'America/Los_Angeles'
 DEFAULT_LANG = 'English'
 
-# Feed generation is usually not desired when developing
+# Feeds
+
 FEED_DOMAIN = SITEURL
 FEED_ALL_ATOM = 'feed/all.xml'
 CATEGORY_FEED_ATOM = 'feed/%s.xml'
@@ -55,6 +59,7 @@ SOCIAL = (('Github', 'https://github.com/aschleg'),
           ('Linkedin', 'https://linkedin.com/in/aaronschlegel'),
           ('Twitter', 'http://www.twitter.com/Aaron_Schlegel'),)
 
+# Pagination
 DEFAULT_PAGINATION = 20
 
 # Related Posts
