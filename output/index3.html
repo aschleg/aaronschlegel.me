@@ -59,6 +59,26 @@
         <div class="eleven columns">
                  <ol id="post-list">
                         <li><article class="hentry">
+                                <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/analyze-nationwide-utility-rates-r-sql-plotly.html" rel="bookmark" title="Permalink to Analyzing Nationwide Utility Rates with R, SQL and Plotly">Analyzing Nationwide Utility Rates with R, SQL and Plotly</a></h2> </header>
+                                <!-- /.post-info -->
+                                <div class="entry-content"> <p>R and SQL make excellent complements for analyzing data due to their respective strengths. The sqldf package provides an interface for working with SQL in R by querying data from a database into an R data.frame. This post will demonstrate how to query and analyze data using the sqldf package in conjunction with the graphing libraries plotly and ggplot2 as well as some other packages that provide useful statistical tests and other functions.</p> </div><!-- /.entry-content -->
+
+                                <div class="medium primary btn">
+                                    <a href="https://aaronschlegel.me/analyze-nationwide-utility-rates-r-sql-plotly.html" rel="bookmark"
+                                       title="Permalink to Analyzing Nationwide Utility Rates with R, SQL and Plotly">
+                                        Read more <i class="icon-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                                <div class="row tag-row">
+                                        <span>Tagged as : </span>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/r.html">R</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/plotly.html">Plotly</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/sql.html">SQL</a>
+                                </div>
+
+                        </article></li>
+                        <li><article class="hentry">
                                 <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/analyze-consumer-complaints-database-python-sql-plotly.html" rel="bookmark" title="Permalink to Analyzing the Consumer Complaints Database with Python, SQL and Plotly">Analyzing the Consumer Complaints Database with Python, SQL and Plotly</a></h2> </header>
                                 <!-- /.post-info -->
                                 <div class="entry-content"> <p>The consumer complaints database is a collection of complaints received by the Bureau of Consumer Financial Protection related to financial products and services. This post explores creating a database file using SQLite and analyzing the data with Pandas and Plotly.</p> </div><!-- /.entry-content -->
@@ -485,82 +505,6 @@
                                 </div>
 
                         </article></li>
-                        <li><article class="hentry">
-                                <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r-part-two.html" rel="bookmark" title="Permalink to Factor Analysis with the Principal Component Method and R Part Two">Factor Analysis with the Principal Component Method and R Part Two</a></h2> </header>
-                                <!-- /.post-info -->
-                                <div class="entry-content"> <p>In the first post on factor analysis, we examined computing the estimated covariance matrix <span class="math">\(S\)</span> of the rootstock data and proceeded to find two factors that fit most of the variance of the data. However, the variables in the data are not on the same scale of measurement, which can cause variables with comparatively large variances to dominate the diagonal of the covariance matrix and the resulting factors. The correlation matrix, therefore, makes more intuitive sense to employ in factor analysis.</p>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script> </div><!-- /.entry-content -->
-
-                                <div class="medium primary btn">
-                                    <a href="https://aaronschlegel.me/factor-analysis-principal-component-method-r-part-two.html" rel="bookmark"
-                                       title="Permalink to Factor Analysis with the Principal Component Method and R Part Two">
-                                        Read more <i class="icon-arrow-right"></i>
-                                    </a>
-                                </div>
-
-                                <div class="row tag-row">
-                                        <span>Tagged as : </span>
-                                            <a class="danger label" href="https://aaronschlegel.me/tag/r.html">R</a>
-                                            <a class="danger label" href="https://aaronschlegel.me/tag/statistics.html">statistics</a>
-                                            <a class="danger label" href="https://aaronschlegel.me/tag/factor-analysis.html">factor analysis</a>
-                                            <a class="danger label" href="https://aaronschlegel.me/tag/linear-algebra.html">linear algebra</a>
-                                </div>
-
-                        </article></li>
                 </ol><!-- /#posts-list -->
 
         </div><!-- /.eleven.columns -->
@@ -588,6 +532,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -601,9 +548,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

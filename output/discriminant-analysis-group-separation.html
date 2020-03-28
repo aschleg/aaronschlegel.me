@@ -122,8 +122,8 @@
 
 
 <p>Separate the two groups into different data frames.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle1</span> <span class="o">&lt;-</span> <span class="nf">filter</span><span class="p">(</span><span class="n">beetles</span><span class="p">,</span> <span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
-<span class="n">beetle2</span> <span class="o">&lt;-</span> <span class="nf">filter</span><span class="p">(</span><span class="n">beetles</span><span class="p">,</span> <span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">beetle1</span> <span class="o">&lt;-</span> <span class="nf">filter</span><span class="p">(</span><span class="n">beetles</span><span class="p">,</span> <span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">)[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+<span class="n">beetle2</span> <span class="o">&lt;-</span> <span class="nf">filter</span><span class="p">(</span><span class="n">beetles</span><span class="p">,</span> <span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">)[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
 </pre></div>
 
 
@@ -159,7 +159,7 @@
 
 
 <p>The output of which gives us the linear discriminant function coefficients. However, as noted earlier, the data is not commensurate and therefore needs to be scaled to provide any meaningful interpretation. The linear discriminant analysis coefficients can be standardized by <span class="math">\(diag(S_{p1})^{1/2}a\)</span>.</p>
-<div class="highlight"><pre><span></span><span class="nf">diag</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span><span class="nf">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span>
+<div class="highlight"><pre><span></span><span class="nf">diag</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span>
 </pre></div>
 
 
@@ -190,7 +190,7 @@
 
 
 <p>The <code>lda()</code> function takes a formula argument.</p>
-<div class="highlight"><pre><span></span><span class="n">beet.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beet.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.</span><span class="o">-</span><span class="n">Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
 <span class="n">beet.lda</span><span class="o">$</span><span class="n">scaling</span>
 </pre></div>
 
@@ -320,6 +320,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -333,9 +336,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

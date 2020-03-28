@@ -134,9 +134,9 @@ representation.</p>
 rows and 600 columns, the same size as the image. Each matrice
 represents a color value that comprises the RGB color scale. To perform
 SVD on these matrices, separate the array into separate objects.</p>
-<div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">1</span><span class="n">]</span>
-<span class="n">g</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">2</span><span class="n">]</span>
-<span class="n">b</span> <span class="o">&lt;-</span> <span class="n">lion[</span><span class="p">,,</span><span class="m">3</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">&lt;-</span> <span class="n">lion</span><span class="p">[,,</span><span class="m">1</span><span class="p">]</span>
+<span class="n">g</span> <span class="o">&lt;-</span> <span class="n">lion</span><span class="p">[,,</span><span class="m">2</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">&lt;-</span> <span class="n">lion</span><span class="p">[,,</span><span class="m">3</span><span class="p">]</span>
 </pre></div>
 
 
@@ -169,7 +169,7 @@ starting from rank 3 to rank 300. The <code>writeJPEG()</code> function from the
 a .jpeg.</p>
 <div class="highlight"><pre><span></span><span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="nf">seq.int</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="nf">round</span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">lion</span><span class="p">),</span> <span class="m">-2</span><span class="p">),</span> <span class="n">length.out</span> <span class="o">=</span> <span class="m">8</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span><span class="n">rgb.svds</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">lion.compress</span> <span class="o">&lt;-</span> <span class="n">i</span><span class="o">$</span><span class="n">u[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="n">j]</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">d[1</span><span class="o">:</span><span class="n">j]</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">v[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="n">j]</span><span class="p">)</span>
+    <span class="n">lion.compress</span> <span class="o">&lt;-</span> <span class="n">i</span><span class="o">$</span><span class="n">u</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="n">j</span><span class="p">]</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">d</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="n">j</span><span class="p">])</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">i</span><span class="o">$</span><span class="n">v</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="n">j</span><span class="p">])</span>
   <span class="p">},</span> <span class="n">simplify</span> <span class="o">=</span> <span class="s">&#39;array&#39;</span><span class="p">)</span>
 
   <span class="nf">writeJPEG</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#39;compressed/lion_compressed&#39;</span><span class="p">,</span> <span class="s">&#39;_svd_rank_&#39;</span><span class="p">,</span> <span class="nf">round</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="m">0</span><span class="p">),</span> <span class="s">&#39;.jpg&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">))</span>
@@ -368,6 +368,9 @@ decomposition can have in the real-world.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -381,9 +384,6 @@ decomposition can have in the real-world.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

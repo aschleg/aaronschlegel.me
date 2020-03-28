@@ -201,10 +201,10 @@ inverse of a <span class="math">\(2 \times 2\)</span> or <span class="math">\(3 
   <span class="c1"># 2x2 inverse matrix</span>
   <span class="nf">if</span><span class="p">(</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="m">2</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1"># Determinant</span>
-    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A[1]</span>
-    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A[3]</span>
-    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A[2]</span>
-    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A[4]</span>
+    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">3</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">2</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">4</span><span class="p">]</span>
     <span class="n">det</span> <span class="o">&lt;-</span> <span class="n">a</span> <span class="o">*</span> <span class="n">d</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span>
     <span class="c1"># Check to see if matrix is singular</span>
     <span class="nf">if </span><span class="p">(</span><span class="n">det</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
@@ -222,15 +222,15 @@ inverse of a <span class="math">\(2 \times 2\)</span> or <span class="math">\(3 
   <span class="c1"># 3x3 inverse matrix</span>
   <span class="nf">if </span><span class="p">(</span><span class="nf">ncol</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="m">3</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1"># Extract the entries from the matrix</span>
-    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A[1]</span>
-    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A[4]</span>
-    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A[7]</span>
-    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A[2]</span>
-    <span class="n">e</span> <span class="o">&lt;-</span> <span class="n">A[5]</span>
-    <span class="n">f</span> <span class="o">&lt;-</span> <span class="n">A[8]</span>
-    <span class="n">g</span> <span class="o">&lt;-</span> <span class="n">A[3]</span>
-    <span class="n">h</span> <span class="o">&lt;-</span> <span class="n">A[6]</span>
-    <span class="n">k</span> <span class="o">&lt;-</span> <span class="n">A[9]</span>
+    <span class="n">a</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">4</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">7</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">2</span><span class="p">]</span>
+    <span class="n">e</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">5</span><span class="p">]</span>
+    <span class="n">f</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">8</span><span class="p">]</span>
+    <span class="n">g</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">3</span><span class="p">]</span>
+    <span class="n">h</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">6</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">&lt;-</span> <span class="n">A</span><span class="p">[</span><span class="m">9</span><span class="p">]</span>
 
     <span class="c1"># Compute the determinant and check that it is not 0</span>
     <span class="n">det</span> <span class="o">&lt;-</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">h</span> <span class="o">-</span> <span class="n">e</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span>
@@ -501,6 +501,9 @@ McGraw-Hill Higher Education.</a></p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -514,9 +517,6 @@ McGraw-Hill Higher Education.</a></p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

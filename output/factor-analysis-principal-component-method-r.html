@@ -214,7 +214,7 @@ by Alvin Rencher. The data contains four dependent variables as follows:</p>
 
 
 <p>Find the covariance matrix <span class="math">\(S\)</span> with the <code>cov()</code> function.</p>
-<div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 <span class="n">S</span>
 </pre></div>
 
@@ -270,10 +270,10 @@ that two factors are appropriate.</p>
 <p>With <span class="math">\(m = 2\)</span> factors, construct the <span class="math">\(C\)</span> and <span class="math">\(D\)</span> matrices from the
 covariance matrix with the first (largest) two eigenvalues and
 corresponding eigenvectors.</p>
-<div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">])</span>
 
-<span class="n">D</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="n">[2]</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="n">[2]</span><span class="p">)</span>
-<span class="nf">diag</span><span class="p">(</span><span class="n">D</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">S.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+<span class="n">D</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)[</span><span class="m">2</span><span class="p">],</span> <span class="nf">dim</span><span class="p">(</span><span class="n">C</span><span class="p">)[</span><span class="m">2</span><span class="p">])</span>
+<span class="nf">diag</span><span class="p">(</span><span class="n">D</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span>
 </pre></div>
 
 
@@ -296,7 +296,7 @@ corresponding eigenvectors.</p>
 'principal component method' is derived from as the factors (columns of
 <span class="math">\(\hat{\Lambda}\)</span>) are proportional to the eigenvectors of <span class="math">\(S\)</span> which are
 equal to the corresponding coefficient of the principal components.</p>
-<div class="highlight"><pre><span></span><span class="n">root.pca</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span><span class="o">$</span><span class="n">rotation[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="c1"># Perform PCA on the rootstock data and take the resulting first two PCs</span>
+<div class="highlight"><pre><span></span><span class="n">root.pca</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span><span class="o">$</span><span class="n">rotation</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span> <span class="c1"># Perform PCA on the rootstock data and take the resulting first two PCs</span>
 
 <span class="n">root.pca</span>
 </pre></div>
@@ -310,7 +310,7 @@ equal to the corresponding coefficient of the principal components.</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span>
 </pre></div>
 
 
@@ -326,7 +326,7 @@ equal to the corresponding coefficient of the principal components.</p>
 factors, denoted <span class="math">\(h^2_i\)</span>, as noted previously is the sum of squares of
 the rows of <span class="math">\(\hat{\Lambda}\)</span>.</p>
 <div class="math">$$ \hat{h}^2_i = \sum^m_{j=1} \hat{\lambda}^2_{ij} $$</div>
-<div class="highlight"><pre><span></span><span class="n">S.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">S.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">S.loadings</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="n">S.h2</span>
 </pre></div>
 
@@ -337,7 +337,7 @@ the rows of <span class="math">\(\hat{\Lambda}\)</span>.</p>
 
 <p>The sum of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> are the respective
 eigenvalues of <span class="math">\(S\)</span>.</p>
-<div class="highlight"><pre><span></span><span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 </pre></div>
 
 
@@ -345,7 +345,7 @@ eigenvalues of <span class="math">\(S\)</span>.</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span>
 </pre></div>
 
 
@@ -372,9 +372,9 @@ respective communality <span class="math">\(\hat{h}^2_i\)</span>:</p>
 <p>The proportion of variance of the loadings is found by dividing the sum
 of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> (the eigenvalues of <span class="math">\(S\)</span>) by
 the sum of the eigenvalues of <span class="math">\(S\)</span>.</p>
-<div class="highlight"><pre><span></span><span class="n">prop.loadings</span> <span class="o">&lt;-</span> <span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">prop.loadings</span> <span class="o">&lt;-</span> <span class="nf">colSums</span><span class="p">(</span><span class="n">S.loadings</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 
-<span class="n">prop.var</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings[1]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">),</span> <span class="n">prop.loadings[2]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">))</span>
+<span class="n">prop.var</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">),</span> <span class="n">prop.loadings</span><span class="p">[</span><span class="m">2</span><span class="p">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">S.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">))</span>
 <span class="n">prop.var</span>
 </pre></div>
 
@@ -387,7 +387,7 @@ the sum of the eigenvalues of <span class="math">\(S\)</span>.</p>
 <p>The proportion of variance explained by the loadings is computed by
 dividing the sum of squares of the columns of <span class="math">\(\hat{\Lambda}\)</span> by the sum
 of those squares.</p>
-<div class="highlight"><pre><span></span><span class="n">prop.exp</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings[1]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">),</span> <span class="n">prop.loadings[2]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">prop.exp</span> <span class="o">&lt;-</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">),</span> <span class="n">prop.loadings</span><span class="p">[</span><span class="m">2</span><span class="p">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="n">prop.loadings</span><span class="p">))</span>
 <span class="n">prop.exp</span>
 </pre></div>
 
@@ -411,7 +411,7 @@ component method as explained above. The rotation is set to <code>none</code> fo
 now as we have not yet done any rotation of the factors. The <code>covar</code>
 argument is set to <code>TRUE</code> so the function factors the covariance matrix
 <span class="math">\(S\)</span> of the data as we did above.</p>
-<div class="highlight"><pre><span></span><span class="n">root.fa.covar</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">covar</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.fa.covar</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">covar</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 <span class="n">root.fa.covar</span>
 </pre></div>
 
@@ -564,6 +564,9 @@ loadings to help improve interpretation of the factors.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -577,9 +580,6 @@ loadings to help improve interpretation of the factors.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

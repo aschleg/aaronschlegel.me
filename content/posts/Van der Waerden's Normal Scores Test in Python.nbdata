@@ -1,0 +1,7 @@
+Title: Van der Waerden's Normal Scores Test
+Slug: van-der-waerdens-normal-scores-test
+Date: 2020-03-23
+Category: Statistics
+Tags: Python, statistics
+Author: Aaron Schlegel
+Summary: The Van der Waerden test is a non-parametric test for testing the hypothesis that $k$ sample distribution functions are equal. Van der Waerden's test is similar to the Kruskal-Wallis one-way analysis of variance test in that it converts the data to ranks and then to standard normal distribution quantiles. The ranked data is known as the 'normal scores'. Hence, the Van der Waerden test is sometimes referred to as a 'normal scores test'.

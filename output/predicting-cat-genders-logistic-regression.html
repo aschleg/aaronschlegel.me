@@ -159,9 +159,9 @@
 
 
 <p>To verify and test our model's performance, we first need to split our data into training and test sets. This is where the caret package comes in, its <code>createDataPartition()</code> function is extremely useful for splitting data into separate sets. Here, we split 60% of the data for training using our new factorized variable and the remaining 40% for testing.</p>
-<div class="highlight"><pre><span></span><span class="n">inTrain</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">cats</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="m">.60</span><span class="p">,</span> <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
-<span class="n">training</span> <span class="o">&lt;-</span> <span class="n">cats[inTrain</span><span class="p">,</span><span class="n">]</span>
-<span class="n">testing</span> <span class="o">&lt;-</span> <span class="n">cats[</span><span class="o">-</span><span class="n">inTrain</span><span class="p">,</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">inTrain</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">cats</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">.</span><span class="m">60</span><span class="p">,</span> <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="n">training</span> <span class="o">&lt;-</span> <span class="n">cats</span><span class="p">[</span><span class="n">inTrain</span><span class="p">,]</span>
+<span class="n">testing</span> <span class="o">&lt;-</span> <span class="n">cats</span><span class="p">[</span><span class="o">-</span><span class="n">inTrain</span><span class="p">,]</span>
 </pre></div>
 
 
@@ -221,8 +221,8 @@
 <p>The next command creates a vector of the 'F' (female category, denoted as 0 in coded set) according to the number of observations in the training data set. This is then converted into 'M' where the predicted probability is greater than 50%.</p>
 <p>The <code>table</code> function builds the confusion matrix. Going diagonally, (21, 38) represent the number of correct predictions. Conversely, the going up diagonally, (8, 21) represent the number of incorrect predictions.</p>
 <div class="highlight"><pre><span></span><span class="n">cats.prob</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
-<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span>
-<span class="n">cats.pred[cats.prob</span> <span class="o">&gt;</span> <span class="m">.5</span><span class="n">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span>
+<span class="n">cats.pred</span><span class="p">[</span><span class="n">cats.prob</span> <span class="o">&gt;</span> <span class="n">.</span><span class="m">5</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
 <span class="nf">table</span><span class="p">(</span><span class="n">cats.pred</span><span class="p">,</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
 </pre></div>
 
@@ -302,8 +302,8 @@
 
 <p>The confusion matrix using the new model shows classifications are very similar to the original model. Also, the computed success rate of the prediction is the same.</p>
 <div class="highlight"><pre><span></span><span class="n">cats.prob</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="n">cats.fit</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="n">type</span><span class="o">=</span><span class="s">&quot;response&quot;</span><span class="p">)</span>
-<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span>
-<span class="n">cats.pred[cats.prob</span> <span class="o">&gt;</span> <span class="m">.5</span><span class="n">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+<span class="n">cats.pred</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span> <span class="nf">dim</span><span class="p">(</span><span class="n">training</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span>
+<span class="n">cats.pred</span><span class="p">[</span><span class="n">cats.prob</span> <span class="o">&gt;</span> <span class="n">.</span><span class="m">5</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
 <span class="nf">table</span><span class="p">(</span><span class="n">cats.pred</span><span class="p">,</span> <span class="n">training</span><span class="o">$</span><span class="n">Sex.f</span><span class="p">)</span>
 </pre></div>
 
@@ -426,6 +426,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -439,9 +442,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

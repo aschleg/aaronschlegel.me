@@ -116,7 +116,7 @@ by Alvin Rencher. The data contains four dependent variables as follows:</p>
 
 
 <p>Compute the correlation matrix of the data.</p>
-<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 <span class="nf">round</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
 </pre></div>
 
@@ -168,7 +168,7 @@ proportion.</p>
 <span class="n">prop</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 <span class="n">cumulative</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">proportion</span> <span class="o">&lt;-</span> <span class="n">i</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span><span class="n">[2]</span>
+  <span class="n">proportion</span> <span class="o">&lt;-</span> <span class="n">i</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])[</span><span class="m">2</span><span class="p">]</span>
   <span class="n">cumulative.proportion</span> <span class="o">&lt;-</span> <span class="n">cumulative.proportion</span> <span class="o">+</span> <span class="n">proportion</span>
 
   <span class="n">prop</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">proportion</span><span class="p">)</span>
@@ -192,7 +192,7 @@ factors.</p>
 <p>The eigenvectors corresponding to the two largest eigenvalues are
 multiplied by the square roots of their respective eigenvalues as seen
 earlier to obtain the factor loadings.</p>
-<div class="highlight"><pre><span></span><span class="n">factors</span> <span class="o">&lt;-</span> <span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">factors</span> <span class="o">&lt;-</span> <span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">])</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]))</span>
 <span class="nf">round</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
 </pre></div>
 
@@ -206,7 +206,7 @@ earlier to obtain the factor loadings.</p>
 
 
 <p>Computing the communality remains the same as in the covariance setting.</p>
-<div class="highlight"><pre><span></span><span class="n">h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 </pre></div>
 
 
@@ -223,7 +223,7 @@ the number of factors on which a variable has moderate or high loadings
 <p>In the most simple structure, the complexity of all the variables is
 <span class="math">\(1\)</span>. The complexity of the variables is reduced by performing rotation
 which will be seen later.</p>
-<div class="highlight"><pre><span></span><span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors^2</span><span class="p">)</span><span class="n">^2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors^4</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors</span><span class="o">^</span><span class="m">4</span><span class="p">)</span>
 <span class="n">com</span>
 </pre></div>
 
@@ -250,7 +250,7 @@ analysis with the principal component method.</p>
 <p>Since we are using <span class="math">\(R\)</span> instead of <span class="math">\(S\)</span>, the <code>covar</code> argument remains
 <code>FALSE</code> by default. No rotation is done for now, so the <code>rotate</code>
 argument is set to <code>none</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">root.fa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.fa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">)</span>
 <span class="n">root.fa</span>
 </pre></div>
 
@@ -323,7 +323,7 @@ load highly on the second factor while the remaining two variables load
 primarily on the first factor.</p>
 <p>Since we used an orthogonal rotation technique, the communalities will
 not change.</p>
-<div class="highlight"><pre><span></span><span class="n">h2.v</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">h2.v</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="n">h2.v</span>
 </pre></div>
 
@@ -360,7 +360,7 @@ not change.</p>
 
 <p>As stated previously, the complexity of the variables on the rotated
 factors should be closer to <span class="math">\(1\)</span> compared to the non-rotated complexity.</p>
-<div class="highlight"><pre><span></span><span class="n">com.v</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v^2</span><span class="p">)</span><span class="n">^2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v^4</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">com.v</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">factors.v</span><span class="o">^</span><span class="m">4</span><span class="p">)</span>
 <span class="n">com.v</span>
 </pre></div>
 
@@ -381,7 +381,7 @@ factors should be closer to <span class="math">\(1\)</span> compared to the non-
 acknowledgment the factors are now in a more simplified structure.</p>
 <p>Setting the <code>rotation</code> argument to <code>varimax</code> in the <code>principal()</code>
 function outputs the rotated factors and corresponding statistics.</p>
-<div class="highlight"><pre><span></span><span class="n">root.fa2</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.fa2</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
 <span class="n">root.fa2</span>
 </pre></div>
 
@@ -527,6 +527,9 @@ interpretation.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -540,9 +543,6 @@ interpretation.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

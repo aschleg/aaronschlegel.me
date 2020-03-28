@@ -99,8 +99,8 @@
 
 
 <p>Find the group means and the pooled sample variance.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle1</span> <span class="o">&lt;-</span> <span class="n">beetles[beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
-<span class="n">beetle2</span> <span class="o">&lt;-</span> <span class="n">beetles[beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">beetle1</span> <span class="o">&lt;-</span> <span class="n">beetles</span><span class="p">[</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+<span class="n">beetle2</span> <span class="o">&lt;-</span> <span class="n">beetles</span><span class="p">[</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
 
 <span class="n">n1</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">beetle1</span><span class="p">)</span>
 <span class="n">n2</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">beetle2</span><span class="p">)</span>
@@ -116,7 +116,7 @@
 
 
 <p>The cutoff point to determine group membership of the observation vector is then found.</p>
-<div class="highlight"><pre><span></span><span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">-</span> <span class="n">beetle2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">+</span> <span class="n">beetle2.means</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">-</span> <span class="n">beetle2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">+</span> <span class="n">beetle2.means</span><span class="p">)</span>
 <span class="n">cutoff</span>
 </pre></div>
 
@@ -127,7 +127,7 @@
 
 
 <p>Thus if <span class="math">\(z\)</span> is greater than −15.81, the observation is assigned to group 1. Otherwise, it is assigned to group 2. We can apply the computed discriminant functions to the beetle data already collected to determine how well it performs in classifying observations.</p>
-<div class="highlight"><pre><span></span><span class="n">species.prediction</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">beetles[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><span class="n">species.prediction</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">beetles</span><span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">],</span> <span class="m">1</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">z</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">beetle1.means</span> <span class="o">-</span> <span class="n">beetle2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="n">y</span> <span class="c1"># Calculate the discriminate function for the observation vector y</span>
   <span class="nf">ifelse</span><span class="p">(</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
 <span class="p">})</span>
@@ -147,7 +147,7 @@
 
 
 <p>Our predictions classified all of group 1's observations correctly but incorrectly assigned a group 2 observation to group 1. The error rate is simply the number of misclassifications divided by the total sample size.</p>
-<div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">beetles</span><span class="p">)</span><span class="n">[1]</span>
+<div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">beetles</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
 <span class="m">1</span> <span class="o">/</span> <span class="n">n</span>
 </pre></div>
 
@@ -163,7 +163,7 @@
 
 
 <p>The <code>predict()</code> function accepts a lda object.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beetle.lda</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.</span><span class="o">-</span><span class="n">Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
 <span class="n">lda.pred</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">beetle.lda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span>
 </pre></div>
 
@@ -186,10 +186,10 @@
 <div class="highlight"><pre><span></span><span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 
 <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">beetles[</span><span class="o">-</span><span class="n">i</span><span class="p">,</span><span class="n">]</span>
+  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">beetles</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">,]</span>
 
-  <span class="n">holdout1</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
-  <span class="n">holdout2</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+  <span class="n">holdout1</span> <span class="o">&lt;-</span> <span class="n">holdout</span><span class="p">[</span><span class="n">holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+  <span class="n">holdout2</span> <span class="o">&lt;-</span> <span class="n">holdout</span><span class="p">[</span><span class="n">holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
 
   <span class="n">holdout1.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
   <span class="n">holdout2.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
@@ -202,9 +202,9 @@
 
   <span class="n">sp1</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n1</span> <span class="o">+</span> <span class="n">n2</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">+</span> <span class="n">w2</span><span class="p">)</span>
 
-  <span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">+</span> <span class="n">holdout2.means</span><span class="p">)</span>
+  <span class="n">cutoff</span> <span class="o">&lt;-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">+</span> <span class="n">holdout2.means</span><span class="p">)</span>
 
-  <span class="n">ay</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">beetles[i</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">)</span>
+  <span class="n">ay</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">holdout1.means</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">sp1</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">beetles</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">])</span>
   <span class="n">group</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">ay</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
   <span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">cv.prediction</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 <span class="p">}</span>
@@ -225,7 +225,7 @@
 
 <p>As before, all of group 1's observations were correctly classified; however, three of group 2's observations were incorrectly assigned to group 1. Although the cross-validated error rate has increased three times to about 7.7%, it is a more realistic estimate compared to the non-cross-validated result.</p>
 <p>Cross-validation is also available in the <code>lda()</code> function with the <code>cv</code> argument.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle.cv</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">CV</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beetle.cv</span> <span class="o">&lt;-</span> <span class="nf">lda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span> <span class="n">.</span><span class="o">-</span><span class="n">Measurement.Number</span><span class="p">,</span> <span class="n">CV</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
 
 <span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">beetle.cv</span><span class="o">$</span><span class="n">class</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
 </pre></div>
@@ -336,6 +336,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -349,9 +352,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

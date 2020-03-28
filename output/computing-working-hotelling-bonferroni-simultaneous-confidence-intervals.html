@@ -131,13 +131,13 @@
   <span class="n">fit</span> <span class="o">&lt;-</span> <span class="n">fit</span><span class="o">$</span><span class="n">fitted.values</span>
 
   <span class="c1"># Find standard error as defined above</span>
-  <span class="n">se</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">fit</span><span class="p">)</span><span class="n">^2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="m">2</span><span class="p">))</span> <span class="o">*</span> 
-    <span class="nf">sqrt</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="n">^2</span> <span class="o">/</span> 
-           <span class="nf">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="n">^2</span><span class="p">))</span>
+  <span class="n">se</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">fit</span><span class="p">)</span><span class="o">^</span><span class="m">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="m">2</span><span class="p">))</span> <span class="o">*</span> 
+    <span class="nf">sqrt</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> 
+           <span class="nf">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">^</span><span class="m">2</span><span class="p">))</span>
 
   <span class="c1"># Calculate B and W statistics for both procedures.</span>
   <span class="n">W</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="m">2</span> <span class="o">*</span> <span class="nf">qf</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">df1</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">df2</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="m">2</span><span class="p">))</span>
-  <span class="n">B</span> <span class="o">&lt;-</span> <span class="m">1</span><span class="o">-</span><span class="nf">qt</span><span class="p">(</span><span class="m">.95</span><span class="o">/</span><span class="p">(</span><span class="m">2</span> <span class="o">*</span> <span class="m">3</span><span class="p">),</span> <span class="n">n</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+  <span class="n">B</span> <span class="o">&lt;-</span> <span class="m">1</span><span class="o">-</span><span class="nf">qt</span><span class="p">(</span><span class="n">.</span><span class="m">95</span><span class="o">/</span><span class="p">(</span><span class="m">2</span> <span class="o">*</span> <span class="m">3</span><span class="p">),</span> <span class="n">n</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
 
   <span class="c1"># Compute the simultaneous confidence intervals</span>
 
@@ -299,6 +299,9 @@ McGraw-Hill Higher Education.</a></p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -312,9 +315,6 @@ McGraw-Hill Higher Education.</a></p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

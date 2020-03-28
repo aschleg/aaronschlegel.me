@@ -202,7 +202,7 @@ analysis on the correlation matrix <span class="math">\(R\)</span> later in the 
 scaled and more balanced representation of the components.</p>
 <p>Find the covariance matrix <span class="math">\(S\)</span> of the data. The grouping column is not
 included.</p>
-<div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">])</span>
 <span class="n">S</span>
 </pre></div>
 
@@ -339,7 +339,7 @@ numerical accuracy.</p>
 matrix, as determined by cor. This is done for compatibility with the
 S-PLUS result.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><span class="n">pilots.pca</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">pilots.pca</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">])</span>
 <span class="n">pilots.pca</span>
 </pre></div>
 
@@ -415,10 +415,10 @@ square root of the number of observations. The principal components are
 then computed for each observation vector. Note the first eigenvector is
 multiplied by a scaling factor of <span class="math">\(-1\)</span> so the signs what was reported by
 the <code>prcomp()</code> function.</p>
-<div class="highlight"><pre><span></span><span class="n">scaling</span> <span class="o">&lt;-</span> <span class="n">pilots.pca</span><span class="o">$</span><span class="n">sdev[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">pilots</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">scaling</span> <span class="o">&lt;-</span> <span class="n">pilots.pca</span><span class="o">$</span><span class="n">sdev</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span> <span class="o">*</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">pilots</span><span class="p">))</span>
 
-<span class="n">pc1</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">sweep</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span> <span class="p">,</span><span class="nf">colMeans</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">)))</span> <span class="o">*</span> <span class="n">s.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span> <span class="o">*</span> <span class="m">-1</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaling[1]</span><span class="p">)</span>
-<span class="n">pc2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">sweep</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">)))</span> <span class="o">*</span> <span class="n">s.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">2</span><span class="n">]</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaling[2]</span><span class="p">)</span>
+<span class="n">pc1</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">sweep</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">],</span> <span class="m">2</span> <span class="p">,</span><span class="nf">colMeans</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">])))</span> <span class="o">*</span> <span class="n">s.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="p">]</span> <span class="o">*</span> <span class="m">-1</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaling</span><span class="p">[</span><span class="m">1</span><span class="p">])</span>
+<span class="n">pc2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">sweep</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">],</span> <span class="m">2</span><span class="p">,</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">])))</span> <span class="o">*</span> <span class="n">s.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">scaling</span><span class="p">[</span><span class="m">2</span><span class="p">])</span>
 </pre></div>
 
 
@@ -445,7 +445,7 @@ appear to have commensurate units for each variable, and because we have
 very little information regarding the tests and the measurements
 collected, it might make sense to employ the <span class="math">\(R\)</span> matrix rather than <span class="math">\(S\)</span>.</p>
 <p>The correlation matrix is found with the <code>cor()</code> function.</p>
-<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">])</span>
 <span class="n">R</span>
 </pre></div>
 
@@ -504,7 +504,7 @@ keep the first four components rather than the first two or three with
 the <span class="math">\(S\)</span> matrix.</p>
 <p>To perform principal component analysis using the correlation matrix
 using the <code>prcomp()</code> function, set the <code>scale</code> argument to <code>TRUE</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">pilots.pca.scaled</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">pilots[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="n">]</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">pilots.pca.scaled</span> <span class="o">&lt;-</span> <span class="nf">prcomp</span><span class="p">(</span><span class="n">pilots</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">7</span><span class="p">],</span> <span class="n">scale</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 <span class="n">pilots.pca.scaled</span>
 </pre></div>
 
@@ -568,8 +568,8 @@ variables and the calculated PCs, which we will use here to find the
 correlations.</p>
 <p>First, compute the correlations between the data and the calculated
 components of the covariance matrix <span class="math">\(S\)</span>.</p>
-<div class="highlight"><pre><span></span><span class="n">comps</span> <span class="o">&lt;-</span> <span class="n">pca.plot</span><span class="o">$</span><span class="n">data[</span><span class="p">,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="o">:</span><span class="m">13</span><span class="p">)</span><span class="n">]</span>
-<span class="nf">cor</span><span class="p">(</span><span class="n">comps[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="n">]</span><span class="p">,</span> <span class="n">comps[</span><span class="p">,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">9</span><span class="p">)</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">comps</span> <span class="o">&lt;-</span> <span class="n">pca.plot</span><span class="o">$</span><span class="n">data</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="o">:</span><span class="m">13</span><span class="p">)]</span>
+<span class="nf">cor</span><span class="p">(</span><span class="n">comps</span><span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="p">],</span> <span class="n">comps</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">9</span><span class="p">)])</span>
 </pre></div>
 
 
@@ -603,8 +603,8 @@ variables and their units of measurement, it makes more sense to use the
 correlation matrix <span class="math">\(R\)</span> for performing principal component analysis.
 Let's see how the interpretation of the principal components changes
 when we use the <span class="math">\(R\)</span> matrix.</p>
-<div class="highlight"><pre><span></span><span class="n">comps.scaled</span> <span class="o">&lt;-</span> <span class="n">pca.plot.scaled</span><span class="o">$</span><span class="n">data[</span><span class="p">,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="o">:</span><span class="m">13</span><span class="p">)</span><span class="n">]</span>
-<span class="nf">cor</span><span class="p">(</span><span class="n">comps.scaled[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="n">]</span><span class="p">,</span> <span class="n">comps.scaled[</span><span class="p">,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">9</span><span class="p">)</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">comps.scaled</span> <span class="o">&lt;-</span> <span class="n">pca.plot.scaled</span><span class="o">$</span><span class="n">data</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">4</span><span class="o">:</span><span class="m">13</span><span class="p">)]</span>
+<span class="nf">cor</span><span class="p">(</span><span class="n">comps.scaled</span><span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">8</span><span class="p">],</span> <span class="n">comps.scaled</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="m">9</span><span class="p">)])</span>
 </pre></div>
 
 
@@ -740,6 +740,9 @@ technique.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -753,9 +756,6 @@ technique.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

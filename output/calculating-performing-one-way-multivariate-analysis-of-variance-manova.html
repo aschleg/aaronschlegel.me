@@ -199,25 +199,25 @@
 <p>Only the first variable, trunk girth at four years, reports a p-value above 0.05. Thus it is concluded there are significant differences in the means for the variables except for trunk girth at four years amongst the six groups.</p>
 <h2>Replicating MANOVA in R</h2>
 <p>For a deeper understanding of how MANOVA is calculated, we can replicate the results of the <code>manova()</code> function by computing the <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices as mentioned above. To calculate these matrices, first split the data into a list by group and find the mean vectors of each group. The sample sizes <span class="math">\(n_i\)</span> of each group, and the total mean vector will also be required.</p>
-<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
 
 <span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
   <span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
 <span class="p">},</span> <span class="n">simplify</span> <span class="o">=</span> <span class="s">&#39;data.frame&#39;</span><span class="p">)</span>
 
 
-<span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span> <span class="o">/</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
+<span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">/</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
 
-<span class="n">total.means</span> <span class="o">&lt;-</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<span class="n">total.means</span> <span class="o">&lt;-</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 </pre></div>
 
 
 <p>The <span class="math">\(H\)</span> and <span class="math">\(E\)</span> matrices can be computed with the following code.</p>
 <div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">H</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span> <span class="p">{</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">H[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">))</span>
-    <span class="n">H[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means[j</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[j]</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means[i</span><span class="p">,</span><span class="n">]</span> <span class="o">-</span> <span class="n">total.means[i]</span><span class="p">))</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means</span><span class="p">[</span><span class="n">i</span><span class="p">,]</span> <span class="o">-</span> <span class="n">total.means</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means</span><span class="p">[</span><span class="n">j</span><span class="p">,]</span> <span class="o">-</span> <span class="n">total.means</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">n</span> <span class="o">*</span> <span class="nf">sum</span><span class="p">((</span><span class="n">root.means</span><span class="p">[</span><span class="n">j</span><span class="p">,]</span> <span class="o">-</span> <span class="n">total.means</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">root.means</span><span class="p">[</span><span class="n">i</span><span class="p">,]</span> <span class="o">-</span> <span class="n">total.means</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
   <span class="p">}</span>
 <span class="p">}</span>
 <span class="n">H</span>
@@ -233,22 +233,22 @@
 
 
 <div class="highlight"><pre><span></span><span class="n">E</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">E</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span> <span class="p">{</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> 
     <span class="nf">for </span><span class="p">(</span><span class="n">k</span> <span class="n">in</span> <span class="n">root.group</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">((</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">i]</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k[</span><span class="p">,</span><span class="n">j]</span><span class="p">)))</span>
+      <span class="n">a</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">((</span><span class="n">k</span><span class="p">[,</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k</span><span class="p">[,</span><span class="n">i</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span><span class="p">[,</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">k</span><span class="p">[,</span><span class="n">j</span><span class="p">])))</span>
       <span class="n">b</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
     <span class="p">}</span>
-    <span class="n">E[i</span><span class="p">,</span><span class="n">j]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">E[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">E</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 
 
 <p>Verify the results by comparing the computed matrices to the output of <code>summary(manova())</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS[1]</span>
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -273,7 +273,7 @@
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS[2]</span>
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">SS</span><span class="p">[</span><span class="m">2</span><span class="p">]</span>
 </pre></div>
 
 
@@ -323,16 +323,16 @@
 <p>An approximate F-statistic can be found with the following equation:</p>
 <div class="math">$$ F = \frac{(2N + s + 1)V^{(s)}}{(2m + s + 1)(s - V^{(s)})} $$</div>
 <div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="nf">unique</span><span class="p">(</span><span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">))</span>
-<span class="n">p</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 <span class="n">vh</span> <span class="o">&lt;-</span> <span class="n">k</span> <span class="o">-</span> <span class="m">1</span>
-<span class="n">ve</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span> <span class="o">-</span> <span class="n">k</span>
+<span class="n">ve</span> <span class="o">&lt;-</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">k</span>
 </pre></div>
 
 
 <p>Where <span class="math">\(v_H\)</span> is the degrees of freedom for the hypothesis and <span class="math">\(v_E\)</span> is the degrees of freedom for the error.</p>
 <div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">&lt;-</span> <span class="nf">min</span><span class="p">(</span><span class="n">vh</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-<span class="n">m</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">vh</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
-<span class="n">N</span> <span class="o">&lt;-</span> <span class="m">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ve</span> <span class="o">-</span> <span class="n">p</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">&lt;-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">vh</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">&lt;-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ve</span> <span class="o">-</span> <span class="n">p</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
 
 <span class="n">f.approx</span> <span class="o">&lt;-</span> <span class="p">((</span><span class="m">2</span> <span class="o">*</span> <span class="n">N</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">vs</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="m">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">vs</span><span class="p">))</span>
 <span class="n">f.approx</span>
@@ -343,7 +343,7 @@
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">stats[</span><span class="p">,</span><span class="m">3</span><span class="n">][1]</span>
+<div class="highlight"><pre><span></span><span class="n">root.manova</span><span class="o">$</span><span class="n">stats</span><span class="p">[,</span><span class="m">3</span><span class="p">][</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -452,6 +452,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -465,9 +468,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

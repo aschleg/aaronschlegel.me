@@ -153,7 +153,7 @@
 <p>Both functions output the chi-squared value, degrees of freedom and p-value. The <code>agricolae</code> package output provides more statistics like the t-value and Least Significant Difference and further comparisons between the groups. Both functions reported a p-value well below 0.05. Therefore, it can be concluded there are differences between the control and treatment groups. The output from the <code>kruskal()</code> function shows there is a difference between treatment one and two while the control is not significantly different from either treatment. Note Tukey's test reported a similar conclusion after ANOVA was performed in a <a href="http://rpubs.com/aaronsc32/anova-compare-more-than-two-groups">previous example</a>, evidence the Kruskal-Wallis test is as performant on approximately normally distributed data.</p>
 <h2>Manually Calculating the Kruskal-Wallis Test</h2>
 <p>The above outputs of the two functions can be replicated manually to verify the results. The procedure is similar to the Mann-Whitney test in that the data is sorted and then the test statistic is calculated on the rank values. The <code>PlantGrowth</code> data are sorted on the weight variable and then ranked as before.</p>
-<div class="highlight"><pre><span></span><span class="n">plants.sorted</span> <span class="o">&lt;-</span> <span class="n">PlantGrowth</span><span class="nf">[order</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">),</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">plants.sorted</span> <span class="o">&lt;-</span> <span class="n">PlantGrowth</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">),]</span>
 <span class="n">plants.sorted</span><span class="o">$</span><span class="n">ranked</span> <span class="o">&lt;-</span> <span class="nf">rank</span><span class="p">(</span><span class="n">plants.sorted</span><span class="o">$</span><span class="n">weight</span><span class="p">,</span> <span class="n">ties.method</span> <span class="o">=</span> <span class="s">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
 
@@ -165,9 +165,9 @@
 
 <span class="n">plants</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">plants.sorted</span><span class="p">,</span> <span class="n">plants.sorted</span><span class="o">$</span><span class="n">group</span><span class="p">)</span>
 
-<span class="n">t_ctrl</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">ctrl</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="n">^2</span>
-<span class="n">t_trt1</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">trt1</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="n">^2</span>
-<span class="n">t_trt2</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">trt2</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="n">^2</span>
+<span class="n">t_ctrl</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">ctrl</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="o">^</span><span class="m">2</span>
+<span class="n">t_trt1</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">trt1</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="o">^</span><span class="m">2</span>
+<span class="n">t_trt2</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">plants</span><span class="o">$</span><span class="n">trt2</span><span class="o">$</span><span class="n">ranked</span><span class="p">)</span><span class="o">^</span><span class="m">2</span>
 </pre></div>
 
 
@@ -185,7 +185,7 @@
 
 
 <p>Notice the computed <span class="math">\(H\)</span> value is slightly different than the value reported earlier. The difference is caused by the presence of ties in the <code>PlantGrowth</code> dataset. Thus, the correction mentioned previously can be applied. There are only two tied values comprising one group in the dataset so that the value can be directly inputted into the correction equation.</p>
-<div class="highlight"><pre><span></span><span class="n">correction</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">-</span> <span class="p">(</span><span class="m">2</span><span class="n">^3</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N^3</span> <span class="o">-</span> <span class="n">N</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">correction</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">-</span> <span class="p">(</span><span class="m">2</span><span class="o">^</span><span class="m">3</span> <span class="o">-</span> <span class="m">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span><span class="o">^</span><span class="m">3</span> <span class="o">-</span> <span class="n">N</span><span class="p">)</span>
 
 <span class="n">corrected.h.value</span> <span class="o">&lt;-</span> <span class="n">h.value</span> <span class="o">/</span> <span class="n">correction</span>
 <span class="n">corrected.h.value</span>
@@ -220,7 +220,7 @@
 <p>The Least Significant Difference reported from the <code>kruskal()</code> function can also be found by finding the mean square error of the computed rank values. The Least Significant Difference is another test statistic that was developed by Ronald Fisher. The basic idea of the LSD is to find the smallest difference between two sample means and conclude a significant difference if a comparison between two other group means exceeds the LSD. Here is an excellent resource for more information on the <a href="https://www.utd.edu/~herve/abdi-LSD2010-pretty.pdf">Least Significant Difference</a>. The LSD can be calculated using the following equation:</p>
 <div class="math">$$ LSD = t_{\alpha, N-k} \sqrt{MSE \frac{2}{n}} $$</div>
 <p>A quick way to get the <span class="math">\(MSE\)</span> is to use the <code>anova()</code> function and extract the value from the reported table.</p>
-<div class="highlight"><pre><span></span><span class="n">mse</span> <span class="o">&lt;-</span> <span class="nf">anova</span><span class="p">(</span><span class="nf">lm</span><span class="p">(</span><span class="n">ranked</span> <span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">plants.sorted</span><span class="p">))</span><span class="n">[[3]][2]</span>
+<div class="highlight"><pre><span></span><span class="n">mse</span> <span class="o">&lt;-</span> <span class="nf">anova</span><span class="p">(</span><span class="nf">lm</span><span class="p">(</span><span class="n">ranked</span> <span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">plants.sorted</span><span class="p">))[[</span><span class="m">3</span><span class="p">]][</span><span class="m">2</span><span class="p">]</span>
 <span class="n">mse</span>
 </pre></div>
 
@@ -338,6 +338,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -351,9 +354,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

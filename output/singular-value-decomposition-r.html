@@ -229,7 +229,7 @@ with some sign changes. These sign changes can happen, as mentioned
 earlier, as the eigenvector scaled by <span class="math">\(-1\)</span> is still the same
 eigenvector, just scaled. We will alter the signs of our calculated <span class="math">\(V\)</span>
 to match the output of the <code>svd()</code> function.</p>
-<div class="highlight"><pre><span></span><span class="n">v.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">v.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">*</span> <span class="m">-1</span>
+<div class="highlight"><pre><span></span><span class="n">v.mat</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">v.mat</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span> <span class="o">*</span> <span class="m">-1</span>
 <span class="n">v.mat</span>
 </pre></div>
 
@@ -293,14 +293,14 @@ only interested in the non-zero eigenvalues and their respective
 eigenvectors. Therefore, we can remove the last eigenvector from the
 matrix which gives us the <span class="math">\(U\)</span> matrix. Note the eigenvalues of <span class="math">\(AA^T\)</span> and
 <span class="math">\(A^TA\)</span> are the same except the <span class="math">\(0\)</span> eigenvalue in the <span class="math">\(AA^T\)</span> matrix.</p>
-<div class="highlight"><pre><span></span><span class="n">u.mat</span> <span class="o">&lt;-</span> <span class="n">u.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span>
+<div class="highlight"><pre><span></span><span class="n">u.mat</span> <span class="o">&lt;-</span> <span class="n">u.mat</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]</span>
 </pre></div>
 
 
 <p>As mentioned earlier, the singular values <span class="math">\(r\)</span> are the square roots of
 the non-zero eigenvalues of the <span class="math">\(AA^T\)</span> and <span class="math">\(A^TA\)</span> matrices.</p>
 <div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">ATA.e</span><span class="o">$</span><span class="n">values</span><span class="p">)</span>
-<span class="n">r</span> <span class="o">&lt;-</span> <span class="n">r</span> <span class="o">*</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span>
+<span class="n">r</span> <span class="o">&lt;-</span> <span class="n">r</span> <span class="o">*</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">r</span><span class="p">))[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]</span>
 <span class="n">r</span>
 </pre></div>
 
@@ -454,6 +454,9 @@ Academic Press.</a></p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -467,9 +470,6 @@ Academic Press.</a></p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

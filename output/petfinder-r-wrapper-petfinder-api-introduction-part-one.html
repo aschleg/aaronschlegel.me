@@ -330,7 +330,7 @@ same call to the Petfinder API but with <code>return_df = TRUE</code> and print 
 first six rows of the first ten columns to demonstrate the returned
 <code>data.frame</code>.</p>
 <div class="highlight"><pre><span></span><span class="n">wa_cats</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.find</span><span class="p">(</span><span class="s">&#39;WA&#39;</span><span class="p">,</span> <span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">wa_cats[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">wa_cats</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])</span>
 
 <span class="c1">##   status  contact.phone contact.state                   contact.email</span>
 <span class="c1">## 1      A   206-296-7387            WA        adoptapet@kingcounty.gov</span>
@@ -578,7 +578,7 @@ random pet records again and output the result as a <code>data.frame</code> (not
 the returned records will likely not be the same as the earlier returned
 records due to the random nature of the output).</p>
 <div class="highlight"><pre><span></span><span class="n">random_records_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.getRandom</span><span class="p">(</span><span class="n">records</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;full&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="n">random_records_df[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+<span class="n">random_records_df</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]</span>
 
 <span class="c1">##   status.1 status.2     status.3 status address1.state</span>
 <span class="c1">## 1  altered hasShots housetrained      A             MA</span>
@@ -607,7 +607,7 @@ before, the returned records will be the same. We also set the
 convert the returned JSON result into a <code>data.frame</code> as in other methods
 seen previously.</p>
 <div class="highlight"><pre><span></span><span class="n">pet_get_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">pet.get</span><span class="p">(</span><span class="n">petId</span> <span class="o">=</span> <span class="n">random_records_df</span><span class="o">$</span><span class="n">id</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="n">pet_get_df[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+<span class="n">pet_get_df</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]</span>
 
 <span class="c1">##   status.1 status.2     status.3 status address1.state</span>
 <span class="c1">## 1  altered hasShots housetrained      A             MA</span>
@@ -857,7 +857,7 @@ quickly find this information. Here, we return the pets currently
 available at the Seattle Area Feline Rescue and print the first ten
 columns of the returned data.</p>
 <div class="highlight"><pre><span></span><span class="n">safr.pets</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.getPets</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets</span><span class="o">$</span><span class="n">petfinder</span><span class="o">$</span><span class="n">pets</span><span class="o">$</span><span class="n">pet</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets</span><span class="o">$</span><span class="n">petfinder</span><span class="o">$</span><span class="n">pets</span><span class="o">$</span><span class="n">pet</span><span class="p">)[,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]</span>
 
 <span class="c1">##                          options.option status.$t contact.phone.$t</span>
 <span class="c1">## 1       altered, hasShots, housetrained         A    206-659-6220 </span>
@@ -886,7 +886,7 @@ columns of the returned data.</p>
 <p>The <code>shelter.getPets()</code> method also has a <code>return_df</code> parameter that can
 be set to TRUE to return a clean, workable <code>data.frame</code> for analysis.</p>
 <div class="highlight"><pre><span></span><span class="n">safr.pets_df</span> <span class="o">&lt;-</span> <span class="n">pf</span><span class="o">$</span><span class="nf">shelter.getPets</span><span class="p">(</span><span class="s">&#39;WA40&#39;</span><span class="p">,</span> <span class="n">return_df</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets_df</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="n">]</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">safr.pets_df</span><span class="p">)[,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]</span>
 
 <span class="c1">##   status contact.phone contact.state                         contact.email</span>
 <span class="c1">## 1      A 206-659-6220             WA adoptions@seattleareafelinerescue.org</span>
@@ -970,6 +970,9 @@ data extraction and analysis.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -983,9 +986,6 @@ data extraction and analysis.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

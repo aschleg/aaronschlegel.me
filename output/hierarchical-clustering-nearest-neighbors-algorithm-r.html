@@ -120,7 +120,7 @@ will scale the pollution data because the variables' scale of
 measurement is quite different from each other, but it should be noted
 standardization should be thoughtfully applied (or not applied) rather
 than proceeding to scale automatically.</p>
-<div class="highlight"><pre><span></span><span class="n">poll.scale</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">scale</span><span class="p">(</span><span class="n">poll[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">8</span><span class="n">]</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">poll.scale</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">scale</span><span class="p">(</span><span class="n">poll</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">8</span><span class="p">]))</span>
 </pre></div>
 
 
@@ -143,14 +143,14 @@ for each pair of observations in the dataset.</p>
 
   <span class="n">n</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
   <span class="n">dist.mat</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-  <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x[1</span><span class="p">,</span><span class="n">]</span>
+  <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x</span><span class="p">[</span><span class="m">1</span><span class="p">,]</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">yj</span> <span class="o">&lt;-</span> <span class="n">x[j</span><span class="p">,</span><span class="n">]</span>
+      <span class="n">yj</span> <span class="o">&lt;-</span> <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">,]</span>
       <span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">as.matrix</span><span class="p">(</span><span class="n">xj</span> <span class="o">-</span> <span class="n">yj</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="n">xj</span> <span class="o">-</span> <span class="n">yj</span><span class="p">)))</span>
-      <span class="n">dist.mat[j</span><span class="p">,</span><span class="n">i]</span> <span class="o">&lt;-</span> <span class="n">d</span>
+      <span class="n">dist.mat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">d</span>
     <span class="p">}</span>
-    <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x[1</span><span class="o">+</span><span class="n">i</span><span class="p">,</span><span class="n">]</span>
+    <span class="n">xj</span> <span class="o">&lt;-</span> <span class="n">x</span><span class="p">[</span><span class="m">1</span><span class="o">+</span><span class="n">i</span><span class="p">,]</span>
   <span class="p">}</span>
   <span class="nf">return</span><span class="p">(</span><span class="n">dist.mat</span><span class="p">)</span>
 <span class="p">}</span>
@@ -174,7 +174,7 @@ to a matrix here to compare our results with the function.</p>
 
 <p>As the resulting matrices are <span class="math">\(41 \times 41\)</span>, check the first and bottom
 three rows of each to verify.</p>
-<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">poll.dist.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">poll.dist.mat[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">poll.dist.mat</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">poll.dist.mat</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]))</span>
 </pre></div>
 
 
@@ -188,7 +188,7 @@ three rows of each to verify.</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">euclid.dist[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">euclid.dist[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="n">]</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="nf">cbind</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">euclid.dist</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">euclid.dist</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]))</span>
 </pre></div>
 
 
@@ -298,24 +298,24 @@ shows how the rows and columns are merged with a simple dataset.</p>
   <span class="c1"># Johnson&#39;s algorithm Step 2L Find the pair with the minimum distance</span>
 
   <span class="c1"># The which() function returns the row and column position of the pair</span>
-  <span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">which</span><span class="p">(</span><span class="n">Lm</span> <span class="o">==</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">),</span> <span class="n">arr.ind</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="n">[1</span><span class="p">,,</span><span class="n">drop</span><span class="o">=</span><span class="kc">FALSE</span><span class="n">]</span>
+  <span class="n">d</span> <span class="o">&lt;-</span> <span class="nf">which</span><span class="p">(</span><span class="n">Lm</span> <span class="o">==</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">),</span> <span class="n">arr.ind</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)[</span><span class="m">1</span><span class="p">,,</span><span class="n">drop</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">]</span>
 
-  <span class="n">height[m]</span> <span class="o">&lt;-</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="c1"># The height is the value of the pair with the minimum distance</span>
+  <span class="n">height</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="nf">min</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span> <span class="c1"># The height is the value of the pair with the minimum distance</span>
 
   <span class="c1"># The row and column position of the minimum pair is stored as sequence m in the merge object</span>
-  <span class="n">merge[m</span><span class="p">,</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">cols[d]</span><span class="p">)</span>
+  <span class="n">merge</span><span class="p">[</span><span class="n">m</span><span class="p">,]</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="n">d</span><span class="p">])</span>
 
   <span class="c1"># Johnson&#39;s algorithm Step 3: The pair with the minimum distance is merged</span>
 
   <span class="c1"># The cluster object is used to find previous clusters that the pair belong to (if they exist)</span>
   <span class="c1"># Does this by finding any columns above 0 (since all column names are negative, a positive </span>
   <span class="c1"># column value implies it has been clustered)</span>
-  <span class="n">cluster</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nf">which</span><span class="p">(</span><span class="n">cols</span> <span class="o">%in%</span> <span class="n">cols[d[1</span><span class="p">,</span> <span class="n">cols[d]</span> <span class="o">&gt;</span> <span class="m">0</span><span class="n">]]</span><span class="p">))</span>
+  <span class="n">cluster</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nf">which</span><span class="p">(</span><span class="n">cols</span> <span class="o">%in%</span> <span class="n">cols</span><span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="m">1</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">]]))</span>
 
-  <span class="nf">colnames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)</span><span class="n">[cluster]</span> <span class="o">&lt;-</span> <span class="n">m</span> <span class="c1"># Rename the columns indicated by cluster to the sequence number, m</span>
+  <span class="nf">colnames</span><span class="p">(</span><span class="n">Lm</span><span class="p">)[</span><span class="n">cluster</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">m</span> <span class="c1"># Rename the columns indicated by cluster to the sequence number, m</span>
 
   <span class="c1"># Merge the pairs according to Johnson&#39;s algorithm and the single linkage method</span>
-  <span class="n">sl</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">Lm[d</span><span class="p">,</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">min</span><span class="p">)</span>
+  <span class="n">sl</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">Lm</span><span class="p">[</span><span class="n">d</span><span class="p">,],</span> <span class="m">2</span><span class="p">,</span> <span class="n">min</span><span class="p">)</span>
 
   <span class="c1"># Johnson&#39;s algorithm Step 4: Remove column and row corresponding to old clusters and</span>
   <span class="c1"># insert a new column and row for newly formed cluster.</span>
@@ -323,16 +323,16 @@ shows how the rows and columns are merged with a simple dataset.</p>
   <span class="c1"># The insertion of the cluster is done by setting the first sequential row and column of the</span>
   <span class="c1"># minimum pair in the distance matrix (top to bottom, left to right) as the cluster resulting </span>
   <span class="c1"># from the single linkage step</span>
-  <span class="n">Lm</span><span class="nf">[min</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
-  <span class="n">Lm[</span><span class="p">,</span><span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
+  <span class="n">Lm</span><span class="p">[</span><span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">),]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
+  <span class="n">Lm</span><span class="p">[,</span><span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span> <span class="o">&lt;-</span> <span class="n">sl</span>
 
   <span class="c1"># Make sure the minimum distance pair is not used again by setting it to Inf</span>
-  <span class="n">Lm</span><span class="nf">[min</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+  <span class="n">Lm</span><span class="p">[</span><span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="nf">min</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
 
   <span class="c1"># The removal step is done by setting the second sequential row and column of the minimum pair</span>
   <span class="c1"># (farthest right, farthest down) to Inf</span>
-  <span class="n">Lm</span><span class="nf">[max</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
-  <span class="n">Lm[</span><span class="p">,</span><span class="nf">max</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+  <span class="n">Lm</span><span class="p">[</span><span class="nf">max</span><span class="p">(</span><span class="n">d</span><span class="p">),]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
+  <span class="n">Lm</span><span class="p">[,</span><span class="nf">max</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span> <span class="o">&lt;-</span> <span class="kc">Inf</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -513,6 +513,9 @@ Queenâs University Belfast.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -526,9 +529,6 @@ Queenâs University Belfast.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

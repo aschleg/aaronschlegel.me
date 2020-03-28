@@ -93,8 +93,8 @@
 <div class="highlight"><pre><span></span><span class="n">set.union</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">u</span> <span class="o">&lt;-</span> <span class="n">a</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">b[i]</span> <span class="o">%in%</span> <span class="n">u</span><span class="p">))</span> <span class="p">{</span>
-      <span class="n">u</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">b[i]</span><span class="p">)</span>
+    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">%in%</span> <span class="n">u</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">u</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="p">}</span>
   <span class="p">}</span>
   <span class="nf">return</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
@@ -131,8 +131,8 @@
   <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">()</span>
 
   <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nf">if </span><span class="p">(</span><span class="n">a[i]</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">intersect</span><span class="p">,</span> <span class="n">a[i]</span><span class="p">)</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">intersect</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">intersect</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="p">}</span>
   <span class="p">}</span>
   <span class="nf">return</span><span class="p">(</span><span class="n">intersect</span><span class="p">)</span>
@@ -157,7 +157,7 @@
 <p>We can write a simple function to test whether a set <span class="math">\(a\)</span> is a subset of <span class="math">\(b\)</span>.</p>
 <div class="highlight"><pre><span></span><span class="n">issubset</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">a[i]</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">%in%</span> <span class="n">b</span><span class="p">))</span> <span class="p">{</span>
       <span class="nf">return</span><span class="p">(</span><span class="kc">FALSE</span><span class="p">)</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -304,6 +304,9 @@ Academic Press.</a></p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -317,9 +320,6 @@ Academic Press.</a></p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

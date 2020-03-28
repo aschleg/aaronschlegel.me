@@ -114,7 +114,7 @@
 
 
 <p>Before classifying the observations in the data first split the data into groups using the <code>split()</code> function. The groups' covariance matrix and mean vectors are then found.</p>
-<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
 <span class="n">Si</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">cov</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 <span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
@@ -125,15 +125,15 @@
 
 <p>The following loop performs quadratic discriminant analysis for several groups. For each observation vector <span class="math">\(y\)</span> in the data, the classification function above is calculated for each group. The group that maximizes the function is the predicted group the observation vector belongs and is thus appended to the <code>l2i.y</code> object.</p>
 <div class="highlight"><pre><span></span><span class="n">l2i.y</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> <span class="c1"># Initialize the vector to store the classified results</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span> <span class="p">{</span>
 
-  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root[i</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span> <span class="c1"># Get the observation vector y</span>
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">]</span> <span class="c1"># Get the observation vector y</span>
   <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 
   <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">))</span> <span class="p">{</span> <span class="c1"># For each group, calculate the QDA function. </span>
-    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means[j]</span><span class="p">)</span>
-    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si[j]</span><span class="p">),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
+    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
   <span class="p">}</span>
 
   <span class="n">l2i.y</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i.y</span><span class="p">,</span> <span class="nf">which.max</span><span class="p">(</span><span class="n">l2i</span><span class="p">))</span> <span class="c1"># Append the group number which maximizes the function</span>
@@ -158,7 +158,7 @@
 
 
 <p>It appears QDA was rather accurate in classifying observations, particularly in groups one through four. Count the number of successful classifications divided by the total sample size to get the error rate.</p>
-<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -172,7 +172,7 @@
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">root.qda</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.qda</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">)</span>
 <span class="n">root.qda</span>
 </pre></div>
 
@@ -229,7 +229,7 @@
 
 
 <p>The error rate of the <code>qda()</code> function also agrees with ours.</p>
-<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">predict</span><span class="p">(</span><span class="n">root.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">predict</span><span class="p">(</span><span class="n">root.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -242,27 +242,27 @@
 <p>The following code performs <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation">leave-one-out cross-validation</a> with quadratic discriminant analysis. Leave-one-out cross-validation is performed by using all but one of the sample observation vectors to determine the classification function and then using that classification function to predict the omitted observation's group membership. The procedure is repeated for each observation so that each is classified by a function of the other observations.</p>
 <div class="highlight"><pre><span></span><span class="n">l2i.y.cv</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span> <span class="c1"># Vector to store classified results</span>
 
-<span class="nf">for </span><span class="p">(</span><span class="n">r</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">r</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span> <span class="p">{</span>
 
   <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 
-  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">root[</span><span class="o">-</span><span class="n">r</span><span class="p">,</span><span class="n">]</span> <span class="c1"># The holdout group is all of the data except one observation</span>
+  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">root</span><span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">,]</span> <span class="c1"># The holdout group is all of the data except one observation</span>
 
   <span class="c1"># Split the data and calculate the covariance matrices and mean vectors of the groups</span>
-  <span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">holdout[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">holdout</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
+  <span class="n">root.group</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">holdout</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">holdout</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span>
   <span class="n">Si</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">cov</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
   <span class="n">root.means</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">root.group</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="nf">c</span><span class="p">(</span><span class="nf">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">))</span>
   <span class="p">})</span>
 
-  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root[r</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span> <span class="c1"># The left out observation vector is stored in the variable y</span>
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="n">root</span><span class="p">[</span><span class="n">r</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">]</span> <span class="c1"># The left out observation vector is stored in the variable y</span>
 
   <span class="c1"># Calculate the quadratic classification function using the y vector for each group to determine which maximizes the function</span>
   <span class="nf">for </span><span class="p">(</span><span class="n">j</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">))</span> <span class="p">{</span>
-    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means[j]</span><span class="p">)</span>
-    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si[j]</span><span class="p">),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="m">.5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
+    <span class="n">y.bar</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="n">root.means</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">Si.j</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">unlist</span><span class="p">(</span><span class="n">Si</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="m">4</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+    <span class="n">l2i</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">l2i</span><span class="p">,</span> <span class="m">-.5</span> <span class="o">*</span> <span class="nf">log</span><span class="p">(</span><span class="nf">det</span><span class="p">(</span><span class="n">Si.j</span><span class="p">))</span> <span class="o">-</span> <span class="n">.</span><span class="m">5</span> <span class="o">*</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">Si.j</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y.bar</span><span class="p">)</span> <span class="o">+</span> <span class="nf">log</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="nf">length</span><span class="p">(</span><span class="n">Si</span><span class="p">)))</span>
   <span class="p">}</span>
 
   <span class="c1"># The group that maximizes the classification function is stored in the initialized vector.</span>
@@ -272,7 +272,7 @@
 
 
 <p>Find the misclassification rate of the cross-validated results.</p>
-<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y.cv</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">l2i.y.cv</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -282,7 +282,7 @@
 
 <p>A 69% error rate is three times the rate we found with the non-cross-validated results above, which we expected due to the relatively small sample size of each group. The error rate is also higher than the 56% error rate found with the cross-validated linear discriminant analysis model. However, since quadratic discriminant analysis makes fewer assumptions regarding the groups and involves more parameters, it may be the recommended model for classifying new observations. The model is also more accurate than simply guessing group membership of observations, which would have an 83% error rate <span class="math">\((1 - \frac{1}{6})\)</span>.</p>
 <p>The <code>qda()</code> function also performs cross-validation when the <code>CV</code> argument is <code>TRUE</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">root.qda.cv</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">CV</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.qda.cv</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Tree.Number</span> <span class="o">~</span> <span class="n">.</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">CV</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 <span class="n">root.qda.cv</span><span class="o">$</span><span class="n">class</span>
 </pre></div>
 
@@ -293,7 +293,7 @@
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">root.qda.cv</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="n">[1]</span>
+<div class="highlight"><pre><span></span><span class="m">1</span> <span class="o">-</span> <span class="nf">sum</span><span class="p">(</span><span class="n">root.qda.cv</span><span class="o">$</span><span class="n">class</span> <span class="o">==</span> <span class="n">root</span><span class="o">$</span><span class="n">Tree.Number</span><span class="p">)</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">root</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
 </pre></div>
 
 
@@ -398,6 +398,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -411,9 +414,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

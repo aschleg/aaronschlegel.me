@@ -179,7 +179,7 @@
 <span class="n">plants</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="p">,</span> <span class="n">PlantGrowth</span><span class="o">$</span><span class="n">group</span><span class="p">)</span>
 
 <span class="n">sse</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">Reduce</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">plants</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-  <span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">x[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">sd</span><span class="p">(</span><span class="n">x[</span><span class="p">,</span><span class="m">1</span><span class="n">]</span><span class="p">)</span><span class="n">^2</span>
+  <span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">x</span><span class="p">[,</span><span class="m">1</span><span class="p">])</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="nf">sd</span><span class="p">(</span><span class="n">x</span><span class="p">[,</span><span class="m">1</span><span class="p">])</span><span class="o">^</span><span class="m">2</span>
 <span class="p">})))</span>
 
 <span class="n">mse</span> <span class="o">&lt;-</span> <span class="n">sse</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
@@ -218,9 +218,9 @@
 <div class="math">$$|Y_1 − Y_2| \geq HSD $$</div>
 <p>The means of each group can be found using the <code>tapply()</code> function. Since there's only three groups, I went ahead and just calculated the differences manually. With the differences obtained, compare the absolute value of the difference to the HSD. I used a quick and dirty <code>for()</code> loop to do this.</p>
 <div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">&lt;-</span> <span class="nf">tapply</span><span class="p">(</span><span class="n">PlantGrowth</span><span class="o">$</span><span class="n">weight</span><span class="p">,</span> <span class="n">PlantGrowth</span><span class="o">$</span><span class="n">group</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
-<span class="n">trt1.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means[2]</span> <span class="o">-</span> <span class="n">means[1]</span>
-<span class="n">trt2.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means[3]</span> <span class="o">-</span> <span class="n">means[1]</span>
-<span class="n">trt2.trt1.diff</span> <span class="o">&lt;-</span> <span class="n">means[3]</span> <span class="o">-</span> <span class="n">means[2]</span>
+<span class="n">trt1.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means</span><span class="p">[</span><span class="m">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+<span class="n">trt2.ctrl.diff</span> <span class="o">&lt;-</span> <span class="n">means</span><span class="p">[</span><span class="m">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+<span class="n">trt2.trt1.diff</span> <span class="o">&lt;-</span> <span class="n">means</span><span class="p">[</span><span class="m">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="m">2</span><span class="p">]</span>
 
 <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">list</span><span class="p">(</span><span class="n">trt1.ctrl.diff</span><span class="p">,</span> <span class="n">trt2.ctrl.diff</span><span class="p">,</span> <span class="n">trt2.trt1.diff</span><span class="p">))</span> <span class="p">{</span>
   <span class="nf">print</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tukey.hsd</span><span class="p">)</span>
@@ -413,6 +413,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -426,9 +429,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

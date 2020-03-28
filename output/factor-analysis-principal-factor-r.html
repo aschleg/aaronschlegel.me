@@ -142,7 +142,7 @@ variables as follows:</p>
 scales, we will proceed with using the correlation matrix <span class="math">\(R\)</span> to perform
 factor analysis.</p>
 <p>Find the correlation matrix.</p>
-<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 <span class="nf">round</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>
 </pre></div>
 
@@ -228,7 +228,7 @@ The following loop demonstrates this phenomenon:</p>
 
 <p>Obtain the factor loadings as before by multiplying the square root of
 the first two eigenvalues by their respective eigenvectors.</p>
-<div class="highlight"><pre><span></span><span class="n">r.lambda</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">r.lambda</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">])</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]))</span>
 <span class="n">r.lambda</span>
 </pre></div>
 
@@ -243,9 +243,9 @@ the first two eigenvalues by their respective eigenvectors.</p>
 
 <p>The communalities, specific variances and complexity of the factor
 loadings can then be calculated.</p>
-<div class="highlight"><pre><span></span><span class="n">r.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">r.h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="n">r.u2</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">-</span> <span class="n">r.h2</span>
-<span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^2</span><span class="p">)</span><span class="n">^2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda^4</span><span class="p">)</span>
+<span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">r.lambda</span><span class="o">^</span><span class="m">4</span><span class="p">)</span>
 </pre></div>
 
 
@@ -278,7 +278,7 @@ estimates with those of the resulting <span class="math">\(\hat{\Lambda}\)</span
 converge. This approach to factor analysis will be demonstrated in a
 future post. Setting the <code>max.iter</code> argument to 1 will output the
 non-iterated principal factor method results.</p>
-<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 <span class="n">root.cor.fa</span>
 </pre></div>
 
@@ -330,7 +330,7 @@ rotation</a> to improve
 interpretation. Varimax rotation of the loadings can be done with the
 <code>varimax()</code> function, or in the <code>fa()</code> function by setting the <code>rotate</code>
 argument to <code>varimax</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">root.cor.fa.v</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa.v</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">,</span> <span class="n">max.iter</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 <span class="n">root.cor.fa.v</span>
 </pre></div>
 
@@ -381,7 +381,7 @@ the correlations or the number of variables is large (Rencher, 2002, pp.
 424).</p>
 <p>Perform the principal component method of factor analysis and compare
 with the principal factor method.</p>
-<div class="highlight"><pre><span></span><span class="n">root.cor.pa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.pa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
 <span class="n">root.cor.pa</span>
 </pre></div>
 
@@ -518,6 +518,9 @@ variance in the variables.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -531,9 +534,6 @@ variance in the variables.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

@@ -108,8 +108,8 @@
 <p>The following function implements quadratic discriminant analysis to predict the group membership of the beetle observations. The function computes the group means and covariance matrices and then calculates <span class="math">\(D_i^2(y)\)</span>, as shown above, and outputs the predicted group, confusion matrix, and error rate.</p>
 <div class="highlight"><pre><span></span><span class="n">two.group.quadratic.classification</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grouping</span><span class="p">,</span> <span class="n">newdata</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">dat.split</span> <span class="o">&lt;-</span> <span class="nf">split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grouping</span><span class="p">)</span>
-  <span class="n">g1</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">dat.split[1]</span><span class="p">)</span>
-  <span class="n">g2</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">dat.split[2]</span><span class="p">)</span>
+  <span class="n">g1</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">dat.split</span><span class="p">[</span><span class="m">1</span><span class="p">])</span>
+  <span class="n">g2</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">dat.split</span><span class="p">[</span><span class="m">2</span><span class="p">])</span>
   <span class="n">g1.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
   <span class="n">g2.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
   <span class="n">g1.covar</span> <span class="o">&lt;-</span> <span class="nf">cov</span><span class="p">(</span><span class="n">g1</span><span class="p">)</span>
@@ -118,11 +118,11 @@
   <span class="n">prediction</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">newdata</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">d2.y1</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">g1.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">g1.covar</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">g1.means</span><span class="p">)</span>
     <span class="n">d2.y2</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">g2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">g2.covar</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">g2.means</span><span class="p">)</span>
-    <span class="nf">ifelse</span><span class="p">(</span><span class="n">d2.y1^2</span> <span class="o">&gt;</span> <span class="n">d2.y2^2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+    <span class="nf">ifelse</span><span class="p">(</span><span class="n">d2.y1</span><span class="o">^</span><span class="m">2</span> <span class="o">&gt;</span> <span class="n">d2.y2</span><span class="o">^</span><span class="m">2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
   <span class="p">})</span>
 
   <span class="n">class.table</span> <span class="o">&lt;-</span> <span class="nf">table</span><span class="p">(</span><span class="n">grouping</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
-  <span class="n">pred.errors</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">diag</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">apply</span><span class="p">(</span><span class="n">class.table</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">rev</span><span class="p">))))</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="n">[1]</span>
+  <span class="n">pred.errors</span> <span class="o">&lt;-</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">diag</span><span class="p">(</span><span class="nf">t</span><span class="p">(</span><span class="nf">apply</span><span class="p">(</span><span class="n">class.table</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">rev</span><span class="p">))))</span> <span class="o">/</span> <span class="nf">dim</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span>
   <span class="n">results</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="s">&#39;Prediction&#39;</span><span class="o">=</span><span class="n">prediction</span><span class="p">,</span> <span class="s">&#39;Table of Predictions&#39;</span><span class="o">=</span><span class="n">class.table</span><span class="p">,</span> <span class="s">&#39;Error Rate&#39;</span><span class="o">=</span><span class="n">pred.errors</span><span class="p">)</span>
 
   <span class="nf">return</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
@@ -131,7 +131,7 @@
 
 
 <p>Run the function with the observed data as the <code>newdata</code> argument.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle.quad</span> <span class="o">&lt;-</span> <span class="nf">two.group.quadratic.classification</span><span class="p">(</span><span class="n">beetles[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">,</span> <span class="n">beetles[</span><span class="p">,</span><span class="m">2</span><span class="n">]</span><span class="p">,</span> <span class="n">beetles[</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beetle.quad</span> <span class="o">&lt;-</span> <span class="nf">two.group.quadratic.classification</span><span class="p">(</span><span class="n">beetles</span><span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">],</span> <span class="n">beetles</span><span class="p">[,</span><span class="m">2</span><span class="p">],</span> <span class="n">beetles</span><span class="p">[,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">])</span>
 <span class="n">beetle.quad</span>
 </pre></div>
 
@@ -157,7 +157,7 @@
 
 
 <p>Similar to the <code>lda()</code> function in the <code>MASS</code> package, the <code>qda()</code> function takes a formula argument.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle.qda</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span><span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beetle.qda</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span><span class="n">.</span><span class="o">-</span><span class="n">Measurement.Number</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
 
 <span class="n">qda.pred</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">beetle.qda</span><span class="p">)</span><span class="o">$</span><span class="n">class</span>
 <span class="n">qda.pred</span>
@@ -186,12 +186,12 @@
 <p>As before, we will use <a href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation">leave-one-out cross-validation</a> to find a more realistic and less optimistic model for classifying observations in practice. Leave-one-out cross-validation is performed by using all but one of the sample observation vectors to determine the classification function and then using that classification function to predict the omitted observation's group membership. The procedure is repeated for each observation so that each is classified by a function of the other observations. The approach to building the quadratic discriminant functions remains the same as before, with the exception that all but <span class="math">\(N − 1\)</span> observations are used.</p>
 <div class="highlight"><pre><span></span><span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">beetles</span><span class="p">)</span><span class="n">[1]</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">beetles[</span><span class="o">-</span><span class="n">i</span><span class="p">,</span><span class="n">]</span>
-  <span class="n">y</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">beetles[i</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">dim</span><span class="p">(</span><span class="n">beetles</span><span class="p">)[</span><span class="m">1</span><span class="p">])</span> <span class="p">{</span>
+  <span class="n">holdout</span> <span class="o">&lt;-</span> <span class="n">beetles</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">,]</span>
+  <span class="n">y</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="n">beetles</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">])</span>
 
-  <span class="n">holdout1</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
-  <span class="n">holdout2</span> <span class="o">&lt;-</span> <span class="n">holdout[holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,</span><span class="n">][</span><span class="p">,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
+  <span class="n">holdout1</span> <span class="o">&lt;-</span> <span class="n">holdout</span><span class="p">[</span><span class="n">holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">1</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
+  <span class="n">holdout2</span> <span class="o">&lt;-</span> <span class="n">holdout</span><span class="p">[</span><span class="n">holdout</span><span class="o">$</span><span class="n">Species</span> <span class="o">==</span> <span class="m">2</span><span class="p">,][,</span><span class="m">3</span><span class="o">:</span><span class="m">6</span><span class="p">]</span>
 
   <span class="n">holdout1.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
   <span class="n">holdout2.means</span> <span class="o">&lt;-</span> <span class="nf">apply</span><span class="p">(</span><span class="n">holdout2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
@@ -202,7 +202,7 @@
   <span class="n">d2.y1</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">holdout1.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">holdout1.covar</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">holdout1.means</span><span class="p">)</span>
   <span class="n">d2.y2</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">solve</span><span class="p">(</span><span class="n">holdout2.covar</span><span class="p">)</span> <span class="o">%*%</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">holdout2.means</span><span class="p">)</span>
 
-  <span class="n">group</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">d2.y1^2</span> <span class="o">&gt;</span> <span class="n">d2.y2^2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+  <span class="n">group</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">d2.y1</span><span class="o">^</span><span class="m">2</span> <span class="o">&gt;</span> <span class="n">d2.y2</span><span class="o">^</span><span class="m">2</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
   <span class="n">cv.prediction</span> <span class="o">&lt;-</span> <span class="nf">append</span><span class="p">(</span><span class="n">cv.prediction</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 <span class="p">}</span>
 
@@ -219,7 +219,7 @@
 
 <p>The cross-validated results show two misclassified observations for each group, giving an error rate of approximately 10.3%. This error rate is slightly higher than the 7.7% error rate we found with cross-validated linear discriminant classifications. One could potentially test both models on new observations to determine their predictive power; however, as quadratic discriminant analysis makes fewer assumptions regarding the data and involves more parameters, it is likely that model would be more realistic in classifying observations.</p>
 <p>Cross-validation can also be done with the <code>qda()</code> function with the <code>CV</code> argument set to <code>TRUE</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">beetle.qda.cv</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span><span class="n">.-Measurement.Number</span><span class="p">,</span> <span class="n">CV</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">beetle.qda.cv</span> <span class="o">&lt;-</span> <span class="nf">qda</span><span class="p">(</span><span class="n">Species</span> <span class="o">~</span><span class="n">.</span><span class="o">-</span><span class="n">Measurement.Number</span><span class="p">,</span> <span class="n">CV</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">beetles</span><span class="p">)</span>
 <span class="nf">table</span><span class="p">(</span><span class="n">beetles</span><span class="o">$</span><span class="n">Species</span><span class="p">,</span> <span class="n">beetle.qda.cv</span><span class="o">$</span><span class="n">class</span><span class="p">,</span> <span class="n">dnn</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Actual Group&#39;</span><span class="p">,</span><span class="s">&#39;Predicted Group&#39;</span><span class="p">))</span>
 </pre></div>
 
@@ -328,6 +328,9 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -341,9 +344,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 

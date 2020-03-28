@@ -122,7 +122,7 @@ are not measured commensurately. Using <span class="math">\(R\)</span> over <spa
 preferred approach and is usually the default in most implementations
 (such as the <code>psych</code> package).</p>
 <p>Calculate the correlation matrix.</p>
-<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">&lt;-</span> <span class="nf">cor</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
 </pre></div>
 
 
@@ -144,7 +144,7 @@ equal to the following:</p>
 error threshold is also the default in the <code>psych</code> package
 implementation of the iterated principal factor method. The <code>com.iter</code>
 object will be used to store the communality iterations.</p>
-<div class="highlight"><pre><span></span><span class="n">min.error</span> <span class="o">&lt;-</span> <span class="m">.001</span>
+<div class="highlight"><pre><span></span><span class="n">min.error</span> <span class="o">&lt;-</span> <span class="n">.</span><span class="m">001</span>
 <span class="n">com.iter</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">()</span>
 </pre></div>
 
@@ -167,7 +167,7 @@ replacing the previous estimates of communality with new ones.</p>
   <span class="n">r.eigen</span> <span class="o">&lt;-</span> <span class="nf">eigen</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="c1"># Get the eigenvalues and eigenvectors of R</span>
 
   <span class="c1"># The lambda object is updated upon each iteration using new estimates of the communality</span>
-  <span class="n">lambda</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">)</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">))</span>
+  <span class="n">lambda</span> <span class="o">&lt;-</span> <span class="nf">as.matrix</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">vectors</span><span class="p">[,</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">])</span> <span class="o">%*%</span> <span class="nf">diag</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]))</span>
 
   <span class="c1"># R - Psi is then found by multiplying the lambda matrix by its transpose</span>
   <span class="n">r.mod</span> <span class="o">&lt;-</span> <span class="n">lambda</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">lambda</span><span class="p">)</span>
@@ -192,9 +192,9 @@ replacing the previous estimates of communality with new ones.</p>
 
 <p>We now have the final <span class="math">\(\hat{\Lambda}\)</span>. Find the communality, specific
 variances and complexity and collect them into a <code>data.frame</code></p>
-<div class="highlight"><pre><span></span><span class="n">h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda^2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">h2</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda</span><span class="o">^</span><span class="m">2</span><span class="p">)</span>
 <span class="n">u2</span> <span class="o">&lt;-</span> <span class="m">1</span> <span class="o">-</span> <span class="n">h2</span>
-<span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda^2</span><span class="p">)</span><span class="n">^2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda^4</span><span class="p">)</span>
+<span class="n">com</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda</span><span class="o">^</span><span class="m">2</span><span class="p">)</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> <span class="nf">rowSums</span><span class="p">(</span><span class="n">lambda</span><span class="o">^</span><span class="m">4</span><span class="p">)</span>
 
 <span class="n">iter.fa.loadings</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">cbind</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="n">lambda</span><span class="p">,</span><span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">h2</span><span class="p">,</span> <span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">com</span><span class="p">,</span> <span class="m">2</span><span class="p">)))</span>
 <span class="nf">colnames</span><span class="p">(</span><span class="n">iter.fa.loadings</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Factor 1&#39;</span><span class="p">,</span> <span class="s">&#39;Factor 2&#39;</span><span class="p">,</span> <span class="s">&#39;h2&#39;</span><span class="p">,</span> <span class="s">&#39;u2&#39;</span><span class="p">,</span> <span class="s">&#39;com&#39;</span><span class="p">)</span>
@@ -208,10 +208,10 @@ cumulative variance of the factors when factoring <span class="math">\(R\)</span
 <div class="math">$$ \frac{\sum^p_{i=1} \hat{\lambda}^2_{ij}}{tr(R)} = \frac{\theta_j}{p} $$</div>
 <p>Where <span class="math">\(p\)</span> is the number of variables. Calculate these values and store
 in a <code>data.frame</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">prop.var</span> <span class="o">&lt;-</span> <span class="n">r.eigen</span><span class="o">$</span><span class="n">values[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">diag</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">prop.var</span> <span class="o">&lt;-</span> <span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]</span> <span class="o">/</span> <span class="nf">sum</span><span class="p">(</span><span class="nf">diag</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
 <span class="n">var.cumulative</span> <span class="o">&lt;-</span> <span class="n">r.eigen</span><span class="o">$</span><span class="n">values</span> <span class="o">/</span> <span class="m">4</span>
 
-<span class="n">factor.var</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="n">prop.var[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">var.cumulative[1</span><span class="o">:</span><span class="m">2</span><span class="n">]</span><span class="p">,</span> <span class="m">2</span><span class="p">)))</span>
+<span class="n">factor.var</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">rbind</span><span class="p">(</span><span class="nf">round</span><span class="p">(</span><span class="n">prop.var</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span> <span class="m">2</span><span class="p">),</span> <span class="nf">round</span><span class="p">(</span><span class="n">var.cumulative</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span> <span class="m">2</span><span class="p">)))</span>
 <span class="nf">rownames</span><span class="p">(</span><span class="n">factor.var</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Proportion Explained&#39;</span><span class="p">,</span> <span class="s">&#39;Cumulative Variance&#39;</span><span class="p">)</span>
 <span class="nf">colnames</span><span class="p">(</span><span class="n">factor.var</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Factor 1&#39;</span><span class="p">,</span> <span class="s">&#39;Factor 2&#39;</span><span class="p">)</span>
 <span class="n">factor.var</span>
@@ -259,7 +259,7 @@ principal factors).</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">)</span>
 <span class="n">root.cor.fa</span>
 </pre></div>
 
@@ -364,7 +364,7 @@ results; however, factor loadings from principal components loaded
 slightly higher on their respective variables and represented the more
 cumulative variance of the original data. Let's see if the iterated
 method performs any better to the principal component method.</p>
-<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.fa</span> <span class="o">&lt;-</span> <span class="nf">fa</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">,</span> <span class="n">fm</span> <span class="o">=</span> <span class="s">&#39;pa&#39;</span><span class="p">)</span>
 <span class="n">root.cor.fa</span>
 </pre></div>
 
@@ -407,7 +407,7 @@ method performs any better to the principal component method.</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">root.cor.pa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="n">]</span><span class="p">,</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">root.cor.pa</span> <span class="o">&lt;-</span> <span class="nf">principal</span><span class="p">(</span><span class="n">root</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">5</span><span class="p">],</span> <span class="n">nfactors</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="s">&#39;varimax&#39;</span><span class="p">)</span>
 <span class="n">root.cor.pa</span>
 </pre></div>
 
@@ -539,6 +539,9 @@ would be inclined to use the principal component method results.</p>
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
             </li>
             <li>
@@ -552,9 +555,6 @@ would be inclined to use the principal component method results.</p>
             </li>
             <li>
               <a href="https://aaronschlegel.me/integration-by-parts.html">Integration by Parts</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/lhospital-rule-calculating-limits-indeterminate-forms.html">L'Hospital's Rule for Calculating Limits and Indeterminate Forms</a>
             </li>
     </ul>
 
