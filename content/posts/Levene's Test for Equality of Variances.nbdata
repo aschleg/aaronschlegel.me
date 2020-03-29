@@ -1,0 +1,7 @@
+Title: Levene's Test for Equality of Variances with Python
+Slug: levenes-test-equality-variances-python
+Date: 2020-03-30
+Category: Statistics
+Tags: Python, statistics
+Author: Aaron Schlegel
+Summary: Levene's test is a statistical procedure for testing equality of variances (also sometimes called homoscedasticity or homogeneity of variances) between two or more sample populations. Several commonly used statistical routines such as the t-test and analysis of variance assume the populations have equal variances. Therefore Levene's test is often employed to test this assumption before performing these tests.
