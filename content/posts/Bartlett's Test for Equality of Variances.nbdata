@@ -1,0 +1,7 @@
+Title: Bartlett's Test for Equality of Variances with Python
+Slug: bartletts-test-equality-variances-python
+Date: 2020-04-06
+Category: Statistics
+Tags: Python, statistics
+Author: Aaron Schlegel
+Summary: Bartlett's test, developed by Maurice Stevenson Bartlett, is a statistical procedure for testing if $k$ population samples have equal variances. Equality of variances in population samples is assumed in commonly used comparison of means tests, such as Student's t-test and analysis of variance. Therefore, a procedure such as Bartlett's test can be conducted to accept or reject the assumption of equal variances across group samples.

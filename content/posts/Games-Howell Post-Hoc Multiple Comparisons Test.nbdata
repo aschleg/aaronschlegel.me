@@ -1,0 +1,7 @@
+Title: Games-Howell Post-Hoc Multiple Comparisons Test with Python
+Slug: games-howell-post-hoc-multiple-comparisons-test-python
+Date: 2020-04-13
+Category: Statistics
+Tags: Python, statistics
+Author: Aaron Schlegel
+Summary: The Games-Howell test is a nonparametric post hoc analysis approach for performing multiple comparisons for two or more sample populations. The Games-Howell test is somewhat similar to Tukey's post hoc test. Still, unlike Tukey's test, it does not assume homogeneity of variances or equal sample sizes. Thus, the Games-Howell test can be applied in settings when the assumptions of Tukey's test do not hold. The Games-Howell test and Tukey's test will often report similar results with data that is assumed to have equal variance and equal sample sizes.
