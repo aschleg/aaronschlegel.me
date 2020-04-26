@@ -1,0 +1,7 @@
+Title: Vector Norms and Inequalities with Python
+Slug: vector-norms-inequalities-python
+Date: 2020-04-20
+Category: Linear Algebra
+Tags: Linear Algebra, Python, mathematics
+Author: Aaron Schlegel
+Summary: Similar to the real line concerning two real scalars and the distance between them, vector norms allow us to get a sense of the distance or magnitude of a vector. In fact, a vector of length one is simply a scalar. Norms are often used in regularization methods and other machine learning procedures, as well as many different matrix and vector operations in linear algebra.

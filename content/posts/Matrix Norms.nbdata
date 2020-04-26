@@ -1,0 +1,7 @@
+Title: Matrix Norms and Inequalities with Python
+Slug: matrix-norms-inequalities-python
+Date: 2020-04-27
+Category: Linear Algebra
+Tags: Linear Algebra, Python, mathematics
+Author: Aaron Schlegel
+Summary: Matrix norms are an extension of vector norms to matrices and are used to define a measure of distance on the space of a matrix. The most commonly occurring matrix norms in matrix analysis are the Frobenius, $L_1$, $L_2$ and $L_\infty$ norms. The following will investigate these norms, along with some Python implementations of the calculation of the matrix norm.

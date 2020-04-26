@@ -2,7 +2,7 @@
 <html lang="english">
 <head>
 
-        <title>Aaron Schlegel's Notebook of Interesting Things - linear algebra</title>
+        <title>Aaron Schlegel's Notebook of Interesting Things - Linear Algebra</title>
         <meta charset="utf-8" />
         <link href="https://aaronschlegel.me/feed/all.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Full Atom Feed" />
         <link href="https://aaronschlegel.me/feed/linear-algebra.tag.xml" type="application/atom+xml" rel="alternate" title="Aaron Schlegel's Notebook of Interesting Things Tags Atom Feed" />
@@ -59,6 +59,101 @@
    <div class="row">
         <div class="eleven columns">
                  <ol id="post-list">
+                        <li><article class="hentry">
+                                <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/matrix-norms-inequalities-python.html" rel="bookmark" title="Permalink to Matrix Norms and Inequalities with Python">Matrix Norms and Inequalities with Python</a></h2> </header>
+                                <!-- /.post-info -->
+                                <div class="entry-content"> <p>Matrix norms are an extension of vector norms to matrices and are used to define a measure of distance on the space of a matrix. The most commonly occurring matrix norms in matrix analysis are the Frobenius, <span class="math">\(L_1\)</span>, <span class="math">\(L_2\)</span> and <span class="math">\(L_\infty\)</span> norms. The following will investigate these norms, along with some Python implementations of the calculation of the matrix norm.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script> </div><!-- /.entry-content -->
+
+                                <div class="medium primary btn">
+                                    <a href="https://aaronschlegel.me/matrix-norms-inequalities-python.html" rel="bookmark"
+                                       title="Permalink to Matrix Norms and Inequalities with Python">
+                                        Read more <i class="icon-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                                <div class="row tag-row">
+                                        <span>Tagged as : </span>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/linear-algebra.html">Linear Algebra</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/python.html">Python</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/mathematics.html">mathematics</a>
+                                </div>
+
+                        </article></li>
+                        <li><article class="hentry">
+                                <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/vector-norms-inequalities-python.html" rel="bookmark" title="Permalink to Vector Norms and Inequalities with Python">Vector Norms and Inequalities with Python</a></h2> </header>
+                                <!-- /.post-info -->
+                                <div class="entry-content"> <p>Similar to the real line concerning two real scalars and the distance between them, vector norms allow us to get a sense of the distance or magnitude of a vector. In fact, a vector of length one is simply a scalar. Norms are often used in regularization methods and other machine learning procedures, as well as many different matrix and vector operations in linear algebra.</p> </div><!-- /.entry-content -->
+
+                                <div class="medium primary btn">
+                                    <a href="https://aaronschlegel.me/vector-norms-inequalities-python.html" rel="bookmark"
+                                       title="Permalink to Vector Norms and Inequalities with Python">
+                                        Read more <i class="icon-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                                <div class="row tag-row">
+                                        <span>Tagged as : </span>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/linear-algebra.html">Linear Algebra</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/python.html">Python</a>
+                                            <a class="danger label" href="https://aaronschlegel.me/tag/mathematics.html">mathematics</a>
+                                </div>
+
+                        </article></li>
                         <li><article class="hentry">
                                 <header> <h2 class="entry-title"><a href="https://aaronschlegel.me/quadratic-discriminant-analysis-several-groups.html" rel="bookmark" title="Permalink to Quadratic Discriminant Analysis of Several Groups">Quadratic Discriminant Analysis of Several Groups</a></h2> </header>
                                 <!-- /.post-info -->
@@ -778,6 +873,12 @@
 
     <ul class="blank">
             <li>
+              <a href="https://aaronschlegel.me/matrix-norms-inequalities-python.html">Matrix Norms and Inequalities with Python</a>
+            </li>
+            <li>
+              <a href="https://aaronschlegel.me/vector-norms-inequalities-python.html">Vector Norms and Inequalities with Python</a>
+            </li>
+            <li>
               <a href="https://aaronschlegel.me/games-howell-post-hoc-multiple-comparisons-test-python.html">Games-Howell Post-Hoc Multiple Comparisons Test with Python</a>
             </li>
             <li>
@@ -788,12 +889,6 @@
             </li>
             <li>
               <a href="https://aaronschlegel.me/van-der-waerdens-normal-scores-test.html">Van der Waerden's Normal Scores Test</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/generalized-black-scholes-formula-european-options.html">The Generalized Black-Scholes Formula for European Options</a>
-            </li>
-            <li>
-              <a href="https://aaronschlegel.me/get-all-nasa-astronomy-pictures-day-2019.html">Get All NASA Astronomy Pictures of the Day from 2019</a>
             </li>
     </ul>
 
